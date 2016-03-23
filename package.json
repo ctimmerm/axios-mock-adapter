@@ -1,11 +1,14 @@
 {
   "name": "axios-mock-adapter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Axios adapter that allows to easily mock requests",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
+  "files": [
+    "index.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ctimmerm/axios-mock-adapter.git"
