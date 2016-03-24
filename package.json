@@ -4,7 +4,8 @@
   "description": "Axios adapter that allows to easily mock requests",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint index.js test"
   },
   "files": [
     "index.js"
@@ -30,6 +31,7 @@
   "devDependencies": {
     "axios": "^0.9.1",
     "chai": "^3.5.0",
+    "eslint": "2.2.0",
     "mocha": "^2.4.5"
   }
 }

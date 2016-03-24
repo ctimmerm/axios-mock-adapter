@@ -86,7 +86,7 @@ describe('MockAdapter', function() {
 
     instance.get('/foooooooooo')
       .then(function() {
-        done()
+        done();
       });
   });
 
