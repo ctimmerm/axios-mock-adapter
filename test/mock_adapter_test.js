@@ -114,6 +114,18 @@ describe('MockAdapter', function() {
       });
   });
 
+  it('works when using baseURL', function(done) {
+    instance.defaults.baseURL = 'http://www.example.org';
+
+    mock.onGet('http://www.example.org/foo').reply(200);
+
+    instance.get('/foo')
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+  });
+
   context('on the default instance', function() {
     afterEach(function() {
       axios.defaults.adapter = undefined;
