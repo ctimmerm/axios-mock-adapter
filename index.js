@@ -18,7 +18,8 @@ function adapter() {
       var response = (handler[1] instanceof Function)
         ? handler[1](config)
         : handler.slice(1);
-      resolve({
+	  ((response[0] === 1223) || (response[0] >= 200 && response[0] < 300 ) ? resolve : reject) 
+      ({
         status: response[0],
         data: response[1],
         headers: response[2],
