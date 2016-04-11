@@ -56,4 +56,10 @@ verbs.forEach(function(method) {
   };
 });
 
-module.exports = MockAdapter;
+if (typeof define === 'function' && define.amd) {
+  define(MockAdapter);
+} else if (typeof exports === 'object') {
+  module.exports = MockAdapter;
+} else {
+  window.AxiosMockAdapter = MockAdapter;
+}
