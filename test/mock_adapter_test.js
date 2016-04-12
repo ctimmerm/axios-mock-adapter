@@ -127,17 +127,17 @@ describe('MockAdapter', function() {
   });
 
   it('rejects when the status is >= 300', function(done) {
-	mock.onGet('/moo').reply(500);
+    mock.onGet('/moo').reply(500);
 
-	instance.get('/moo')
+    instance.get('/moo')
       .then(
-	    function(response) {
-	    },
-	    function(response) {
+        function(response) {
+        },
+        function(response) {
           expect(response.status).to.equal(500);
           done();
-	    }
-	  );
+        }
+      );
   });
 
   context('on the default instance', function() {
