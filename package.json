@@ -4,11 +4,16 @@
   "description": "Axios adapter that allows to easily mock requests",
   "main": "index.js",
   "scripts": {
+    "clean": "rimraf dist",
     "test": "mocha",
-    "lint": "eslint index.js test"
+    "lint": "eslint index.js test",
+    "build:umd": "webpack index.js dist/axios-mock-adapter.js",
+    "build:umd:min": "NODE_ENV=production webpack index.js dist/axios-mock-adapter.min.js",
+    "prepublish": "npm run clean && npm run build:umd && npm run build:umd:min"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -32,6 +37,8 @@
     "axios": "^0.9.1",
     "chai": "^3.5.0",
     "eslint": "^2.6.0",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "rimraf": "^2.5.2",
+    "webpack": "^1.12.15"
   }
 }
