@@ -44,6 +44,18 @@ function MockAdapter(axiosInstance) {
 
 MockAdapter.prototype.adapter = adapter;
 
+MockAdapter.prototype.onAny = function(matcher) {
+  var _this = this;
+  return {
+    reply: function reply(code, response, headers) {
+      var handler = [matcher, code, response, headers];
+      verbs.forEach(function(verb) {
+        _this.matchers[verb].push(handler);
+      });
+    }
+  };
+};
+
 verbs.forEach(function(method) {
   var methodName = 'on' + method.charAt(0).toUpperCase() + method.slice(1);
   MockAdapter.prototype[methodName] = function(matcher) {

@@ -25,6 +25,15 @@ describe('MockAdapter', function() {
     expect(mock.onPatch).to.be.a('function');
   });
 
+  it('registers the mock handlers on the mock instance', function() {
+    mock.onGet('/foo').reply(200, { foo: 'bar' }, { baz: 'quux' });
+
+    expect(mock.matchers['get'][0][0]).to.equal('/foo');
+    expect(mock.matchers['get'][0][1]).to.equal(200);
+    expect(mock.matchers['get'][0][2].foo).to.equal('bar');
+    expect(mock.matchers['get'][0][3].baz).to.equal('quux');
+  });
+
   it('mocks requests', function(done) {
     mock.onGet('/foo').reply(200, {
       foo: 'bar'
@@ -126,18 +135,22 @@ describe('MockAdapter', function() {
       });
   });
 
+  it('returns a 404 when no matching url is found', function(done) {
+    instance.get('/foo')
+      .catch(function(response) {
+        expect(response.status).to.equal(404);
+        done();
+      });
+  });
+
   it('rejects when the status is >= 300', function(done) {
     mock.onGet('/moo').reply(500);
 
     instance.get('/moo')
-      .then(
-        function(response) {
-        },
-        function(response) {
-          expect(response.status).to.equal(500);
-          done();
-        }
-      );
+      .catch(function(response) {
+        expect(response.status).to.equal(500);
+        done();
+      });
   });
 
   context('on the default instance', function() {
@@ -153,6 +166,28 @@ describe('MockAdapter', function() {
       axios.get('/foo')
         .then(function(response) {
           expect(response.status).to.equal(200);
+          done();
+        });
+    });
+  });
+
+  context('.onAny', function() {
+    it('registers a handler for every HTTP method', function() {
+      mock.onAny('/foo').reply(200);
+
+      expect(mock.matchers['get']).not.to.be.empty;
+      expect(mock.matchers['patch']).not.to.be.empty;
+      expect(mock.matchers['put']).not.to.be.empty;
+    });
+
+    it('mocks any request with a matching url', function(done) {
+      mock.onAny('/foo').reply(200);
+
+      instance.head('/foo')
+        .then(function() {
+          return instance.patch('/foo');
+        })
+        .then(function() {
           done();
         });
     });

@@ -25,6 +25,8 @@ var mock = new MockAdapter(axios);
 //   var mock = new MockAdapter();
 //   axios.defaults.adapter = mock.adapter();
 
+// Mock any GET request to /users
+// arguments for reply are (status, data, headers)
 mock.onGet('/users').reply(200, {
   users: [
     { id: 1, name: 'John Smith' }
@@ -35,6 +37,9 @@ axios.get('/users')
   .then(function(response) {
     console.log(response.data);
   });
+
+// If a request is made for a URL that is not handled in the mock adapter,
+// the promise will reject with a response that has status 404.
 ```
 
 Passing a function to `reply`
@@ -62,28 +67,27 @@ mock.onGet(/\/users\/\d+/).reply(function(config) {
 });
 ```
 
-### API
+Mocking any request to a given url
 
-**mock.onGet(url)**
+```js
+// mocks GET, POST, ... requests to /foo
+mock.onAny('/foo').reply(200);
+```
 
-**mock.onHead(url)**
+`.onAny` can be useful when you want to test for a specific order of requests
 
-**mock.onPost(url)**
+```js
+// Expected order of requests:
+const responses = [
+  ['GET',  '/foo', 200, { foo: 'bar' }],
+  ['POST', '/bar', 200],
+  ['PUT',  '/baz', 200]
+];
 
-**mock.onPut(url)**
-
-**mock.onPatch(url)**
-
-**mock.onDelete(url)**
-
-`url` can either be a string or a regex.
-
-#### Sending a reply
-
-**reply(status, data, headers)**
-
-Or you can pass a function that returns an array in the shape of:
-[status, data, headers]
-
-**reply(function)**
-
+mock.onAny(/.*/).reply(config => {
+  const [method, url, ...response] = responses.shift();
+  if (config.url === url && config.method.toUpperCase() === method) return response;
+  // Unexpected request, error out
+  return [500, {}];
+});
+```
