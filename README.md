@@ -11,6 +11,31 @@ Using npm:
 
 `$ npm install axios-mock-adapter`
 
+## Usage
+
+### Node.js require
+```js
+var axios = require('axios'),
+MockAdapter = require('axios-mock-adapter');
+
+axios.defaults.adapter = new MockAdapter().adapter();
+
+```
+
+### AMD
+```js
+define(['axios', 'axios-mock-adapter'], function(axios, MockAdapter) {
+
+  axios.defaults.adapter = new MockAdapter().adapter();
+
+});
+```
+
+### Browser globals
+```js
+axios.defaults.adapter = new AxiosMockAdapter().adapter();
+```
+
 ## Example
 
 Mocking a `GET` request
