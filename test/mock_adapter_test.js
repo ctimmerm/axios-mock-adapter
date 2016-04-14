@@ -153,6 +153,16 @@ describe('MockAdapter', function() {
       });
   });
 
+  it('restores the previous adapter (if any)', function() {
+    var adapter = function() {};
+    var newInstance = axios.create();
+    newInstance.defaults.adapter = adapter;
+    var newMock = new MockAdapter(newInstance);
+    newMock.restore();
+
+    expect(newInstance.defaults.adapter).to.equal(adapter);
+  });
+
   context('on the default instance', function() {
     afterEach(function() {
       axios.defaults.adapter = undefined;

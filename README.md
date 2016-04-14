@@ -21,9 +21,6 @@ var MockAdapter = require('axios-mock-adapter');
 
 // This sets the mock adapter on the default instance
 var mock = new MockAdapter(axios);
-// which is the same as:
-//   var mock = new MockAdapter();
-//   axios.defaults.adapter = mock.adapter();
 
 // Mock any GET request to /users
 // arguments for reply are (status, data, headers)
@@ -40,6 +37,12 @@ axios.get('/users')
 
 // If a request is made for a URL that is not handled in the mock adapter,
 // the promise will reject with a response that has status 404.
+```
+
+You can restore the original adapter (which will remove the mocking behavior)
+
+```js
+mock.restore();
 ```
 
 Passing a function to `reply`

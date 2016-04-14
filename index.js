@@ -38,6 +38,8 @@ function MockAdapter(axiosInstance) {
   }, {});
 
   if (axiosInstance) {
+    this.axiosInstance = axiosInstance;
+    this.originalAdapter = axiosInstance.defaults.adapter;
     axiosInstance.defaults.adapter = adapter.call(this);
   }
 }
@@ -54,6 +56,12 @@ MockAdapter.prototype.onAny = function(matcher) {
       });
     }
   };
+};
+
+MockAdapter.prototype.restore = function() {
+  if (this.axiosInstance) {
+    this.axiosInstance.defaults.adapter = this.originalAdapter;
+  }
 };
 
 verbs.forEach(function(method) {
