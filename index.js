@@ -54,6 +54,7 @@ MockAdapter.prototype.onAny = function(matcher) {
       verbs.forEach(function(verb) {
         _this.matchers[verb].push(handler);
       });
+      return _this;
     }
   };
 };
@@ -71,6 +72,7 @@ verbs.forEach(function(method) {
     return {
       reply: function reply(code, response, headers) {
         _this.matchers[method].push([matcher, code, response, headers]);
+        return _this;
       }
     };
   };

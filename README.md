@@ -70,6 +70,14 @@ mock.onGet(/\/users\/\d+/).reply(function(config) {
 });
 ```
 
+Chaining is also supported
+
+```js
+mock
+  .onGet('/users').reply(200, users)
+  .onGet('/posts').reply(200, posts);
+```
+
 Mocking any request to a given url
 
 ```js

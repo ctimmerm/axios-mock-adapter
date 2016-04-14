@@ -163,6 +163,16 @@ describe('MockAdapter', function() {
     expect(newInstance.defaults.adapter).to.equal(adapter);
   });
 
+  it('can chain calls to add mock handlers', function() {
+    mock
+      .onGet('/foo').reply(200)
+      .onAny('/bar').reply(404)
+      .onPost('/baz').reply(500);
+
+    expect(mock.matchers['get']).to.not.be.empty;
+    expect(mock.matchers['post']).to.not.be.empty;
+  });
+
   context('on the default instance', function() {
     afterEach(function() {
       axios.defaults.adapter = undefined;
