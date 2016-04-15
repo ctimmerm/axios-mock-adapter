@@ -45,6 +45,15 @@ You can restore the original adapter (which will remove the mocking behavior)
 mock.restore();
 ```
 
+You can also reset the registered mock handlers with `reset`
+
+```js
+mock.reset();
+```
+
+`reset` is different from `restore` in that `restore` removes the mocking from the axios instance completely,
+whereas `reset` only removes all mock handlers that were added with onGet, onPost, etc. but leaves the mocking in place.
+
 Passing a function to `reply`
 
 ```js

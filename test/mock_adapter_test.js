@@ -163,6 +163,18 @@ describe('MockAdapter', function() {
     expect(newInstance.defaults.adapter).to.equal(adapter);
   });
 
+  it('resets the registered mock handlers', function(done) {
+    mock.onGet('/foo').reply(500);
+    mock.reset();
+    mock.onGet('/foo').reply(200);
+
+    instance.get('/foo')
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+  });
+
   it('can chain calls to add mock handlers', function() {
     mock
       .onGet('/foo').reply(200)

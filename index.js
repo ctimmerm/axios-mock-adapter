@@ -31,11 +31,15 @@ function adapter() {
   }.bind(this);
 }
 
-function MockAdapter(axiosInstance) {
+function reset() {
   this.matchers = verbs.reduce(function(previousValue, currentValue) {
     previousValue[currentValue] = [];
     return previousValue;
   }, {});
+}
+
+function MockAdapter(axiosInstance) {
+  reset.call(this);
 
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
@@ -64,6 +68,8 @@ MockAdapter.prototype.restore = function() {
     this.axiosInstance.defaults.adapter = this.originalAdapter;
   }
 };
+
+MockAdapter.prototype.reset = reset;
 
 verbs.forEach(function(method) {
   var methodName = 'on' + method.charAt(0).toUpperCase() + method.slice(1);
