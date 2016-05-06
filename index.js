@@ -10,6 +10,13 @@ function findHandler(matchers, method, url) {
   });
 }
 
+function delayAdapterResponse(responder, response, delay){
+  console.log('chamou com delay de: ', delay)
+  setTimeout(function(){
+    responder(response)
+  }, delay)
+}
+
 function adapter() {
   return function(resolve, reject, config) {
     var handler = findHandler(this.matchers, config.method, config.url);
@@ -18,15 +25,21 @@ function adapter() {
       var response = (handler[1] instanceof Function)
         ? handler[1](config)
         : handler.slice(1);
-      ((response[0] === 1223) || (response[0] >= 200 && response[0] < 300 ) ? resolve : reject)
-      ({
+      var responder = (response[0] === 1223)
+        || (response[0] >= 200 && response[0] < 300)
+        ? resolve
+        : reject;
+      delayAdapterResponse(responder, {
         status: response[0],
         data: response[1],
         headers: response[2],
         config: config
-      });
+      }, this.delayResponseBy)
     } else {
-      reject({ status: 404, config: config });
+      delayAdapterResponse(reject, {
+        status: 404,
+        config: config
+      }, this.delayResponseBy);
     }
   }.bind(this);
 }
@@ -38,12 +51,14 @@ function reset() {
   }, {});
 }
 
-function MockAdapter(axiosInstance) {
+function MockAdapter(axiosInstance, delayResponseBy) {
   reset.call(this);
 
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
+    console.log(delayResponseBy);
+    this.delayResponseBy = delayResponseBy > 0 ? delayResponseBy : 0;
     axiosInstance.defaults.adapter = adapter.call(this);
   }
 }
