@@ -10,11 +10,10 @@ function findHandler(matchers, method, url) {
   });
 }
 
-function delayAdapterResponse(responder, response, delay){
-  console.log('chamou com delay de: ', delay)
-  setTimeout(function(){
-    responder(response)
-  }, delay)
+function delayAdapterResponse(responder, response, delay) {
+  setTimeout(function() {
+    responder(response);
+  }, delay);
 }
 
 function adapter() {
@@ -34,7 +33,7 @@ function adapter() {
         data: response[1],
         headers: response[2],
         config: config
-      }, this.delayResponseBy)
+      }, this.delayResponseBy);
     } else {
       delayAdapterResponse(reject, {
         status: 404,
