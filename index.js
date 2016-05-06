@@ -57,7 +57,6 @@ function MockAdapter(axiosInstance, delayResponseBy) {
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
-    console.log(delayResponseBy);
     this.delayResponseBy = delayResponseBy > 0 ? delayResponseBy : 0;
     axiosInstance.defaults.adapter = adapter.call(this);
   }
