@@ -201,6 +201,21 @@ describe('MockAdapter', function() {
           done();
         });
     });
+
+    it('mocks requests on the default instance when method CAPS', function(done) {
+      var defaultMock = new MockAdapter(axios);
+
+      defaultMock.onGet('/foo').reply(200);
+
+      axios({
+        method: 'GET',
+        url: '/foo'
+      })
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+          done();
+        });
+    });
   });
 
   context('.onAny', function() {

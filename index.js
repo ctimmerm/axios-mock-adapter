@@ -1,7 +1,7 @@
 var verbs = ['get', 'post', 'head', 'delete', 'patch', 'put'];
 
 function findHandler(matchers, method, url) {
-  return matchers[method].find(function(matcher) {
+  return matchers[method.toLowerCase()].find(function(matcher) {
     if (typeof matcher[0] === 'string') {
       return url === matcher[0];
     } else if (matcher[0] instanceof RegExp) {
