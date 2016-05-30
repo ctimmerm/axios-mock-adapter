@@ -11,6 +11,13 @@ Using npm:
 
 `$ npm install axios-mock-adapter`
 
+It's also available as a UMD build:
+
+* https://npmcdn.com/axios-mock-adapter/dist/axios-mock-adapter.js
+* https://npmcdn.com/axios-mock-adapter/dist/axios-mock-adapter.min.js
+
+axios-mock-adapter works on Node as well as in a browser.
+
 ## Example
 
 Mocking a `GET` request
@@ -85,6 +92,16 @@ Chaining is also supported
 mock
   .onGet('/users').reply(200, users)
   .onGet('/posts').reply(200, posts);
+```
+
+`.replyOnce()` can be used to let the mock only reply once
+
+```js
+mock
+  .onGet('/users').replyOnce(200, users) // After the first request to /users, this handler is removed
+  .onGet('/users').replyOnce(500);       // The second request to /users will have status code 500
+                                         // Any following request would return a 404 since there are
+                                         // no matching handlers
 ```
 
 Mocking any request to a given url
