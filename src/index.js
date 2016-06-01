@@ -6,7 +6,8 @@ var verbs = ['get', 'post', 'head', 'delete', 'patch', 'put'];
 
 function adapter() {
   return function(resolve, reject, config) {
-    var handler = utils.findHandler(this.handlers, config.method, config.url);
+    var url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+    var handler = utils.findHandler(this.handlers, config.method, url);
 
     if (handler) {
       utils.purgeIfReplyOnce(this, handler);
