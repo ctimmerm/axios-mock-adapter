@@ -50,7 +50,7 @@ To add a delay to responses, specify a delay ammount (in milliseconds) when inst
 
 ```js
 // All requests using this instance will have a 2 seconds delay:
-var mock = new MockAdapter(axiosInstance, 2000);
+var mock = new MockAdapter(axiosInstance, {delayResponse: 2000});
 ```
 
 You can restore the original adapter (which will remove the mocking behavior)
