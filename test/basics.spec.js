@@ -1,9 +1,9 @@
 var axios = require('axios');
 var expect = require('chai').expect;
 
-var MockAdapter = require('..');
+var MockAdapter = require('../src');
 
-describe('MockAdapter', function() {
+describe('MockAdapter basics', function() {
   var instance;
   var mock;
 
@@ -28,10 +28,10 @@ describe('MockAdapter', function() {
   it('registers the mock handlers on the mock instance', function() {
     mock.onGet('/foo').reply(200, { foo: 'bar' }, { baz: 'quux' });
 
-    expect(mock.matchers['get'][0][0]).to.equal('/foo');
-    expect(mock.matchers['get'][0][1]).to.equal(200);
-    expect(mock.matchers['get'][0][2].foo).to.equal('bar');
-    expect(mock.matchers['get'][0][3].baz).to.equal('quux');
+    expect(mock.handlers['get'][0][0]).to.equal('/foo');
+    expect(mock.handlers['get'][0][1]).to.equal(200);
+    expect(mock.handlers['get'][0][2].foo).to.equal('bar');
+    expect(mock.handlers['get'][0][3].baz).to.equal('quux');
   });
 
   it('mocks requests', function(done) {
@@ -135,6 +135,18 @@ describe('MockAdapter', function() {
       });
   });
 
+  it('allows multiple consecutive requests for the mocked url', function(done) {
+    mock.onGet('/foo').reply(200);
+
+    instance.get('/foo')
+      .then(function() {
+        return instance.get('/foo');
+      })
+      .then(function() {
+        done();
+      });
+  });
+
   it('returns a 404 when no matching url is found', function(done) {
     instance.get('/foo')
       .catch(function(response) {
@@ -153,6 +165,42 @@ describe('MockAdapter', function() {
       });
   });
 
+  it('supports providing a validateStatus function', function(done) {
+    instance.defaults.validateStatus = function() {
+      return true;
+    };
+    mock.onGet('/foo').reply(500);
+
+    instance.get('/foo')
+      .then(function() {
+        done();
+      });
+  });
+
+  it('respects validatesStatus when requesting unhandled urls', function(done) {
+    instance.defaults.validateStatus = function() {
+      return true;
+    };
+
+    instance.get('/foo')
+      .then(function() {
+        done();
+      });
+  });
+
+  it('handles errors thrown as expected', function(done) {
+    mock.onGet('/foo').reply(function() {
+      throw new Error('bar');
+    });
+
+    instance.get('/foo')
+      .catch(function(response) {
+        expect(response).to.be.an.instanceof(Error);
+        expect(response.message).to.equal('bar');
+        done();
+      });
+  });
+
   it('restores the previous adapter (if any)', function() {
     var adapter = function() {};
     var newInstance = axios.create();
@@ -163,16 +211,12 @@ describe('MockAdapter', function() {
     expect(newInstance.defaults.adapter).to.equal(adapter);
   });
 
-  it('resets the registered mock handlers', function(done) {
-    mock.onGet('/foo').reply(500);
-    mock.reset();
+  it('resets the registered mock handlers', function() {
     mock.onGet('/foo').reply(200);
+    expect(mock.handlers['get']).not.to.be.empty;
 
-    instance.get('/foo')
-      .then(function(response) {
-        expect(response.status).to.equal(200);
-        done();
-      });
+    mock.reset();
+    expect(mock.handlers['get']).to.be.empty;
   });
 
   it('can chain calls to add mock handlers', function() {
@@ -181,47 +225,8 @@ describe('MockAdapter', function() {
       .onAny('/bar').reply(404)
       .onPost('/baz').reply(500);
 
-    expect(mock.matchers['get']).to.not.be.empty;
-    expect(mock.matchers['post']).to.not.be.empty;
-  });
-
-  context('on the default instance', function() {
-    afterEach(function() {
-      axios.defaults.adapter = undefined;
-    });
-
-    it('mocks requests on the default instance', function(done) {
-      var defaultMock = new MockAdapter(axios);
-
-      defaultMock.onGet('/foo').reply(200);
-
-      axios.get('/foo')
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          done();
-        });
-    });
-  });
-
-  context('.onAny', function() {
-    it('registers a handler for every HTTP method', function() {
-      mock.onAny('/foo').reply(200);
-
-      expect(mock.matchers['get']).not.to.be.empty;
-      expect(mock.matchers['patch']).not.to.be.empty;
-      expect(mock.matchers['put']).not.to.be.empty;
-    });
-
-    it('mocks any request with a matching url', function(done) {
-      mock.onAny('/foo').reply(200);
-
-      instance.head('/foo')
-        .then(function() {
-          return instance.patch('/foo');
-        })
-        .then(function() {
-          done();
-        });
-    });
+    expect(mock.handlers['get'].length).to.equal(2);
+    expect(mock.handlers['patch'].length).to.equal(1);
+    expect(mock.handlers['post'].length).to.equal(2);
   });
 });
