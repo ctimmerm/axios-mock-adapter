@@ -126,7 +126,7 @@ describe('MockAdapter basics', function() {
   it('works when using baseURL', function(done) {
     instance.defaults.baseURL = 'http://www.example.org';
 
-    mock.onGet('http://www.example.org/foo').reply(200);
+    mock.onGet('/foo').reply(200);
 
     instance.get('/foo')
       .then(function(response) {
