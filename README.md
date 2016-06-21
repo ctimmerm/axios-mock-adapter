@@ -46,6 +46,13 @@ axios.get('/users')
 // the promise will reject with a response that has status 404.
 ```
 
+To add a delay to responses, specify a delay ammount (in milliseconds) when instantiating the adapter
+
+```js
+// All requests using this instance will have a 2 seconds delay:
+var mock = new MockAdapter(axiosInstance, {delayResponse: 2000});
+```
+
 You can restore the original adapter (which will remove the mocking behavior)
 
 ```js
