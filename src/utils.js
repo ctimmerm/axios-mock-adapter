@@ -33,8 +33,7 @@ function purgeIfReplyOnce(mock, handler) {
 }
 
 function settle(resolve, reject, response, delay) {
-
-  if(delay > 0){
+  if (delay > 0) {
     setTimeout(function() {
       settle(resolve, reject, response);
     }, delay);
@@ -55,7 +54,6 @@ function settle(resolve, reject, response, delay) {
     reject(response);
   }
 }
-
 
 module.exports = {
   findHandler: findHandler,
