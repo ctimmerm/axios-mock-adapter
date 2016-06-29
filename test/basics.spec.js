@@ -229,4 +229,16 @@ describe('MockAdapter basics', function() {
     expect(mock.handlers['patch'].length).to.equal(1);
     expect(mock.handlers['post'].length).to.equal(2);
   });
+
+  it('allows to delay responses', function(done) {
+    mock = new MockAdapter(instance, { delayResponse: 1 });
+
+    mock.onGet('/foo').reply(200);
+
+    instance.get('/foo')
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+  });
 });

@@ -22,7 +22,10 @@ function adapter() {
         config: config
       }, this.delayResponse);
     } else {
-      utils.settle(resolve, reject, { status: 404, config: config }, this.delayResponse);
+      utils.settle(resolve, reject, {
+        status: 404,
+        config: config
+      }, this.delayResponse);
     }
   }.bind(this);
 }
@@ -41,7 +44,9 @@ function MockAdapter(axiosInstance, options) {
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
-    this.delayResponse = options && options.delayResponse > 0 ? options.delayResponse : null;
+    this.delayResponse = options && options.delayResponse > 0
+      ? options.delayResponse
+      : null;
     axiosInstance.defaults.adapter = adapter.call(this);
   }
 }
