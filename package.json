@@ -33,8 +33,11 @@
     "url": "https://github.com/ctimmerm/axios-mock-adapter/issues"
   },
   "homepage": "https://github.com/ctimmerm/axios-mock-adapter#readme",
+  "peerDependencies": {
+    "axios": ">= 0.13.0"
+  },
   "devDependencies": {
-    "axios": "^0.12.0",
+    "axios": "^0.13.0",
     "chai": "^3.5.0",
     "eslint": "^2.13.1",
     "mocha": "^2.4.5",
