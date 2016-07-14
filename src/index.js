@@ -5,28 +5,30 @@ var utils = require('./utils');
 var verbs = ['get', 'post', 'head', 'delete', 'patch', 'put'];
 
 function adapter() {
-  return function(resolve, reject, config) {
-    var url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
-    var handler = utils.findHandler(this.handlers, config.method, url);
+  return function(config) {
+    return new Promise(function(resolve, reject) {
+      var url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+      var handler = utils.findHandler(this.handlers, config.method, url);
 
-    if (handler) {
-      utils.purgeIfReplyOnce(this, handler);
-      var response = handler[1] instanceof Function
-        ? handler[1](config)
-        : handler.slice(1);
+      if (handler) {
+        utils.purgeIfReplyOnce(this, handler);
+        var response = handler[1] instanceof Function
+          ? handler[1](config)
+          : handler.slice(1);
 
-      utils.settle(resolve, reject, {
-        status: response[0],
-        data: response[1],
-        headers: response[2],
-        config: config
-      }, this.delayResponse);
-    } else {
-      utils.settle(resolve, reject, {
-        status: 404,
-        config: config
-      }, this.delayResponse);
-    }
+        utils.settle(resolve, reject, {
+          status: response[0],
+          data: response[1],
+          headers: response[2],
+          config: config
+        }, this.delayResponse);
+      } else {
+        utils.settle(resolve, reject, {
+          status: 404,
+          config: config
+        }, this.delayResponse);
+      }
+    }.bind(this));
   }.bind(this);
 }
 
