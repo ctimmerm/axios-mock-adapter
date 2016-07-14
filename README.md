@@ -9,7 +9,7 @@ Axios adapter that allows to easily mock requests
 
 Using npm:
 
-`$ npm install axios-mock-adapter`
+`$ npm install axios-mock-adapter --save-dev`
 
 It's also available as a UMD build:
 

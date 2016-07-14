@@ -39,7 +39,7 @@
   "devDependencies": {
     "axios": "^0.13.0",
     "chai": "^3.5.0",
-    "eslint": "^2.13.1",
+    "eslint": "^3.0.1",
     "mocha": "^2.4.5",
     "rimraf": "^2.5.2",
     "webpack": "^1.12.15"
