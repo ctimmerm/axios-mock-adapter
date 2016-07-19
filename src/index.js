@@ -8,7 +8,7 @@ function adapter() {
   return function(config) {
     return new Promise(function(resolve, reject) {
       var url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
-      var handler = utils.findHandler(this.handlers, config.method, url);
+      var handler = utils.findHandler(this.handlers, config.method, url, config.data);
 
       if (handler) {
         utils.purgeIfReplyOnce(this, handler);
@@ -63,11 +63,11 @@ MockAdapter.prototype.restore = function restore() {
 
 MockAdapter.prototype.reset = reset;
 
-MockAdapter.prototype.onAny = function onAny(matcher) {
+MockAdapter.prototype.onAny = function onAny(matcher, body) {
   var _this = this;
   return {
     reply: function reply(code, response, headers) {
-      var handler = [matcher, code, response, headers];
+      var handler = [matcher, code, response, headers, body];
       verbs.forEach(function(verb) {
         _this.handlers[verb].push(handler);
       });
@@ -75,7 +75,7 @@ MockAdapter.prototype.onAny = function onAny(matcher) {
     },
 
     replyOnce: function replyOnce(code, response, headers) {
-      var handler = [matcher, code, response, headers];
+      var handler = [matcher, code, response, headers, body];
       _this.replyOnceHandlers.push(handler);
       verbs.forEach(function(verb) {
         _this.handlers[verb].push(handler);
@@ -87,17 +87,17 @@ MockAdapter.prototype.onAny = function onAny(matcher) {
 
 verbs.forEach(function(method) {
   var methodName = 'on' + method.charAt(0).toUpperCase() + method.slice(1);
-  MockAdapter.prototype[methodName] = function(matcher) {
+  MockAdapter.prototype[methodName] = function(matcher, body) {
     var _this = this;
     return {
       reply: function reply(code, response, headers) {
-        var handler = [matcher, code, response, headers];
+        var handler = [matcher, code, response, headers, body];
         _this.handlers[method].push(handler);
         return _this;
       },
 
       replyOnce: function replyOnce(code, response, headers) {
-        var handler = [matcher, code, response, headers];
+        var handler = [matcher, code, response, headers, body];
         _this.handlers[method].push(handler);
         _this.replyOnceHandlers.push(handler);
         return _this;

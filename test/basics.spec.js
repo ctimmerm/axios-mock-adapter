@@ -34,6 +34,19 @@ describe('MockAdapter basics', function() {
     expect(mock.handlers['get'][0][3].baz).to.equal('quux');
   });
 
+  it('registers the mock handlers with body on the mock instance', function() {
+    var body = { foo: 'bar' };
+    var response = { foo: 'bar' };
+    var headers = { baz: 'quux' };
+    mock.onGet('/foo', body).reply(200, response, headers);
+
+    expect(mock.handlers['get'][0][0]).to.equal('/foo');
+    expect(mock.handlers['get'][0][1]).to.equal(200);
+    expect(mock.handlers['get'][0][2]).to.eql(response);
+    expect(mock.handlers['get'][0][3]).to.equal(headers);
+    expect(mock.handlers['get'][0][4]).to.eql(body);
+  });
+
   it('mocks requests', function(done) {
     mock.onGet('/foo').reply(200, {
       foo: 'bar'
@@ -97,6 +110,44 @@ describe('MockAdapter basics', function() {
       .then(function() {
         done();
       });
+  });
+
+  it('can pass a body to match to a handler', function(done) {
+    var body = { body: { is: 'passed' }, in: true };
+    mock.onPost('/withBody', body).reply(200);
+
+    instance.post('/withBody', body).then(function(response) {
+      expect(response.status).to.equal(200);
+      done();
+    });
+  });
+
+  it('does not match when body is wrong', function(done) {
+    var body = { body: { is: 'passed' }, in: true };
+    mock.onPatch('/wrongObjBody', body).reply(200);
+
+    instance.patch('/wrongObjBody', { wrong: 'body' }).catch(function(response) {
+      expect(response.status).to.equal(404);
+      done();
+    });
+  });
+
+  it('does not match when string body is wrong', function(done) {
+    mock.onPatch('/wrongStrBody', 'foo').reply(200);
+
+    instance.patch('/wrongStrBody', 'bar').catch(function(response) {
+      expect(response.status).to.equal(404);
+      done();
+    });
+  });
+
+  it('does match with string body', function(done) {
+    mock.onPatch(/^\/strBody$/, 'foo').reply(200);
+
+    instance.patch('/strBody', 'foo').then(function(response) {
+      expect(response.status).to.equal(200);
+      done();
+    });
   });
 
   it('passes the config to the callback', function(done) {
