@@ -135,3 +135,10 @@ mock.onAny(/.*/).reply(config => {
   return [500, {}];
 });
 ```
+
+Mocking a request with a specific request body
+
+```js
+// usable with reply, replyOnce, onAny, onPatch, onPost, onPost ...
+mock.onPut('/withBody', { request: 'body' }).reply(200);
+```

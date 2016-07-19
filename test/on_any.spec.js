@@ -32,6 +32,19 @@ describe('MockAdapter onAny', function() {
       });
   });
 
+  it('mocks any request with a matching url and body', function(done) {
+    var body = [{ object: { with: { deep: 'property' } }, array: ['1', 'abc'] }, 'a'];
+    mock.onAny('/anyWithBody', body).reply(200);
+
+    instance.put('/anyWithBody', body)
+      .then(function() {
+        return instance.post('/anyWithBody', body);
+      })
+      .then(function() {
+        done();
+      });
+  });
+
   it('removes all handlers after replying with replyOnce', function(done) {
     mock.onAny('/foo').replyOnce(200);
 

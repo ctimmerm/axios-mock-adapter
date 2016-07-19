@@ -8,14 +8,19 @@ function find(array, predicate) {
   }
 }
 
-function findHandler(handlers, method, url) {
+function findHandler(handlers, method, url, body) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return url === handler[0];
+      return url === handler[0] && isBodyMatching(body, handler[4]);
     } else if (handler[0] instanceof RegExp) {
-      return handler[0].test(url);
+      return handler[0].test(url) && isBodyMatching(body, handler[4]);
     }
   });
+}
+
+function isBodyMatching(body, requiredBody) {
+  return requiredBody === undefined
+    || (typeof body === 'string' && body === requiredBody || body === JSON.stringify(requiredBody));
 }
 
 function purgeIfReplyOnce(mock, handler) {

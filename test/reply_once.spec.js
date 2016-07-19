@@ -66,4 +66,21 @@ describe('MockAdapter replyOnce', function() {
         done();
       });
   });
+
+  it('replies only once when using request body matching', function(done) {
+    var called = false;
+    var body = 'abc';
+    mock.onPost('/onceWithBody', body).replyOnce(200);
+
+    instance.post('/onceWithBody', body)
+      .then(function() {
+        called = true;
+        return instance.post('/onceWithBody', body);
+      })
+      .catch(function(response) {
+        expect(called).to.be.true;
+        expect(response.status).to.equal(404);
+        done();
+      });
+  });
 });
