@@ -44,9 +44,9 @@ describe('MockAdapter replyOnce', function() {
         called = true;
         return instance.get('/foo');
       })
-      .catch(function(response) {
+      .catch(function(error) {
         expect(called).to.be.true;
-        expect(response.status).to.equal(404);
+        expect(error.response.status).to.equal(404);
         done();
       });
   });
@@ -60,9 +60,9 @@ describe('MockAdapter replyOnce', function() {
         called = true;
         return instance.post('/foo');
       })
-      .catch(function(response) {
+      .catch(function(error) {
         expect(called).to.be.true;
-        expect(response.status).to.equal(404);
+        expect(error.response.status).to.equal(404);
         done();
       });
   });
@@ -77,9 +77,9 @@ describe('MockAdapter replyOnce', function() {
         called = true;
         return instance.post('/onceWithBody', body);
       })
-      .catch(function(response) {
+      .catch(function(error) {
         expect(called).to.be.true;
-        expect(response.status).to.equal(404);
+        expect(error.response.status).to.equal(404);
         done();
       });
   });

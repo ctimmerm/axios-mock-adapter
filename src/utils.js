@@ -1,6 +1,10 @@
 'use strict';
 var eql = require('deep-eql');
 
+var axios = require('axios');
+// < 0.13.0 will not have default headers set on a custom instance
+var rejectWithError = !!axios.create().defaults.headers;
+
 function find(array, predicate) {
   var length = array.length;
   for (var i = 0; i < length; i++) {
@@ -55,7 +59,11 @@ function settle(resolve, reject, response, delay) {
   if (response.config && response.config.validateStatus) {
     response.config.validateStatus(response.status)
       ? resolve(response)
-      : reject(response);
+      : reject(createErrorResponse(
+        'Request failed with status code ' + response.status,
+        response.config,
+        response
+      ));
     return;
   }
 
@@ -65,6 +73,16 @@ function settle(resolve, reject, response, delay) {
   } else {
     reject(response);
   }
+}
+
+function createErrorResponse(message, config, response) {
+  // Support for axios < 0.13.0
+  if (!rejectWithError) return response;
+
+  var error = new Error(message);
+  error.config = config;
+  error.response = response;
+  return error;
 }
 
 module.exports = {

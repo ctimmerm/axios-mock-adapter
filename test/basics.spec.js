@@ -116,38 +116,42 @@ describe('MockAdapter basics', function() {
     var body = { body: { is: 'passed' }, in: true };
     mock.onPost('/withBody', body).reply(200);
 
-    instance.post('/withBody', body).then(function(response) {
-      expect(response.status).to.equal(200);
-      done();
-    });
+    instance.post('/withBody', body)
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+        done();
+      });
   });
 
   it('does not match when body is wrong', function(done) {
     var body = { body: { is: 'passed' }, in: true };
     mock.onPatch('/wrongObjBody', body).reply(200);
 
-    instance.patch('/wrongObjBody', { wrong: 'body' }).catch(function(response) {
-      expect(response.status).to.equal(404);
-      done();
-    });
+    instance.patch('/wrongObjBody', { wrong: 'body' })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+        done();
+      });
   });
 
   it('does not match when string body is wrong', function(done) {
     mock.onPatch('/wrongStrBody', 'foo').reply(200);
 
-    instance.patch('/wrongStrBody', 'bar').catch(function(response) {
-      expect(response.status).to.equal(404);
-      done();
-    });
+    instance.patch('/wrongStrBody', 'bar')
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+        done();
+      });
   });
 
   it('does match with string body', function(done) {
     mock.onPatch(/^\/strBody$/, 'foo').reply(200);
 
-    instance.patch('/strBody', 'foo').then(function(response) {
-      expect(response.status).to.equal(200);
-      done();
-    });
+    instance.patch('/strBody', 'foo')
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+        done();
+      });
   });
 
   it('passes the config to the callback', function(done) {
@@ -200,8 +204,8 @@ describe('MockAdapter basics', function() {
 
   it('returns a 404 when no matching url is found', function(done) {
     instance.get('/foo')
-      .catch(function(response) {
-        expect(response.status).to.equal(404);
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
         done();
       });
   });
@@ -210,8 +214,19 @@ describe('MockAdapter basics', function() {
     mock.onGet('/moo').reply(500);
 
     instance.get('/moo')
-      .catch(function(response) {
-        expect(response.status).to.equal(500);
+      .catch(function(error) {
+        expect(error.response.status).to.equal(500);
+        done();
+      });
+  });
+
+  it('rejects the promise with an error when the status is >= 300', function(done) {
+    mock.onGet('/foo').reply(500);
+
+    instance.get('/foo')
+      .catch(function(error) {
+        expect(error).to.be.an.instanceof(Error);
+        expect(error.message).to.match(/request failed/i);
         done();
       });
   });
@@ -245,9 +260,9 @@ describe('MockAdapter basics', function() {
     });
 
     instance.get('/foo')
-      .catch(function(response) {
-        expect(response).to.be.an.instanceof(Error);
-        expect(response.message).to.equal('bar');
+      .catch(function(error) {
+        expect(error).to.be.an.instanceof(Error);
+        expect(error.message).to.equal('bar');
         done();
       });
   });
