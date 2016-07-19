@@ -20,16 +20,14 @@ function findHandler(handlers, method, url, body) {
 }
 
 function isBodyMatching(body, requiredBody) {
+  if (requiredBody === undefined) {
+    return true;
+  }
   var parsedBody;
-  var isJSON = true;
   try {
     parsedBody = JSON.parse(body);
-  } catch (error) {
-    isJSON = false;
-  }
-  return requiredBody === undefined
-    || (typeof body === 'string' && body === requiredBody || eql(body, requiredBody)
-    || (isJSON && eql(parsedBody, requiredBody)));
+  } catch (e) { }
+  return parsedBody ? eql(parsedBody, requiredBody) : eql(body, requiredBody);
 }
 
 function purgeIfReplyOnce(mock, handler) {
