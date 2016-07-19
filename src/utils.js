@@ -1,4 +1,5 @@
 'use strict';
+var eql = require('deep-eql');
 
 function find(array, predicate) {
   var length = array.length;
@@ -19,8 +20,16 @@ function findHandler(handlers, method, url, body) {
 }
 
 function isBodyMatching(body, requiredBody) {
+  var parsedBody;
+  var isJSON = true;
+  try {
+    parsedBody = JSON.parse(body);
+  } catch (error) {
+    isJSON = false;
+  }
   return requiredBody === undefined
-    || (typeof body === 'string' && body === requiredBody || body === JSON.stringify(requiredBody));
+    || (typeof body === 'string' && body === requiredBody || eql(body, requiredBody)
+    || (isJSON && eql(parsedBody, requiredBody)));
 }
 
 function purgeIfReplyOnce(mock, handler) {

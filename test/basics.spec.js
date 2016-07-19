@@ -122,7 +122,7 @@ describe('MockAdapter basics', function() {
     });
   });
 
-  it('does not match when its wrong body', function(done) {
+  it('does not match when body is wrong', function(done) {
     var body = { body: { is: 'passed' }, in: true };
     mock.onPatch('/wrongObjBody', body).reply(200);
 
@@ -132,11 +132,20 @@ describe('MockAdapter basics', function() {
     });
   });
 
-  it('does not match when its wrong body with string body', function(done) {
+  it('does not match when string body is wrong', function(done) {
     mock.onPatch('/wrongStrBody', 'foo').reply(200);
 
     instance.patch('/wrongStrBody', 'bar').catch(function(response) {
       expect(response.status).to.equal(404);
+      done();
+    });
+  });
+
+  it('does match with string body', function(done) {
+    mock.onPatch(/^\/strBody$/, 'foo').reply(200);
+
+    instance.patch('/strBody', 'foo').then(function(response) {
+      expect(response.status).to.equal(200);
       done();
     });
   });
