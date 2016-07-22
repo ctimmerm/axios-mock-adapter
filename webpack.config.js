@@ -5,6 +5,9 @@ var config = {
     library: 'AxiosMockAdapter',
     libraryTarget: 'umd'
   },
+  externals: {
+    axios: 'axios'
+  },
   plugins: []
 };
 
