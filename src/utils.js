@@ -1,7 +1,12 @@
 'use strict';
-var eql = require('deep-eql');
 
 var axios = require('axios');
+var deepEqual = require('deep-equal');
+
+function eql(a, b) {
+  return deepEqual(a, b, { strict: true });
+}
+
 // < 0.13.0 will not have default headers set on a custom instance
 var rejectWithError = !!axios.create().defaults.headers;
 
