@@ -22,24 +22,23 @@ describe('MockAdapter replyOnce', function() {
     expect(mock.handlers['post'].length).to.equal(2);
   });
 
-  it('replies as normally on the first call', function(done) {
+  it('replies as normally on the first call', function() {
     mock.onGet('/foo').replyOnce(200, {
       foo: 'bar'
     });
 
-    instance.get('/foo')
+    return instance.get('/foo')
       .then(function(response) {
         expect(response.status).to.equal(200);
         expect(response.data.foo).to.equal('bar');
-        done();
       });
   });
 
-  it('replies only once', function(done) {
+  it('replies only once', function() {
     var called = false;
     mock.onGet('/foo').replyOnce(200);
 
-    instance.get('/foo')
+    return instance.get('/foo')
       .then(function() {
         called = true;
         return instance.get('/foo');
@@ -47,15 +46,14 @@ describe('MockAdapter replyOnce', function() {
       .catch(function(error) {
         expect(called).to.be.true;
         expect(error.response.status).to.equal(404);
-        done();
       });
   });
 
-  it('replies only once when used with onAny', function(done) {
+  it('replies only once when used with onAny', function() {
     var called = false;
     mock.onAny('/foo').replyOnce(200);
 
-    instance.get('/foo')
+    return instance.get('/foo')
       .then(function() {
         called = true;
         return instance.post('/foo');
@@ -63,16 +61,15 @@ describe('MockAdapter replyOnce', function() {
       .catch(function(error) {
         expect(called).to.be.true;
         expect(error.response.status).to.equal(404);
-        done();
       });
   });
 
-  it('replies only once when using request body matching', function(done) {
+  it('replies only once when using request body matching', function() {
     var called = false;
     var body = 'abc';
     mock.onPost('/onceWithBody', body).replyOnce(200);
 
-    instance.post('/onceWithBody', body)
+    return instance.post('/onceWithBody', body)
       .then(function() {
         called = true;
         return instance.post('/onceWithBody', body);
@@ -80,7 +77,6 @@ describe('MockAdapter replyOnce', function() {
       .catch(function(error) {
         expect(called).to.be.true;
         expect(error.response.status).to.equal(404);
-        done();
       });
   });
 });

@@ -20,39 +20,38 @@ describe('MockAdapter onAny', function() {
     expect(mock.handlers['put']).not.to.be.empty;
   });
 
-  it('mocks any request with a matching url', function(done) {
+  it('mocks any request with a matching url', function() {
     mock.onAny('/foo').reply(200);
 
-    instance.head('/foo')
+    return instance.head('/foo')
       .then(function() {
         return instance.patch('/foo');
       })
-      .then(function() {
-        done();
+      .then(function(response) {
+        expect(response.status).to.equal(200);
       });
   });
 
-  it('mocks any request with a matching url and body', function(done) {
+  it('mocks any request with a matching url and body', function() {
     var body = [{ object: { with: { deep: 'property' } }, array: ['1', 'abc'] }, 'a'];
     mock.onAny('/anyWithBody', body).reply(200);
 
-    instance.put('/anyWithBody', body)
+    return instance.put('/anyWithBody', body)
       .then(function() {
         return instance.post('/anyWithBody', body);
       })
-      .then(function() {
-        done();
+      .then(function(response) {
+        expect(response.status).to.equal(200);
       });
   });
 
-  it('removes all handlers after replying with replyOnce', function(done) {
+  it('removes all handlers after replying with replyOnce', function() {
     mock.onAny('/foo').replyOnce(200);
 
-    instance.get('/foo')
+    return instance.get('/foo')
       .then(function() {
         expect(mock.handlers['get']).to.be.empty;
         expect(mock.handlers['post']).to.be.empty;
-        done();
       });
   });
 });

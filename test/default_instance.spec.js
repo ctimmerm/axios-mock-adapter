@@ -14,13 +14,12 @@ describe('MockAdapter on default axios instance', function() {
     mock.restore();
   });
 
-  it('mocks requests on the default instance', function(done) {
+  it('mocks requests on the default instance', function() {
     mock.onGet('/foo').reply(200);
 
-    axios.get('/foo')
+    return axios.get('/foo')
       .then(function(response) {
         expect(response.status).to.equal(200);
-        done();
       });
   });
 });
