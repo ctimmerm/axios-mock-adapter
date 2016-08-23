@@ -110,10 +110,11 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass a body to match to a handler', function() {
-    var body = { body: { is: 'passed' }, in: true };
-    mock.onPost('/withBody', body).reply(200);
+    mock
+      .onPost('/withBody', { body: { is: 'passed' }, in: true })
+      .reply(200);
 
-    return instance.post('/withBody', body)
+    return instance.post('/withBody', { body: { is: 'passed' }, in: true })
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
