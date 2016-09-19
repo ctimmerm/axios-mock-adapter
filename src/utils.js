@@ -3,7 +3,7 @@
 var axios = require('axios');
 var deepEqual = require('deep-equal');
 
-function eql(a, b) {
+function isEqual(a, b) {
   return deepEqual(a, b, { strict: true });
 }
 
@@ -36,7 +36,7 @@ function isBodyMatching(body, requiredBody) {
   try {
     parsedBody = JSON.parse(body);
   } catch (e) { }
-  return parsedBody ? eql(parsedBody, requiredBody) : eql(body, requiredBody);
+  return parsedBody ? isEqual(parsedBody, requiredBody) : isEqual(body, requiredBody);
 }
 
 function purgeIfReplyOnce(mock, handler) {

@@ -108,7 +108,7 @@ mock
   .onGet('/users').replyOnce(200, users) // After the first request to /users, this handler is removed
   .onGet('/users').replyOnce(500);       // The second request to /users will have status code 500
                                          // Any following request would return a 404 since there are
-                                         // no matching handlers
+                                         // no matching handlers left
 ```
 
 Mocking any request to a given url
@@ -139,6 +139,5 @@ mock.onAny(/.*/).reply(config => {
 Mocking a request with a specific request body/data
 
 ```js
-// usable with reply, replyOnce, onAny, onPatch, onPost, onPut ...
-mock.onPut('/withBody', { request: 'body' }).reply(200);
+mock.onPut('/product', { id: 4, name: 'foo' }).reply(204);
 ```
