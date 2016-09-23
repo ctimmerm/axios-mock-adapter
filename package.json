@@ -8,7 +8,7 @@
     "test": "mocha",
     "lint": "eslint src test",
     "build:umd": "webpack src/index.js dist/axios-mock-adapter.js",
-    "build:umd:min": "set NODE_ENV=production&& webpack src/index.js dist/axios-mock-adapter.min.js",
+    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/axios-mock-adapter.min.js",
     "prepublish": "npm run clean && npm run build:umd && npm run build:umd:min"
   },
   "files": [
@@ -39,6 +39,7 @@
   "devDependencies": {
     "axios": "^0.14.0",
     "chai": "^3.5.0",
+    "cross-env": "^2.0.1",
     "eslint": "^3.5.0",
     "mocha": "^3.0.2",
     "rimraf": "^2.5.2",
