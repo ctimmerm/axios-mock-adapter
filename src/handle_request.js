@@ -1,26 +1,59 @@
 var utils = require('./utils');
 
+function makeResponse(result, config) {
+  return {
+    status: result[0],
+    data: result[1],
+    headers: result[2],
+    config: config
+  };
+}
+
 function handleRequest(resolve, reject, config) {
-  var url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
-  var handler = utils.findHandler(this.handlers, config.method, url, config.data);
+  config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+  config.adapter = null;
+
+  var handler = utils.findHandler(this.handlers, config.method, config.url, config.data);
+  var _this = this;
 
   if (handler) {
     utils.purgeIfReplyOnce(this, handler);
-    var response = handler[1] instanceof Function
-      ? handler[1](config)
-      : handler.slice(1);
 
-    utils.settle(resolve, reject, {
-      status: response[0],
-      data: response[1],
-      headers: response[2],
-      config: config
-    }, this.delayResponse);
-  } else {
-    utils.settle(resolve, reject, {
-      status: 404,
-      config: config
-    }, this.delayResponse);
+    if (!(handler[1] instanceof Function)) {
+      utils.settle(resolve, reject, makeResponse(handler.slice(1), config), this.delayResponse);
+    } else {
+      var result = handler[1](config);
+      if (!(result.then instanceof Function)) {
+        utils.settle(resolve, reject, makeResponse(result, config), this.delayResponse);
+      } else {
+        result.then(
+          function(result) {
+            utils.settle(resolve, reject, makeResponse(result, config), _this.delayResponse);
+          },
+          function(error) {
+            if (_this.delayResponse > 0) {
+              setTimeout(function() {
+                reject(error);
+              }, _this.delayResponse);
+            } else {
+              reject(error);
+            }
+          }
+        );
+      }
+    }
+  } else { // handler not found
+    if (!this.passThrough) {
+      utils.settle(resolve, reject, {
+        status: 404,
+        config: config
+      }, this.delayResponse);
+    } else {
+      this
+        .axiosInstance
+        .request(config)
+        .then(resolve, reject);
+    }
   }
 }
 

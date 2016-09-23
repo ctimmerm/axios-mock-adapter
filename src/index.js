@@ -35,6 +35,7 @@ function MockAdapter(axiosInstance, options) {
     this.delayResponse = options && options.delayResponse > 0
       ? options.delayResponse
       : null;
+    this.passThrough = options && options.passThrough;
     axiosInstance.defaults.adapter = adapter.call(this);
   }
 }

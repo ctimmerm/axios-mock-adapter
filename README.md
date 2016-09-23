@@ -41,17 +41,28 @@ axios.get('/users')
   .then(function(response) {
     console.log(response.data);
   });
-
-// If a request is made for a URL that is not handled in the mock adapter,
-// the promise will reject with a response that has status 404.
 ```
 
-To add a delay to responses, specify a delay ammount (in milliseconds) when instantiating the adapter
+To add a delay to responses, specify a delay amount (in milliseconds) when instantiating the adapter
 
 ```js
 // All requests using this instance will have a 2 seconds delay:
 var mock = new MockAdapter(axiosInstance, { delayResponse: 2000 });
 ```
+
+By default, requests that do not map to a mock handler will be automatically rejected with
+a response that has status 404. To instead forward unmocked requests over network specify
+`passThrough`:
+
+```js
+var mock = new MockAdapter(axios, { passThrough: true });
+
+mock.onGet('/foo').reply(200, 'foo');
+axios.get('/foo').then(function(response) { console.log(response.data); }); // => 'foo'
+axios.get('/bar').then(/*...*/); // => HTTP GET /bar ...
+```
+
+Note that `passThrough` requests are not subject to delaying by `delayResponse`.
 
 You can restore the original adapter (which will remove the mocking behavior)
 
@@ -140,4 +151,46 @@ Mocking a request with a specific request body/data
 
 ```js
 mock.onPut('/product', { id: 4, name: 'foo' }).reply(204);
+```
+
+As of 1.7.0, `reply` function may return a Promise:
+
+```js
+mock.onGet('/product').reply(function(config) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      if (Math.random() > 0.1) {
+        resolve([200, { id: 4, name: 'foo' } ]);
+      } else {
+        // reject() reason will be passed as-is.
+        // Use HTTP error status code to simulate server failure.
+        resolve([500, { success: false } ]);
+      }
+    }, 1000);
+  });
+});
+```
+
+Composing from multiple sources with Promises:
+
+```js
+var normalAxios = axios.create();
+var mockAxios = axios.create();
+var mock = MockAdapter(mockAxios);
+
+mock
+  .onGet('/orders')
+  .reply(() => Promise.all([
+      normalAxios
+        .get('/api/v1/orders')
+        .then(resp => resp.data),
+      normalAxios
+        .get('/api/v2/orders')
+        .then(resp => resp.data),
+      { id: '-1', content: 'extra row 1' },
+      { id: '-2', content: 'extra row 2' }
+    ]).then(
+      sources => [200, sources.reduce((agg, source) => agg.concat(source))]
+    )
+  );
 ```
