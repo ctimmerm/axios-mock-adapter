@@ -8,7 +8,7 @@
     "test": "mocha",
     "lint": "eslint src test",
     "build:umd": "webpack src/index.js dist/axios-mock-adapter.js",
-    "build:umd:min": "NODE_ENV=production webpack src/index.js dist/axios-mock-adapter.min.js",
+    "build:umd:min": "set NODE_ENV=production&& webpack src/index.js dist/axios-mock-adapter.min.js",
     "prepublish": "npm run clean && npm run build:umd && npm run build:umd:min"
   },
   "files": [
