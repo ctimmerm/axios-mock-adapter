@@ -2,24 +2,25 @@
 
 var handleRequest = require('./handle_request');
 
-var verbs = ['get', 'post', 'head', 'delete', 'patch', 'put'];
+var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put'];
 
 function adapter() {
   return function(config) {
+    var mockAdapter = this;
     // axios >= 0.13.0 only passes the config and expects a promise to be
     // returned. axios < 0.13.0 passes (config, resolve, reject).
     if (arguments.length === 3) {
-      handleRequest.call(this, arguments[0], arguments[1], arguments[2]);
+      handleRequest(mockAdapter, arguments[0], arguments[1], arguments[2]);
     } else {
       return new Promise(function(resolve, reject) {
-        handleRequest.call(this, resolve, reject, config);
-      }.bind(this));
+        handleRequest(mockAdapter, resolve, reject, config);
+      });
     }
   }.bind(this);
 }
 
 function reset() {
-  this.handlers = verbs.reduce(function(accumulator, verb) {
+  this.handlers = VERBS.reduce(function(accumulator, verb) {
     accumulator[verb] = [];
     return accumulator;
   }, {});
@@ -50,47 +51,35 @@ MockAdapter.prototype.restore = function restore() {
 
 MockAdapter.prototype.reset = reset;
 
-MockAdapter.prototype.onAny = function onAny(matcher, body) {
-  var _this = this;
-  return {
-    reply: function reply(code, response, headers) {
-      var handler = [matcher, code, response, headers, body];
-      verbs.forEach(function(verb) {
-        _this.handlers[verb].push(handler);
-      });
-      return _this;
-    },
-
-    replyOnce: function replyOnce(code, response, headers) {
-      var handler = [matcher, code, response, headers, body];
-      _this.replyOnceHandlers.push(handler);
-      verbs.forEach(function(verb) {
-        _this.handlers[verb].push(handler);
-      });
-      return _this;
-    }
-  };
-};
-
-verbs.forEach(function(method) {
+VERBS.concat('any').forEach(function(method) {
   var methodName = 'on' + method.charAt(0).toUpperCase() + method.slice(1);
   MockAdapter.prototype[methodName] = function(matcher, body) {
     var _this = this;
     return {
       reply: function reply(code, response, headers) {
         var handler = [matcher, code, response, headers, body];
-        _this.handlers[method].push(handler);
+        addHandler(method, _this.handlers, handler);
         return _this;
       },
 
       replyOnce: function replyOnce(code, response, headers) {
         var handler = [matcher, code, response, headers, body];
-        _this.handlers[method].push(handler);
+        addHandler(method, _this.handlers, handler);
         _this.replyOnceHandlers.push(handler);
         return _this;
       }
     };
   };
 });
+
+function addHandler(method, handlers, handler) {
+  if (method === 'any') {
+    VERBS.forEach(function(verb) {
+      handlers[verb].push(handler);
+    });
+  } else {
+    handlers[method].push(handler);
+  }
+}
 
 module.exports = MockAdapter;

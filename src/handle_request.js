@@ -9,32 +9,31 @@ function makeResponse(result, config) {
   };
 }
 
-function handleRequest(resolve, reject, config) {
+function handleRequest(mockAdapter, resolve, reject, config) {
   config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
   config.adapter = null;
 
-  var handler = utils.findHandler(this.handlers, config.method, config.url, config.data);
-  var _this = this;
+  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data);
 
   if (handler) {
-    utils.purgeIfReplyOnce(this, handler);
+    utils.purgeIfReplyOnce(mockAdapter, handler);
 
     if (!(handler[1] instanceof Function)) {
-      utils.settle(resolve, reject, makeResponse(handler.slice(1), config), this.delayResponse);
+      utils.settle(resolve, reject, makeResponse(handler.slice(1), config), mockAdapter.delayResponse);
     } else {
       var result = handler[1](config);
       if (!(result.then instanceof Function)) {
-        utils.settle(resolve, reject, makeResponse(result, config), this.delayResponse);
+        utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
       } else {
         result.then(
           function(result) {
-            utils.settle(resolve, reject, makeResponse(result, config), _this.delayResponse);
+            utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
           },
           function(error) {
-            if (_this.delayResponse > 0) {
+            if (mockAdapter.delayResponse > 0) {
               setTimeout(function() {
                 reject(error);
-              }, _this.delayResponse);
+              }, mockAdapter.delayResponse);
             } else {
               reject(error);
             }
@@ -43,13 +42,13 @@ function handleRequest(resolve, reject, config) {
       }
     }
   } else { // handler not found
-    if (!this.passThrough) {
+    if (!mockAdapter.passThrough) {
       utils.settle(resolve, reject, {
         status: 404,
         config: config
-      }, this.delayResponse);
+      }, mockAdapter.delayResponse);
     } else {
-      this
+      mockAdapter
         .axiosInstance
         .request(config)
         .then(resolve, reject);

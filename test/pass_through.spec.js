@@ -70,8 +70,8 @@ describe('MockAdapter(passThrough=true) tests (requires Node)', function() {
 
   it('handles errors correctly', function() {
     return instance.get('/error')
-      .then(function(response) {
-        expect(false).to.equal(true);
+      .then(function() {
+        throw new Error('ERROR');
       })
       .catch(function(error) {
         expect(error).to.have.deep.property('response.status', 500);
