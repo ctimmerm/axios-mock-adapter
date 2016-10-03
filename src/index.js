@@ -36,7 +36,6 @@ function MockAdapter(axiosInstance, options) {
     this.delayResponse = options && options.delayResponse > 0
       ? options.delayResponse
       : null;
-    this.passThrough = options && options.passThrough;
     axiosInstance.defaults.adapter = adapter.call(this);
   }
 }
@@ -55,17 +54,24 @@ VERBS.concat('any').forEach(function(method) {
   var methodName = 'on' + method.charAt(0).toUpperCase() + method.slice(1);
   MockAdapter.prototype[methodName] = function(matcher, body) {
     var _this = this;
+    var matcher = matcher === undefined ?  /.*/ : matcher;
     return {
       reply: function reply(code, response, headers) {
-        var handler = [matcher, code, response, headers, body];
+        var handler = [matcher, body, code, response, headers];
         addHandler(method, _this.handlers, handler);
         return _this;
       },
 
       replyOnce: function replyOnce(code, response, headers) {
-        var handler = [matcher, code, response, headers, body];
+        var handler = [matcher, body, code, response, headers];
         addHandler(method, _this.handlers, handler);
         _this.replyOnceHandlers.push(handler);
+        return _this;
+      },
+
+      passThrough: function passThrough() {
+        var handler = [matcher, body];
+        addHandler(method, _this.handlers, handler);
         return _this;
       }
     };

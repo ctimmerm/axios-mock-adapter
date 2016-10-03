@@ -50,20 +50,6 @@ To add a delay to responses, specify a delay amount (in milliseconds) when insta
 var mock = new MockAdapter(axiosInstance, { delayResponse: 2000 });
 ```
 
-By default, requests that do not map to a mock handler will be automatically rejected with
-a response that has status 404. To instead forward unmocked requests over network specify
-`passThrough`:
-
-```js
-var mock = new MockAdapter(axios, { passThrough: true });
-
-mock.onGet('/foo').reply(200, 'foo');
-axios.get('/foo').then(function(response) { console.log(response.data); }); // => 'foo'
-axios.get('/bar').then(/*...*/); // => HTTP GET /bar ...
-```
-
-Note that `passThrough` requests are not subject to delaying by `delayResponse`.
-
 You can restore the original adapter (which will remove the mocking behavior)
 
 ```js
@@ -104,6 +90,13 @@ mock.onGet(/\/users\/\d+/).reply(function(config) {
 });
 ```
 
+Specify no path to match by verb alone
+
+```js
+// Reject all POST requests with HTTP 500
+mock.onPost().reply(500);
+```
+
 Chaining is also supported
 
 ```js
@@ -139,7 +132,8 @@ const responses = [
   ['PUT',  '/baz', 200]
 ];
 
-mock.onAny(/.*/).reply(config => {
+// Match ALL requests
+mock.onAny().reply(config => {
   const [method, url, ...response] = responses.shift();
   if (config.url === url && config.method.toUpperCase() === method) return response;
   // Unexpected request, error out
@@ -147,11 +141,44 @@ mock.onAny(/.*/).reply(config => {
 });
 ```
 
+Requests that do not map to a mock handler are rejected with a HTTP 404 response. Since
+handlers are matched in order, a final `onAny()` can be used to change the default
+behaviour
+
+```js
+ // Mock GET requests to /foo, reject all others with HTTP 500
+mock
+  .onGet('/foo').reply(200)
+  .onAny().reply(500);
+```
+
 Mocking a request with a specific request body/data
 
 ```js
 mock.onPut('/product', { id: 4, name: 'foo' }).reply(204);
 ```
+
+`.passThrough()` forwards the matched request over network
+
+```js
+// Mock POST requests to /api with HTTP 201, but forward
+// GET requests to server
+mock
+  .onPost(/\/^api/).reply(201)
+  .onGet(/\/^api/).passThrough();
+```
+
+Recall that the order of handlers is significant
+
+```js
+// Mock specific requests, but let unmatched ones through
+mock
+  .onGet('/foo').reply(200)
+  .onPut('/bar', { xyz: 'abc' }).reply(204)
+  .onAny().passThrough();
+```
+
+Note that `passThrough` requests are not subject to delaying by `delayResponse`.
 
 As of 1.7.0, `reply` function may return a Promise:
 

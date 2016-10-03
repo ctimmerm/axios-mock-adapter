@@ -4,7 +4,7 @@ var createServer = require('http').createServer;
 
 var MockAdapter = require('../src');
 
-describe('MockAdapter(passThrough=true) tests (requires Node)', function() {
+describe('passThrough tests (requires Node)', function() {
   var instance;
   var mock;
   var httpServer;
@@ -22,8 +22,8 @@ describe('MockAdapter(passThrough=true) tests (requires Node)', function() {
           resp.end(req.url.slice(1), 'utf8');
         }
       })
-      .listen(0, 'localhost', function() {
-        serverUrl = 'http://localhost:' + httpServer.address().port;
+      .listen(0, '127.0.0.1', function() {
+        serverUrl = 'http://127.0.0.1:' + httpServer.address().port;
         resolve();
       })
       .on('error', reject);
@@ -32,22 +32,13 @@ describe('MockAdapter(passThrough=true) tests (requires Node)', function() {
 
   beforeEach(function() {
     instance = axios.create({ baseURL: serverUrl });
-    mock = new MockAdapter(instance, { passThrough: true });
-  });
-
-  it('allows normal mocking', function() {
-    mock.onGet('/foo').reply(200, 'bar');
-
-    return instance.get('/foo')
-      .then(function(response) {
-        expect(response.status).to.equal(200);
-        expect(response.data).to.equal('bar');
-      });
+    mock = new MockAdapter(instance);
   });
 
   it('allows selective mocking', function() {
     mock.onGet('/foo').reply(200, 'bar');
-    mock.onGet('/notFound').reply(200, 'found');
+    mock.onGet('/error').reply(200, 'success');
+    mock.onGet('/bar').passThrough();
 
     return Promise.all([
       instance.get('/foo')
@@ -55,20 +46,30 @@ describe('MockAdapter(passThrough=true) tests (requires Node)', function() {
           expect(response.status).to.equal(200);
           expect(response.data).to.equal('bar');
         }),
-      instance.get('/notFound')
+      instance.get('/error')
         .then(function(response) {
           expect(response.status).to.equal(200);
-          expect(response.data).to.equal('found');
+          expect(response.data).to.equal('success');
         }),
       instance.get('/bar')
         .then(function(response) {
           expect(response.status).to.equal(200);
           expect(response.data).to.equal('bar');
+        }),
+      instance.get('/noHandler')
+        .then(function(response) {
+          // Mock adapter should return an error
+          expect(true).to.equal(false);
+        })
+        .catch(function(error) {
+          expect(error).to.have.deep.property('response.status', 404);
         })
     ]);
   });
 
   it('handles errors correctly', function() {
+    mock.onGet('/error').passThrough();
+
     return instance.get('/error')
       .then(function() {
         // The server should've returned an error
@@ -77,5 +78,31 @@ describe('MockAdapter(passThrough=true) tests (requires Node)', function() {
       .catch(function(error) {
         expect(error).to.have.deep.property('response.status', 500);
       });
+  });
+
+  it('allows setting default passThrough handler', function() {
+    mock
+      .onGet('/foo').reply(200, 'bar')
+      .onAny().passThrough();
+
+    var randomPath = 'xyz' + Math.round(10000 * Math.random());
+
+    return Promise.all([
+      instance.get('/foo')
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+          expect(response.data).to.equal('bar');
+        }),
+      instance.get('/' + randomPath)
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+          expect(response.data).to.equal(randomPath);
+        }),
+      instance.post('/post')
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+          expect(response.data).to.equal('post');
+        })
+    ]);
   });
 });

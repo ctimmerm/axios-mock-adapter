@@ -21,9 +21,9 @@ function find(array, predicate) {
 function findHandler(handlers, method, url, body) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return url === handler[0] && isBodyMatching(body, handler[4]);
+      return url === handler[0] && isBodyMatching(body, handler[1]);
     } else if (handler[0] instanceof RegExp) {
-      return handler[0].test(url) && isBodyMatching(body, handler[4]);
+      return handler[0].test(url) && isBodyMatching(body, handler[1]);
     }
   });
 }

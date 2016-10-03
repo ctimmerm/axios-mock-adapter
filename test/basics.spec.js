@@ -25,28 +25,6 @@ describe('MockAdapter basics', function() {
     expect(mock.onPatch).to.be.a('function');
   });
 
-  it('registers the mock handlers on the mock instance', function() {
-    mock.onGet('/foo').reply(200, { foo: 'bar' }, { baz: 'quux' });
-
-    expect(mock.handlers['get'][0][0]).to.equal('/foo');
-    expect(mock.handlers['get'][0][1]).to.equal(200);
-    expect(mock.handlers['get'][0][2].foo).to.equal('bar');
-    expect(mock.handlers['get'][0][3].baz).to.equal('quux');
-  });
-
-  it('registers the mock handlers with body on the mock instance', function() {
-    var body = { foo: 'bar' };
-    var response = { foo: 'bar' };
-    var headers = { baz: 'quux' };
-    mock.onGet('/foo', body).reply(200, response, headers);
-
-    expect(mock.handlers['get'][0][0]).to.equal('/foo');
-    expect(mock.handlers['get'][0][1]).to.equal(200);
-    expect(mock.handlers['get'][0][2]).to.eql(response);
-    expect(mock.handlers['get'][0][3]).to.equal(headers);
-    expect(mock.handlers['get'][0][4]).to.eql(body);
-  });
-
   it('mocks requests', function() {
     mock.onGet('/foo').reply(200, {
       foo: 'bar'
@@ -292,5 +270,45 @@ describe('MockAdapter basics', function() {
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
+  });
+
+  it('maps empty GET path to any path', function() {
+    mock
+      .onGet('/foo').reply(200, 'foo')
+      .onGet().reply(200, 'bar');
+
+    return Promise.all([
+      instance.get('/foo').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('foo');
+      }),
+      instance.get('/bar').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('bar');
+      }),
+      instance
+        .get('/xyz' + Math.round(100000 * Math.random()))
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+          expect(response.data).to.equal('bar');
+        })
+    ]);
+  });
+
+  it('allows mocking all requests', function() {
+    mock.onAny().reply(200);
+
+    function anyResponseTester(response) {
+      expect(response.status).to.equal(200);
+    }
+
+    return Promise.all([
+      instance.get('/foo').then(anyResponseTester),
+      instance.post('/bar').then(anyResponseTester),
+      instance.put('/foobar').then(anyResponseTester),
+      instance.head('/barfoo').then(anyResponseTester),
+      instance.delete('/foo/bar').then(anyResponseTester),
+      instance.patch('/bar/foo').then(anyResponseTester)
+    ]);
   });
 });

@@ -18,10 +18,15 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   if (handler) {
     utils.purgeIfReplyOnce(mockAdapter, handler);
 
-    if (!(handler[1] instanceof Function)) {
-      utils.settle(resolve, reject, makeResponse(handler.slice(1), config), mockAdapter.delayResponse);
+    if (handler.length === 2) { // passThrough handler
+      mockAdapter
+        .axiosInstance
+        .request(config)
+        .then(resolve, reject);
+    } else if (!(handler[2] instanceof Function)) {
+      utils.settle(resolve, reject, makeResponse(handler.slice(2), config), mockAdapter.delayResponse);
     } else {
-      var result = handler[1](config);
+      var result = handler[2](config);
       if (!(result.then instanceof Function)) {
         utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
       } else {
@@ -42,17 +47,10 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       }
     }
   } else { // handler not found
-    if (!mockAdapter.passThrough) {
-      utils.settle(resolve, reject, {
-        status: 404,
-        config: config
-      }, mockAdapter.delayResponse);
-    } else {
-      mockAdapter
-        .axiosInstance
-        .request(config)
-        .then(resolve, reject);
-    }
+    utils.settle(resolve, reject, {
+      status: 404,
+      config: config
+    }, mockAdapter.delayResponse);
   }
 }
 
