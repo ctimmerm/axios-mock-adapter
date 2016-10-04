@@ -46,11 +46,10 @@ describe('MockAdapter basics', function() {
       foo: 'bar'
     });
 
-    instance.get('/foo')
+    return instance.get('/foo')
       .then(function(response) {
         expect(response.status).to.equal(200);
         expect(response.data.foo).to.equal('bar');
-        done();
       });
   });
 

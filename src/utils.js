@@ -91,6 +91,7 @@ function createErrorResponse(message, config, response) {
 }
 
 module.exports = {
+  find: find,
   findHandler: findHandler,
   purgeIfReplyOnce: purgeIfReplyOnce,
   settle: settle
