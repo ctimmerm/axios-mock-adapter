@@ -1,6 +1,6 @@
 {
   "name": "axios-mock-adapter",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Axios adapter that allows to easily mock requests",
   "main": "src/index.js",
   "scripts": {
@@ -38,12 +38,12 @@
     "axios": ">= 0.9.0"
   },
   "devDependencies": {
-    "axios": "^0.14.0",
+    "axios": "^0.15.0",
     "chai": "^3.5.0",
     "cross-env": "^3.0.0",
     "eslint": "^3.7.1",
     "istanbul": "^0.4.5",
-    "mocha": "^3.0.2",
+    "mocha": "^3.1.2",
     "rimraf": "^2.5.2",
     "webpack": "^1.13.2"
   },
