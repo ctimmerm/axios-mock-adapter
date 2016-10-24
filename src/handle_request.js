@@ -10,7 +10,9 @@ function makeResponse(result, config) {
 }
 
 function handleRequest(mockAdapter, resolve, reject, config) {
-  config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+  if (config.baseURL && config.url.substr(0, config.baseURL.length) === config.baseURL) {
+    config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+  }
   config.adapter = null;
 
   var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data);
@@ -27,6 +29,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       utils.settle(resolve, reject, makeResponse(handler.slice(2), config), mockAdapter.delayResponse);
     } else {
       var result = handler[2](config);
+      // TODO throw a sane exception when return value is incorrect
       if (!(result.then instanceof Function)) {
         utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
       } else {

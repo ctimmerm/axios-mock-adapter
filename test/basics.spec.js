@@ -158,6 +158,20 @@ describe('MockAdapter basics', function() {
       });
   });
 
+  it('allows using an absolute URL when a baseURL is set', function() {
+    instance.defaults.baseURL = 'http://www.example.org';
+
+    mock.onAny().reply(function(config) {
+      return [200, config.url];
+    });
+
+    return instance.get('http://www.foo.com/bar')
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('http://www.foo.com/bar');
+      });
+  });
+
   it('allows multiple consecutive requests for the mocked url', function() {
     mock.onGet('/foo').reply(200);
 
