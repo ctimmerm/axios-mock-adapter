@@ -206,7 +206,7 @@ describe('MockAdapter basics', function() {
     return instance.get('/foo')
       .catch(function(error) {
         expect(error).to.be.an.instanceof(Error);
-        expect(error.message).to.match(/request failed/i);
+        expect(error.message).to.match(/request GET \/foo failed/i);
       });
   });
 
