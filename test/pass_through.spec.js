@@ -22,11 +22,11 @@ describe('passThrough tests (requires Node)', function() {
           resp.end(req.url.slice(1), 'utf8');
         }
       })
-      .listen(0, '127.0.0.1', function() {
-        serverUrl = 'http://127.0.0.1:' + httpServer.address().port;
-        resolve();
-      })
-      .on('error', reject);
+        .listen(0, '127.0.0.1', function() {
+          serverUrl = 'http://127.0.0.1:' + httpServer.address().port;
+          resolve();
+        })
+        .on('error', reject);
     });
   });
 
