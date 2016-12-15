@@ -61,14 +61,12 @@ function settle(resolve, reject, response, delay) {
     return;
   }
 
-  var config = response.config;
-
-  if (config && config.validateStatus) {
-    config.validateStatus(response.status)
+  if (response.config && response.config.validateStatus) {
+    response.config.validateStatus(response.status)
       ? resolve(response)
       : reject(createErrorResponse(
-        'Request ' + config.method.toUpperCase() + ' ' + config.url + ' failed with status code ' + response.status,
-        config,
+        'Request failed with status code ' + response.status,
+        response.config,
         response
       ));
     return;
