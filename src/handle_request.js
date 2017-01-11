@@ -15,7 +15,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   }
   config.adapter = null;
 
-  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data);
+  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data, config.params);
 
   if (handler) {
     utils.purgeIfReplyOnce(mockAdapter, handler);
