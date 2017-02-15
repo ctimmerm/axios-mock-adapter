@@ -22,7 +22,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
 
     if (handler.length === 2) { // passThrough handler
       // tell axios to use the original adapter instead of our mock, fixes #35
-      config.adapter = config.originalAdapter;
+      config.adapter = mockAdapter.originalAdapter;
       mockAdapter
         .axiosInstance
         .request(config)

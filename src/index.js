@@ -12,8 +12,6 @@ function adapter() {
     if (arguments.length === 3) {
       handleRequest(mockAdapter, arguments[0], arguments[1], arguments[2]);
     } else {
-      // store axios originalAdapter in config object fix #35
-      config.originalAdapter = this.originalAdapter;
       return new Promise(function(resolve, reject) {
         handleRequest(mockAdapter, resolve, reject, config);
       });
