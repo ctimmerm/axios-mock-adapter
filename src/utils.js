@@ -18,14 +18,31 @@ function find(array, predicate) {
   }
 }
 
-function findHandler(handlers, method, url, body) {
+function findHandler(handlers, method, url, body, parameters) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return url === handler[0] && isBodyMatching(body, handler[1]);
+      return url === handler[0] && isBodyOrParametersMatching(method, body, parameters, handler[1]);
     } else if (handler[0] instanceof RegExp) {
-      return handler[0].test(url) && isBodyMatching(body, handler[1]);
+      return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]);
     }
   });
+}
+
+function isBodyOrParametersMatching(method, body, parameters, required) {
+  if (method === 'get') {
+    var params = required ? required.params : undefined;
+    return isParametersMatching(parameters, params);
+  } else {
+    return isBodyMatching(body, required);
+  }
+}
+
+function isParametersMatching(parameters, required) {
+  if (required === undefined && parameters === undefined) {
+    return true;
+  }
+
+  return isEqual(parameters, required);
 }
 
 function isBodyMatching(body, requiredBody) {
