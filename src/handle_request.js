@@ -15,12 +15,14 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   }
   config.adapter = null;
 
-  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data);
+  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data, config.params);
 
   if (handler) {
     utils.purgeIfReplyOnce(mockAdapter, handler);
 
     if (handler.length === 2) { // passThrough handler
+      // tell axios to use the original adapter instead of our mock, fixes #35
+      config.adapter = mockAdapter.originalAdapter;
       mockAdapter
         .axiosInstance
         .request(config)
