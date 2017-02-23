@@ -21,11 +21,17 @@ function find(array, predicate) {
 function findHandler(handlers, method, url, body, parameters) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return url === handler[0] && isBodyOrParametersMatching(method, body, parameters, handler[1]);
+      return isUrlMatching(url, handler[0]) && isBodyOrParametersMatching(method, body, parameters, handler[1]);
     } else if (handler[0] instanceof RegExp) {
       return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]);
     }
   });
+}
+
+function isUrlMatching(url, required) {
+  var noSlashUrl = url[0] === '/' ? url.substr(1) : url;
+  var noSlashRequired = required[0] === '/' ? required.substr(1) : required;
+  return (noSlashUrl === noSlashRequired);
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
