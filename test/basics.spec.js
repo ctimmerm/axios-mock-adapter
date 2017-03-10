@@ -110,7 +110,7 @@ describe('MockAdapter basics', function() {
 
   it('does not match when parameters are wrong', function() {
     mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
-    return instance.get('/withParams', { params: { foo: 'bar', bar: 'other' }, in: true })
+    return instance.get('/withParams', { params: { foo: 'bar', bar: 'other' } })
       .catch(function(error) {
         expect(error.response.status).to.equal(404);
       });
@@ -124,11 +124,11 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it('does not match when parameters were not expected', function() {
+  it('matches when parameters were not expected', function() {
     mock.onGet('/withParams').reply(200);
-    return instance.get('/withParams', { params: { foo: 'bar', bar: 'foo' }, in: true })
-      .catch(function(error) {
-        expect(error.response.status).to.equal(404);
+    return instance.get('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
       });
   });
 

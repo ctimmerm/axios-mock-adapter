@@ -44,9 +44,7 @@ function isBodyOrParametersMatching(method, body, parameters, required) {
 }
 
 function isParametersMatching(parameters, required) {
-  if (required === undefined && parameters === undefined) {
-    return true;
-  }
+  if (required === undefined) return true;
 
   return isEqual(parameters, required);
 }
