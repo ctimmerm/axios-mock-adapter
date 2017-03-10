@@ -95,6 +95,19 @@ describe('MockAdapter basics', function() {
       });
   });
 
+  it('can pass query params to match to a handler with uppercase method', function() {
+    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+
+    return instance({
+      method: 'GET',
+      url: '/withParams',
+      params: { foo: 'bar', bar: 'foo' }
+    })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
   it('does not match when parameters are wrong', function() {
     mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
     return instance.get('/withParams', { params: { foo: 'bar', bar: 'other' }, in: true })
