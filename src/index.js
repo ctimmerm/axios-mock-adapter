@@ -55,12 +55,13 @@ VERBS.concat('any').forEach(function(method) {
   MockAdapter.prototype[methodName] = function(matcher, body) {
     var _this = this;
     var matcher = matcher === undefined ?  /.*/ : matcher;
+    function reply(code, response, headers) {
+      var handler = [matcher, body, code, response, headers];
+      addHandler(method, _this.handlers, handler);
+      return _this;
+    }
     return {
-      reply: function reply(code, response, headers) {
-        var handler = [matcher, body, code, response, headers];
-        addHandler(method, _this.handlers, handler);
-        return _this;
-      },
+      reply: reply,
 
       replyOnce: function replyOnce(code, response, headers) {
         var handler = [matcher, body, code, response, headers];
@@ -73,7 +74,25 @@ VERBS.concat('any').forEach(function(method) {
         var handler = [matcher, body];
         addHandler(method, _this.handlers, handler);
         return _this;
+      },
+
+      networkError: function() {
+        reply(function(config) {
+          var error = new Error('Network Error');
+          error.config = config;
+          return Promise.reject(error);
+        });
+      },
+
+      timeout: function(timeout) {
+        reply(function(config) {
+          var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
+          error.config = config;
+          error.code = 'ECONNABORTED';
+          return Promise.reject(error);
+        });
       }
+
     };
   };
 });
