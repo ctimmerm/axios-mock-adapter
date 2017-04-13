@@ -88,6 +88,20 @@ mock.reset();
 `reset` is different from `restore` in that `restore` removes the mocking from the axios instance completely,
 whereas `reset` only removes all mock handlers that were added with onGet, onPost, etc. but leaves the mocking in place.
 
+Mock a low level network error
+
+```js
+// Returns a failed promise with Error('Network Error');
+mock.onGet('/users').networkError();
+```
+
+Mock a network timeout
+
+```js
+// Returns a failed promise with Error with code set to 'ECONNABORTED'
+mock.onGet('/users').timeout();
+```
+
 Passing a function to `reply`
 
 ```js
