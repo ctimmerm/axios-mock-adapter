@@ -84,7 +84,7 @@ VERBS.concat('any').forEach(function(method) {
         });
       },
 
-      timeout: function(timeout) {
+      timeout: function() {
         reply(function(config) {
           var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
           error.config = config;
