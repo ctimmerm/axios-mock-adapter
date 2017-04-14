@@ -3,7 +3,7 @@ var utils = require('./utils');
 function makeResponse(result, config) {
   return {
     status: result[0],
-    data: result[1],
+    data: utils.isObject(result[1]) ? JSON.parse(JSON.stringify(result[1])) : result[1],
     headers: result[2],
     config: config
   };

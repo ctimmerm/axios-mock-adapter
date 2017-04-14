@@ -111,9 +111,14 @@ function createErrorResponse(message, config, response) {
   return error;
 }
 
+function isObject(value) {
+  return value !== null && typeof value === 'object';
+}
+
 module.exports = {
   find: find,
   findHandler: findHandler,
+  isObject: isObject,
   purgeIfReplyOnce: purgeIfReplyOnce,
   settle: settle
 };
