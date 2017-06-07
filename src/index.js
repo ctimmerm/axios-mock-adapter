@@ -1,6 +1,7 @@
 'use strict';
 
 var handleRequest = require('./handle_request');
+var replyWithConfig = require('./reply_with_config');
 
 var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put'];
 
@@ -64,6 +65,8 @@ VERBS.concat('any').forEach(function(method) {
 
     return {
       reply: reply,
+
+      replyWithConfig: replyWithConfig(reply),
 
       replyOnce: function replyOnce(code, response, headers) {
         var handler = [matcher, body, code, response, headers];

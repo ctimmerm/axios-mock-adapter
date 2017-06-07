@@ -258,3 +258,27 @@ mock
     )
   );
 ```
+
+Mocking a `GET` request with timeout config
+
+```js
+mock.onGet('/users').replyWithConfig({
+      responses: {
+        success: [200, { users: [{ id: 1, name: 'John Smith' }] }]
+      },
+      delay: [50, 200] //delay between 50 and 200 ms
+    });
+```
+
+Mocking a `GET` request with timeout config and 30% error chance
+
+```js
+mock.onGet('/users').replyWithConfig({
+      responses: {
+        success: [200, { users: [{ id: 1, name: 'John Smith' }] }], //success response
+        error: [500, { message: 'error' }] //error response
+      },
+      delay: 50, //delay 50 ms
+      errorChance: .3 //chance of error, where 1 is 100% and 0 is 0%
+    });
+```
