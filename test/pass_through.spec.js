@@ -62,7 +62,7 @@ describe('passThrough tests (requires Node)', function() {
           expect(true).to.equal(false);
         })
         .catch(function(error) {
-          expect(error).to.have.deep.property('response.status', 404);
+          expect(error).to.have.nested.property('response.status', 404);
         })
     ]);
   });
@@ -76,7 +76,7 @@ describe('passThrough tests (requires Node)', function() {
         expect(false).to.equal(true);
       })
       .catch(function(error) {
-        expect(error).to.have.deep.property('response.status', 500);
+        expect(error).to.have.nested.property('response.status', 500);
       });
   });
 

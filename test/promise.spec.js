@@ -47,8 +47,8 @@ describe('MockAdapter reply with Promise', function() {
         expect(true).to.equal(false);
       })
       .catch(function(error) {
-        expect(error).to.have.deep.property('response.status', 400);
-        expect(error).to.have.deep.property('response.data.bad', 'request');
+        expect(error).to.have.nested.property('response.status', 400);
+        expect(error).to.have.nested.property('response.data.bad', 'request');
       });
   });
 

@@ -35,32 +35,30 @@ describe('trailing slash in axios baseUrl issue (requires Node)', function() {
     mock = new MockAdapter(instance);
   });
 
-  it('axios should handle trailing slash in baseUrl', function() { // passes
+  it('axios should handle trailing slash in baseUrl', function() {
+    // passes
     mock.onAny().passThrough();
     return Promise.all([
-      instance.get('/foo')
-      .then(function(response) {
+      instance.get('/foo').then(function(response) {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal('foo');
       }),
-      instance.get('foo')
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal('foo');
-        })
+      instance.get('foo').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('foo');
+      })
     ]);
   });
 
-  it('mock adapter should handle trailing slash in baseUrl', function() { // both fail: 404
+  it('mock adapter should handle trailing slash in baseUrl', function() {
+    // both fail: 404
     mock.onGet('/foo').reply(200, 'bar');
     return Promise.all([
-      instance.get('/foo')
-      .then(function(response) {
+      instance.get('/foo').then(function(response) {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal('bar');
       }),
-      instance.get('foo')
-      .then(function(response) {
+      instance.get('foo').then(function(response) {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal('bar');
       })
