@@ -59,7 +59,7 @@ describe('passThrough tests (requires Node)', function() {
       instance.get('/noHandler')
         .then(function(response) {
           // Mock adapter should return an error
-          expect(true).to.equal(false);
+          expect(true).to.be.false;
         })
         .catch(function(error) {
           expect(error).to.have.nested.property('response.status', 404);
@@ -73,7 +73,7 @@ describe('passThrough tests (requires Node)', function() {
     return instance.get('/error')
       .then(function() {
         // The server should've returned an error
-        expect(false).to.equal(true);
+        expect(false).to.be.true;
       })
       .catch(function(error) {
         expect(error).to.have.nested.property('response.status', 500);

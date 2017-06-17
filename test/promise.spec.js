@@ -28,7 +28,7 @@ describe('MockAdapter reply with Promise', function() {
         expect(response.data.bar).to.equal('fooPromised');
       })
       .catch(function() {
-        expect(true).to.equal(false);
+        expect(true).to.be.false;
       });
   });
 
@@ -44,7 +44,7 @@ describe('MockAdapter reply with Promise', function() {
     return instance
       .get('/bad/promise')
       .then(function(response) {
-        expect(true).to.equal(false);
+        expect(true).to.be.false;
       })
       .catch(function(error) {
         expect(error).to.have.nested.property('response.status', 400);
@@ -64,7 +64,7 @@ describe('MockAdapter reply with Promise', function() {
     return instance
       .get('/reject')
       .then(function(response) {
-        expect(true).to.equal(false);
+        expect(true).to.be.false;
       })
       .catch(function(error) {
         expect(error).to.deep.equal({ custom: 'error' });
