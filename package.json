@@ -39,13 +39,13 @@
   },
   "devDependencies": {
     "axios": "^0.16.2",
-    "chai": "^4.0.2",
-    "cross-env": "3.2.4",
-    "eslint": "^4.0.0",
+    "chai": "^4.1.0",
+    "cross-env": "^5.0.1",
+    "eslint": "^4.3.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2",
     "rimraf": "^2.6.1",
-    "webpack": "^2.6.1"
+    "webpack": "^3.3.0"
   },
   "dependencies": {
     "deep-equal": "^1.0.1"
