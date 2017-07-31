@@ -111,14 +111,14 @@ function createErrorResponse(message, config, response) {
   return error;
 }
 
-function isObject(value) {
-  return value !== null && typeof value === 'object';
+function isSimpleObject(value) {
+  return value !== null && value !== undefined && value.toString() === '[object Object]';
 }
 
 module.exports = {
   find: find,
   findHandler: findHandler,
-  isObject: isObject,
+  isSimpleObject: isSimpleObject,
   purgeIfReplyOnce: purgeIfReplyOnce,
   settle: settle
 };
