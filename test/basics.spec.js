@@ -376,6 +376,23 @@ describe('MockAdapter basics', function() {
     });
   });
 
+  it('allows sending an any object as response', function() {
+    var buffer = new ArrayBuffer(1);
+    var view = new Uint8Array(buffer);
+    view[0] = 0xFF;
+
+    mock.onGet('/').reply(200, buffer);
+
+    return instance({
+      url: '/',
+      method: 'GET',
+      responseType: 'arraybuffer'
+    }).then(function(response) {
+      var view = new Uint8Array(response.data);
+      expect(view[0]).to.equal(0xFF);
+    });
+  });
+
   it('returns a deep copy of the mock data in the response when the data is an object', function() {
     var data = {
       foo: {
