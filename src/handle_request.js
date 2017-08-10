@@ -17,7 +17,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   }
   config.adapter = null;
 
-  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data, config.params);
+  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data, config.params, config.headers);
 
   if (handler) {
     utils.purgeIfReplyOnce(mockAdapter, handler);
@@ -29,10 +29,10 @@ function handleRequest(mockAdapter, resolve, reject, config) {
         .axiosInstance
         .request(config)
         .then(resolve, reject);
-    } else if (!(handler[2] instanceof Function)) {
-      utils.settle(resolve, reject, makeResponse(handler.slice(2), config), mockAdapter.delayResponse);
+    } else if (!(handler[3] instanceof Function)) {
+      utils.settle(resolve, reject, makeResponse(handler.slice(3), config), mockAdapter.delayResponse);
     } else {
-      var result = handler[2](config);
+      var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
       if (!(result.then instanceof Function)) {
         utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
