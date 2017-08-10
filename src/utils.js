@@ -21,15 +21,9 @@ function find(array, predicate) {
 function findHandler(handlers, method, url, body, parameters, headers) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      if (handler[2]) {  // required headers are defined
-        return isUrlMatching(url, handler[0]) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
-      }
-      return isUrlMatching(url, handler[0]) && isBodyOrParametersMatching(method, body, parameters, handler[1]);
+      return isUrlMatching(url, handler[0]) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
     } else if (handler[0] instanceof RegExp) {
-      if (handler[2]) {  // required headers are defined
-        return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
-      }
-      return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]);
+      return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
     }
   });
 }
@@ -41,7 +35,8 @@ function isUrlMatching(url, required) {
 }
 
 function isRequestHeadersMatching(requestHeaders, required) {
-  return  isEqual(requestHeaders, required);
+  if (required === undefined) return true;
+  return isEqual(requestHeaders, required);
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
