@@ -14,6 +14,10 @@ namespace AllowsConstructingWithOptions {
   });
 }
 
+namespace ExposesAdapter {
+  mock.adapter();
+}
+
 namespace SupportsReset {
   mock.reset();
 }
@@ -45,6 +49,10 @@ namespace AllowsUrlMatcher {
 
 namespace AllowsUrlRegExpMatcher {
   mock.onGet(/\/fo+/);
+}
+
+namespace AllowsStringBodyMatcher {
+  mock.onPatch("/foo", "bar");
 }
 
 namespace AllowsBodyMatcher {
@@ -79,11 +87,23 @@ namespace SupportsTimeout {
 }
 
 namespace AllowsFunctionReply {
-  // TODO
+  mock.onGet().reply((config) => {
+    return [
+      200,
+      { data: "foo" },
+      { RequestedURL: config.url },
+    ];
+  });
 }
 
 namespace AllowsPromiseReply {
-  // TODO
+  mock.onGet().reply((config) => {
+    return Promise.resolve([
+      200,
+      { data: "bar" },
+      { RequestedURL: config.url },
+    ]);
+  });
 }
 
 namespace SupportsChanining {

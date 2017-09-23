@@ -1,10 +1,8 @@
-import { AxiosInstance, AxiosRequestConfig } from "axios";
+import { AxiosAdapter, AxiosInstance, AxiosRequestConfig } from "axios";
 
-type ResponseSpecFunc = (status: number, data?: any, headers?: any) => MockAdapter;
-type FunctionResponseSpecFunc = (config: AxiosRequestConfig) => Array<any>;
-type PromiseResponseSpecFunc = (config: AxiosRequestConfig) => Promise<Array<any>>;
+type CallbackResponseSpecFunc = (config: AxiosRequestConfig) => Array<any> | Promise<Array<any>>;
 
-type ResponseSpec = ResponseSpecFunc | FunctionResponseSpecFunc | PromiseResponseSpecFunc;
+type ResponseSpecFunc = (statusOrCallback: number | CallbackResponseSpecFunc, data?: any, headers?: any) => MockAdapter;
 
 type RequestHandler = {
   reply: ResponseSpecFunc;
@@ -26,11 +24,12 @@ interface IRequestDataMatcher {
   }
 }
 
-type RequestMatcherFunc = (matcher?: string | RegExp, body?: IRequestDataMatcher) => RequestHandler;
+type RequestMatcherFunc = (matcher?: string | RegExp, body?: string | IRequestDataMatcher) => RequestHandler;
 
 declare class MockAdapter {
   constructor(axiosInstance: AxiosInstance, options?: IMockAdapterOptions);
 
+  adapter(): AxiosAdapter;
   reset(): void;
   restore(): void;
 
