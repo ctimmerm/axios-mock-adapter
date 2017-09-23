@@ -16,6 +16,7 @@
     "src",
     "dist"
   ],
+  "types": "types",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ctimmerm/axios-mock-adapter.git"
