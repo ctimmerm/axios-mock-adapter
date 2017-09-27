@@ -35,7 +35,7 @@ function isUrlMatching(url, required) {
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
-  if (method.toLowerCase() === 'get') {
+  if (required !== undefined) {
     var params = required ? required.params : undefined;
     return isParametersMatching(parameters, params);
   } else {
