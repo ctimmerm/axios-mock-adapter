@@ -110,3 +110,5 @@ function addHandler(method, handlers, handler) {
 }
 
 module.exports = MockAdapter;
+// allow default import in typescript
+module.exports.default = MockAdapter;
