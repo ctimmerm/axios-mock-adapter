@@ -35,7 +35,8 @@ function isUrlMatching(url, required) {
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
-  if (required !== undefined) {
+  var allowedParamsMethods = ['delete', 'get', 'head', 'options'];
+  if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
     var params = required ? required.params : undefined;
     return isParametersMatching(parameters, params);
   } else {
