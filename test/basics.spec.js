@@ -177,6 +177,33 @@ describe('MockAdapter basics', function() {
     });
   });
 
+  it('can pass headers to match to a handler', function() {
+    var headers = {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Header-test': 'test-header'
+    };
+
+    mock.onPost('/withHeaders', undefined, headers).reply(200);
+
+    return instance
+      .post('/withHeaders', undefined, { headers: headers })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('does not match when request header is wrong', function() {
+    var headers = { 'Header-test': 'test-header' };
+    mock.onPatch('/wrongObjHeader', undefined, headers).reply(200);
+
+    return instance
+      .patch('/wrongObjHeader', undefined, { headers: { 'Header-test': 'wrong-header' } })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+      });
+  });
+
   it('passes the config to the callback', function() {
     mock.onGet(/\/products\/\d+/).reply(function(config) {
       return [200, {}, { RequestedURL: config.url }];

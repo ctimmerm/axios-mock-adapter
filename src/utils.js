@@ -18,12 +18,12 @@ function find(array, predicate) {
   }
 }
 
-function findHandler(handlers, method, url, body, parameters) {
+function findHandler(handlers, method, url, body, parameters, headers) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return isUrlMatching(url, handler[0]) && isBodyOrParametersMatching(method, body, parameters, handler[1]);
+      return isUrlMatching(url, handler[0]) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
     } else if (handler[0] instanceof RegExp) {
-      return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]);
+      return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
     }
   });
 }
@@ -32,6 +32,11 @@ function isUrlMatching(url, required) {
   var noSlashUrl = url[0] === '/' ? url.substr(1) : url;
   var noSlashRequired = required[0] === '/' ? required.substr(1) : required;
   return (noSlashUrl === noSlashRequired);
+}
+
+function isRequestHeadersMatching(requestHeaders, required) {
+  if (required === undefined) return true;
+  return isEqual(requestHeaders, required);
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
