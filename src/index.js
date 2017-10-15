@@ -109,4 +109,4 @@ function addHandler(method, handlers, handler) {
   }
 }
 
-module.exports = MockAdapter;
+module.exports = module.exports.default = MockAdapter;
