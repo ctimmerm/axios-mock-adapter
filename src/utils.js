@@ -40,7 +40,8 @@ function isRequestHeadersMatching(requestHeaders, required) {
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
-  if (method.toLowerCase() === 'get') {
+  var allowedParamsMethods = ['delete', 'get', 'head', 'options'];
+  if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
     var params = required ? required.params : undefined;
     return isParametersMatching(parameters, params);
   } else {

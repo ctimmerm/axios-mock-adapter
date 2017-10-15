@@ -85,7 +85,7 @@ describe('MockAdapter basics', function() {
     });
   });
 
-  it('can pass query params to match to a handler', function() {
+  it('can pass query params for get to match to a handler', function() {
     mock
       .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
       .reply(200);
@@ -94,6 +94,54 @@ describe('MockAdapter basics', function() {
       .get('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
       .then(function(response) {
         expect(response.status).to.equal(200);
+      });
+  });
+
+  it('can pass query params for delete to match to a handler', function() {
+    mock
+      .onDelete('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
+
+    return instance
+      .delete('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('can pass query params for head to match to a handler', function() {
+    mock
+      .onHead('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
+
+    return instance
+      .head('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('can\'t pass query params for post to match to a handler', function() {
+    mock
+      .onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
+
+    return instance
+      .post('/withParams', { params: { foo: 'bar', bar: 'foo' }, in: true })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+      });
+  });
+
+  it('can\'t pass query params for put to match to a handler', function() {
+    mock
+      .onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
+
+    return instance
+      .put('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
       });
   });
 
