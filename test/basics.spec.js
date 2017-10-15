@@ -121,7 +121,7 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it('can\'t pass query params for post to match to a handler', function() {
+  it("can't pass query params for post to match to a handler", function() {
     mock
       .onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } })
       .reply(200);
@@ -133,7 +133,7 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it('can\'t pass query params for put to match to a handler', function() {
+  it("can't pass query params for put to match to a handler", function() {
     mock
       .onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } })
       .reply(200);
