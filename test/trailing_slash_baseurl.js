@@ -30,6 +30,10 @@ describe('trailing slash in axios baseUrl issue (requires Node)', function() {
     });
   });
 
+  after(function() {
+    httpServer.close();
+  });
+
   beforeEach(function() {
     instance = axios.create({ baseURL: serverUrl + '/' }); // baseUrl has a trailing slash
     mock = new MockAdapter(instance);

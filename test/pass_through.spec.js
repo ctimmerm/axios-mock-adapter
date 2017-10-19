@@ -30,6 +30,10 @@ describe('passThrough tests (requires Node)', function() {
     });
   });
 
+  after(function() {
+    httpServer.close();
+  });
+
   beforeEach(function() {
     instance = axios.create({ baseURL: serverUrl });
     mock = new MockAdapter(instance);
