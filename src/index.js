@@ -2,7 +2,7 @@
 
 var handleRequest = require('./handle_request');
 
-var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put'];
+var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options'];
 
 function adapter() {
   return function(config) {
