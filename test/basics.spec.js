@@ -23,6 +23,7 @@ describe('MockAdapter basics', function() {
     expect(mock.onHead).to.be.a('function');
     expect(mock.onDelete).to.be.a('function');
     expect(mock.onPatch).to.be.a('function');
+    expect(mock.onOptions).to.be.a('function');
   });
 
   it('mocks requests', function() {
