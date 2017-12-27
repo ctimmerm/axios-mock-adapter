@@ -14,7 +14,8 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "types"
   ],
   "types": "types",
   "repository": {
