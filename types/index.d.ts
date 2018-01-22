@@ -42,4 +42,4 @@ declare class MockAdapter {
   onAny: RequestMatcherFunc;
 }
 
-export = MockAdapter;
+export default MockAdapter;
