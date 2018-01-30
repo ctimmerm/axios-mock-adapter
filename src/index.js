@@ -31,7 +31,7 @@ function MockAdapter(axiosInstance, options) {
   reset.call(this);
 
   if (axiosInstance) {
-    this.axiosInstance = axiosInstance;
+    this.axiosInstance = Object.assign({}, axiosInstance);
     this.originalAdapter = axiosInstance.defaults.adapter;
     this.delayResponse = options && options.delayResponse > 0
       ? options.delayResponse
