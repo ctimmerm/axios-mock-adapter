@@ -296,6 +296,28 @@ describe('MockAdapter basics', function() {
     });
   });
 
+  // https://github.com/ctimmerm/axios-mock-adapter/issues/74
+  it('allows mocks to match on the result of concatenating baseURL and url', () => {
+    instance.defaults.baseURL = 'http://www.example.org/api/v1/';
+
+    mock.onGet('http://www.example.org/api/v1/foo').reply(200);
+
+    return instance.get('/foo').then(function (response) {
+      expect(response.status).to.equal(200);
+    });
+  });
+
+  // https://github.com/ctimmerm/axios-mock-adapter/issues/74
+  it('allows mocks to match on the result of concatenating baseURL and url with a regex', () => {
+    instance.defaults.baseURL = 'http://www.example.org/api/v1/';
+
+    mock.onGet(/\/api\/v1\/foo$/).reply(200);
+
+    return instance.get('/foo').then(function (response) {
+      expect(response.status).to.equal(200);
+    });
+  });
+
   it('allows multiple consecutive requests for the mocked url', function() {
     mock.onGet('/foo').reply(200);
 

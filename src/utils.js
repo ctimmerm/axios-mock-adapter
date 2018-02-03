@@ -18,12 +18,20 @@ function find(array, predicate) {
   }
 }
 
-function findHandler(handlers, method, url, body, parameters, headers) {
+function combineUrls(baseURL, url) {
+  if (baseURL) {
+    return baseURL.replace(/\/+$/, '') + '/' + url.replace(/\/+$/, '');
+  }
+
+  return url;
+}
+
+function findHandler(handlers, method, url, body, parameters, headers, baseURL) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return isUrlMatching(url, handler[0]) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
+      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
     } else if (handler[0] instanceof RegExp) {
-      return handler[0].test(url) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
+      return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
     }
   });
 }
