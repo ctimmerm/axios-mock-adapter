@@ -20,7 +20,7 @@ function find(array, predicate) {
 
 function combineUrls(baseURL, url) {
   if (baseURL) {
-    return baseURL.replace(/\/+$/, '') + '/' + url.replace(/\/+$/, '');
+    return baseURL.replace(/\/+$/, '') + '/' + url.replace(/^\/+/, '');
   }
 
   return url;
