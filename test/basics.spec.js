@@ -533,7 +533,7 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it('should overwrite existing mock', function() {
+  it('overwrites existing mock', function() {
     var data = [
       {
         bar: 123
@@ -549,10 +549,8 @@ describe('MockAdapter basics', function() {
     mock.onGet('/').reply(200, data);
     mock.onGet('/').reply(200, data2);
 
-    return instance
-      .get('/')
-      .then(function(response) {
-        expect(response.data).to.deep.equal(data2);
-      });
+    return instance.get('/').then(function(response) {
+      expect(response.data).to.deep.equal(data2);
+    });
   });
 });
