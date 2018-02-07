@@ -17,13 +17,15 @@ describe('timeout spec', function() {
   it('mocks timeout response', function() {
     mock.onGet('/foo').timeout();
 
-    return axios.get('/foo')
-      .then(function() {
+    return axios.get('/foo').then(
+      function() {
         expect.fail('should not be called');
-      }, function(error) {
+      },
+      function(error) {
         expect(error.config).to.exist;
         expect(error.code).to.equal('ECONNABORTED');
         expect(error.message).to.equal('timeout of 0ms exceeded');
-      });
+      }
+    );
   });
 });

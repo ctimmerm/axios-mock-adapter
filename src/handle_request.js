@@ -17,20 +17,31 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   }
   config.adapter = null;
 
-  var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data, config.params, config.headers, config.baseURL);
+  var handler = utils.findHandler(
+    mockAdapter.handlers,
+    config.method,
+    config.url,
+    config.data,
+    config.params,
+    config.headers,
+    config.baseURL
+  );
 
   if (handler) {
     utils.purgeIfReplyOnce(mockAdapter, handler);
 
-    if (handler.length === 2) { // passThrough handler
+    if (handler.length === 2) {
+      // passThrough handler
       // tell axios to use the original adapter instead of our mock, fixes #35
       config.adapter = mockAdapter.originalAdapter;
-      mockAdapter
-        .axiosInstance
-        .request(config)
-        .then(resolve, reject);
+      mockAdapter.axiosInstance.request(config).then(resolve, reject);
     } else if (!(handler[3] instanceof Function)) {
-      utils.settle(resolve, reject, makeResponse(handler.slice(3), config), mockAdapter.delayResponse);
+      utils.settle(
+        resolve,
+        reject,
+        makeResponse(handler.slice(3), config),
+        mockAdapter.delayResponse
+      );
     } else {
       var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
@@ -53,11 +64,17 @@ function handleRequest(mockAdapter, resolve, reject, config) {
         );
       }
     }
-  } else { // handler not found
-    utils.settle(resolve, reject, {
-      status: 404,
-      config: config
-    }, mockAdapter.delayResponse);
+  } else {
+    // handler not found
+    utils.settle(
+      resolve,
+      reject,
+      {
+        status: 404,
+        config: config
+      },
+      mockAdapter.delayResponse
+    );
   }
 }
 

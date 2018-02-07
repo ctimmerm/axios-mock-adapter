@@ -33,9 +33,7 @@ function MockAdapter(axiosInstance, options) {
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
-    this.delayResponse = options && options.delayResponse > 0
-      ? options.delayResponse
-      : null;
+    this.delayResponse = options && options.delayResponse > 0 ? options.delayResponse : null;
     axiosInstance.defaults.adapter = adapter.call(this);
   }
 }
@@ -54,7 +52,7 @@ VERBS.concat('any').forEach(function(method) {
   var methodName = 'on' + method.charAt(0).toUpperCase() + method.slice(1);
   MockAdapter.prototype[methodName] = function(matcher, body, requestHeaders) {
     var _this = this;
-    var matcher = matcher === undefined ?  /.*/ : matcher;
+    var matcher = matcher === undefined ? /.*/ : matcher;
 
     function reply(code, response, headers) {
       var handler = [matcher, body, requestHeaders, code, response, headers];
@@ -94,7 +92,6 @@ VERBS.concat('any').forEach(function(method) {
           return Promise.reject(error);
         });
       }
-
     };
   };
 });
