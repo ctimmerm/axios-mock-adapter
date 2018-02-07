@@ -106,9 +106,9 @@ function addHandler(method, handlers, handler) {
     });
   } else {
     if (handlers[method].length) {
-      handlers[method].forEach((item, index) => {
+      handlers[method].forEach(function(item, index) {
         if (item[0] === handler[0]) {
-          handlers[method].splice(index, 1, handler)
+          handlers[method].splice(index, 1, handler);
         }
         handlers[method].push(handler);
       });
