@@ -532,4 +532,27 @@ describe('MockAdapter basics', function() {
         expect(data[0].bar).to.equal(123);
       });
   });
+
+  it('should overwrite existing mock', function() {
+    var data = [
+      {
+        bar: 123
+      }
+    ];
+
+    var data2 = [
+      {
+        bar: 321
+      }
+    ];
+
+    mock.onGet('/').reply(200, data);
+    mock.onGet('/').reply(200, data2);
+
+    return instance
+      .get('/')
+      .then(function(response) {
+        expect(response.data).to.deep.equal(data2);
+      });
+  });
 });

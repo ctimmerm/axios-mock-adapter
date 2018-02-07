@@ -102,7 +102,16 @@ function addHandler(method, handlers, handler) {
       handlers[verb].push(handler);
     });
   } else {
-    handlers[method].push(handler);
+    if (handlers[method].length) {
+      handlers[method].forEach(function(item, index) {
+        if (item[0] === handler[0]) {
+          handlers[method].splice(index, 1, handler);
+        }
+        handlers[method].push(handler);
+      });
+    } else {
+      handlers[method].push(handler);
+    }
   }
 }
 
