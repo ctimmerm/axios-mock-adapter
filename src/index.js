@@ -58,7 +58,7 @@ VERBS.concat('any').forEach(function(method) {
 
     function reply(code, response, headers) {
       var handler = [matcher, body, requestHeaders, code, response, headers];
-      addHandler(method, _this.handlers, handler);
+      addHandler(method, _this.handlers, handler, _this.replyOnceHandlers);
       return _this;
     }
 
@@ -67,7 +67,7 @@ VERBS.concat('any').forEach(function(method) {
 
       replyOnce: function replyOnce(code, response, headers) {
         var handler = [matcher, body, requestHeaders, code, response, headers];
-        addHandler(method, _this.handlers, handler);
+        addHandlerReplyOnce(method, _this.handlers, handler);
         _this.replyOnceHandlers.push(handler);
         return _this;
       },
@@ -99,13 +99,73 @@ VERBS.concat('any').forEach(function(method) {
   };
 });
 
-function addHandler(method, handlers, handler) {
+function findInHandler(method, handlers, handler) {
+  var index = -1;
+  for (var i = 0; i < handlers[method].length; i += 1) {
+    var item = handlers[method][i];
+    var isSame = (
+      item[0] === handler[0] &&
+      item[1] === handler[1] &&
+      item[2] === handler[2]
+    );
+
+    if (isSame) {
+      index =  i;
+    }
+  }
+  return index;
+}
+
+function findInReplyOnceHandler(handler, replyOnceHandlers) {
+  var index = -1;
+  if (replyOnceHandlers && replyOnceHandlers.length) {
+    for (var i = 0; i < replyOnceHandlers.length; i += 1) {
+      var item = replyOnceHandlers[i];
+      var isInReplyOnce = (
+        item[0] === handler[0] &&
+        item[1] === handler[1] &&
+        item[2] === handler[2]
+      );
+
+      if (isInReplyOnce) {
+        index = i;
+      }
+    }
+  }
+  return index;
+}
+
+function replaceHandler(method, handlers, handler, index) {
+  handlers[method].splice(index, 1, handler);
+}
+
+function addHandlerReplyOnce(method, handlers, handler) {
   if (method === 'any') {
     VERBS.forEach(function(verb) {
       handlers[verb].push(handler);
     });
   } else {
     handlers[method].push(handler);
+  }
+}
+
+function addHandler(method, handlers, handler, replyOnceHandlers) {
+  if (method === 'any') {
+    VERBS.forEach(function(verb) {
+      handlers[verb].push(handler);
+    });
+  } else {
+    var indexOfExistingHandler = findInHandler(method, handlers, handler);
+    var indexOfExistingReplyOnceHandler = findInReplyOnceHandler(handler, replyOnceHandlers);
+    if (indexOfExistingHandler > -1) {
+      if (indexOfExistingReplyOnceHandler > -1 ) {
+        handlers[method].push(handler);
+      } else {
+        replaceHandler(method, handlers, handler, indexOfExistingHandler);
+      }
+    } else {
+      handlers[method].push(handler);
+    }
   }
 }
 
