@@ -540,7 +540,7 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it.only('should not add duplicate handlers', function() {
+  it('should not add duplicate handlers', function() {
     mock.onGet('/').replyOnce(312);
     mock.onGet('/').reply(200);
     mock.onGet('/1').reply(200);
