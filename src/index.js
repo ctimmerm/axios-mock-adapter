@@ -135,10 +135,6 @@ function findInReplyOnceHandler(handler, replyOnceHandlers) {
   return index;
 }
 
-function replaceHandler(method, handlers, handler, index) {
-  handlers[method].splice(index, 1, handler);
-}
-
 function addHandlerReplyOnce(method, handlers, handler) {
   if (method === 'any') {
     VERBS.forEach(function(verb) {
@@ -161,7 +157,7 @@ function addHandler(method, handlers, handler, replyOnceHandlers) {
       if (indexOfExistingReplyOnceHandler > -1 ) {
         handlers[method].push(handler);
       } else {
-        replaceHandler(method, handlers, handler, indexOfExistingHandler);
+        handlers[method].splice(indexOfExistingHandler, 1, handler);
       }
     } else {
       handlers[method].push(handler);
