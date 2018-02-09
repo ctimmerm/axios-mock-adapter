@@ -528,4 +528,53 @@ describe('MockAdapter basics', function() {
         expect(data[0].bar).to.equal(123);
       });
   });
+
+  it('should overwrite existing mock', function() {
+    mock.onGet('/').reply(500);
+    mock.onGet('/').reply(200);
+
+    return instance
+      .get('/')
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it.only('should not add duplicate handlers', function() {
+    mock.onGet('/').replyOnce(312);
+    mock.onGet('/').reply(200);
+    mock.onGet('/1').reply(200);
+    mock.onGet('/2').reply(200);
+    mock.onGet('/3').replyOnce(300);
+    mock.onGet('/3').reply(200);
+    mock.onGet('/4').reply(200);
+
+    expect(mock.handlers['get'].length).to.equal(7);
+    expect(mock.replyOnceHandlers.length).to.equal(2);
+  });
+
+  it('supports chaining on same path with different params', function () {
+    mock
+      .onGet('/users', { params: { searchText: 'John' } }).reply(200, { id: 1 })
+      .onGet('/users', { params: { searchText: 'James' } }).reply(200, { id: 2 })
+      .onGet('/users', { params: { searchText: 'Jake' } }).reply(200, { id: 3 })
+      .onGet('/users', { params: { searchText: 'Jackie' } }).reply(200, { id: 4 });
+
+    return instance.get('/users', { params: { searchText: 'John' } })
+      .then(function (response) {
+        expect(response.data.id).to.equal(1);
+        return instance.get('/users', { params: { searchText: 'James' } });
+      })
+      .then(function (response) {
+        expect(response.data.id).to.equal(2);
+        return instance.get('/users', { params: { searchText: 'Jake' } });
+      })
+      .then(function (response) {
+        expect(response.data.id).to.equal(3);
+        return instance.get('/users', { params: { searchText: 'Jackie' } });
+      })
+      .then(function (response) {
+        expect(response.data.id).to.equal(4);
+      });
+  })
 });
