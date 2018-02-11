@@ -24,7 +24,6 @@ function reset() {
     accumulator[verb] = [];
     return accumulator;
   }, {});
-  this.replyOnceHandlers = [];
 }
 
 function MockAdapter(axiosInstance, options) {
@@ -68,7 +67,6 @@ VERBS.concat('any').forEach(function(method) {
       replyOnce: function replyOnce(code, response, headers) {
         var handler = [matcher, body, requestHeaders, code, response, headers, true];
         addHandler(method, _this.handlers, handler);
-        _this.replyOnceHandlers.push(handler);
         return _this;
       },
 
