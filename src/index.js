@@ -97,13 +97,35 @@ VERBS.concat('any').forEach(function(method) {
   };
 });
 
+function findInHandlers(method, handlers, handler) {
+  var index = -1;
+  for (var i = 0; i < handlers[method].length; i += 1) {
+    var item = handlers[method][i];
+    var isReplyOnce = item.length === 7;
+    var isSame = (
+      item[0] === handler[0] &&
+      item[1] === handler[1] &&
+      item[2] === handler[2]
+    );
+    if (isSame && !isReplyOnce) {
+      index =  i;
+    }
+  }
+  return index;
+}
+
 function addHandler(method, handlers, handler) {
   if (method === 'any') {
     VERBS.forEach(function(verb) {
       handlers[verb].push(handler);
     });
   } else {
-    handlers[method].push(handler);
+    var indexOfExistingHandler = findInHandlers(method, handlers, handler);
+    if (indexOfExistingHandler > -1 && handler.length < 7) {
+      handlers[method].splice(indexOfExistingHandler, 1, handler);
+    } else {
+      handlers[method].push(handler);
+    }
   }
 }
 
