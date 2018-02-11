@@ -36,7 +36,12 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       if (handler.length === 7) {
         utils.purgeIfReplyOnce(mockAdapter, handler);
       }
-      utils.settle(resolve, reject, makeResponse(handler.slice(3), config), mockAdapter.delayResponse);
+      utils.settle(
+        resolve,
+        reject,
+        makeResponse(handler.slice(3), config),
+        mockAdapter.delayResponse
+      );
     } else {
       var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
