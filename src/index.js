@@ -1,5 +1,7 @@
 'use strict';
 
+var deepEqual = require('deep-equal');
+
 var handleRequest = require('./handle_request');
 
 var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options'];
@@ -100,9 +102,9 @@ function findInHandlers(method, handlers, handler) {
     var item = handlers[method][i];
     var isReplyOnce = item.length === 7;
     var isSame = (
-      item[0] === handler[0] &&
-      item[1] === handler[1] &&
-      item[2] === handler[2]
+      deepEqual(item[0], handler[0]) &&
+      deepEqual(item[1], handler[1]) &&
+      deepEqual(item[2], handler[2])
     );
     if (isSame && !isReplyOnce) {
       index =  i;
