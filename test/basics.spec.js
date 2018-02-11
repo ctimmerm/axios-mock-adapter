@@ -87,9 +87,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for get to match to a handler', function() {
-    mock
-      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
 
     return instance
       .get('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -99,9 +97,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for delete to match to a handler', function() {
-    mock
-      .onDelete('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onDelete('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
 
     return instance
       .delete('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -111,9 +107,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for head to match to a handler', function() {
-    mock
-      .onHead('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onHead('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
 
     return instance
       .head('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -123,9 +117,7 @@ describe('MockAdapter basics', function() {
   });
 
   it("can't pass query params for post to match to a handler", function() {
-    mock
-      .onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
 
     return instance
       .post('/withParams', { params: { foo: 'bar', bar: 'foo' }, in: true })
@@ -135,9 +127,7 @@ describe('MockAdapter basics', function() {
   });
 
   it("can't pass query params for put to match to a handler", function() {
-    mock
-      .onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
 
     return instance
       .put('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -147,9 +137,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params to match to a handler with uppercase method', function() {
-    mock
-      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
 
     return instance({
       method: 'GET',
@@ -161,9 +149,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('does not match when parameters are wrong', function() {
-    mock
-      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
     return instance
       .get('/withParams', { params: { foo: 'bar', bar: 'other' } })
       .catch(function(error) {
@@ -172,9 +158,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('does not match when parameters are missing', function() {
-    mock
-      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
-      .reply(200);
+    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
     return instance.get('/withParams').catch(function(error) {
       expect(error.response.status).to.equal(404);
     });
@@ -203,11 +187,9 @@ describe('MockAdapter basics', function() {
     var body = { body: { is: 'passed' }, in: true };
     mock.onPatch('/wrongObjBody', body).reply(200);
 
-    return instance
-      .patch('/wrongObjBody', { wrong: 'body' })
-      .catch(function(error) {
-        expect(error.response.status).to.equal(404);
-      });
+    return instance.patch('/wrongObjBody', { wrong: 'body' }).catch(function(error) {
+      expect(error.response.status).to.equal(404);
+    });
   });
 
   it('does not match when string body is wrong', function() {
@@ -228,18 +210,16 @@ describe('MockAdapter basics', function() {
 
   it('can pass headers to match to a handler', function() {
     var headers = {
-      'Accept': 'application/json, text/plain, */*',
+      Accept: 'application/json, text/plain, */*',
       'Content-Type': 'application/x-www-form-urlencoded',
       'Header-test': 'test-header'
     };
 
     mock.onPost('/withHeaders', undefined, headers).reply(200);
 
-    return instance
-      .post('/withHeaders', undefined, { headers: headers })
-      .then(function(response) {
-        expect(response.status).to.equal(200);
-      });
+    return instance.post('/withHeaders', undefined, { headers: headers }).then(function(response) {
+      expect(response.status).to.equal(200);
+    });
   });
 
   it('does not match when request header is wrong', function() {
@@ -297,23 +277,23 @@ describe('MockAdapter basics', function() {
   });
 
   // https://github.com/ctimmerm/axios-mock-adapter/issues/74
-  it('allows mocks to match on the result of concatenating baseURL and url', () => {
+  it('allows mocks to match on the result of concatenating baseURL and url', function() {
     instance.defaults.baseURL = 'http://www.example.org/api/v1/';
 
     mock.onGet('http://www.example.org/api/v1/foo').reply(200);
 
-    return instance.get('/foo').then(function (response) {
+    return instance.get('/foo').then(function(response) {
       expect(response.status).to.equal(200);
     });
   });
 
   // https://github.com/ctimmerm/axios-mock-adapter/issues/74
-  it('allows mocks to match on the result of concatenating baseURL and url with a regex', () => {
+  it('allows mocks to match on the result of concatenating baseURL and url with a regex', function() {
     instance.defaults.baseURL = 'http://www.example.org/api/v1/';
 
     mock.onGet(/\/api\/v1\/foo$/).reply(200);
 
-    return instance.get('/foo').then(function (response) {
+    return instance.get('/foo').then(function(response) {
       expect(response.status).to.equal(200);
     });
   });
@@ -428,8 +408,34 @@ describe('MockAdapter basics', function() {
     });
   });
 
+  it('allows to delay error responses', function() {
+    mock = new MockAdapter(instance, { delayResponse: 1 });
+
+    mock.onGet('/foo').reply(500);
+
+    return instance.get('/foo').catch(function(error) {
+      expect(error.response.status).to.equal(500);
+    });
+  });
+
+  it('allows to delay responses when the response promise is rejected', function() {
+    mock = new MockAdapter(instance, { delayResponse: 1 });
+
+    mock.onGet('/foo').reply(function(config) {
+      return Promise.reject('error');
+    });
+
+    return instance.get('/foo').catch(function(message) {
+      expect(message).to.equal('error');
+    });
+  });
+
   it('maps empty GET path to any path', function() {
-    mock.onGet('/foo').reply(200, 'foo').onGet().reply(200, 'bar');
+    mock
+      .onGet('/foo')
+      .reply(200, 'foo')
+      .onGet()
+      .reply(200, 'bar');
 
     return Promise.all([
       instance.get('/foo').then(function(response) {
@@ -440,12 +446,10 @@ describe('MockAdapter basics', function() {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal('bar');
       }),
-      instance
-        .get('/xyz' + Math.round(100000 * Math.random()))
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal('bar');
-        })
+      instance.get('/xyz' + Math.round(100000 * Math.random())).then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('bar');
+      })
     ]);
   });
 
@@ -477,7 +481,7 @@ describe('MockAdapter basics', function() {
   it('allows sending an any object as response', function() {
     var buffer = new ArrayBuffer(1);
     var view = new Uint8Array(buffer);
-    view[0] = 0xFF;
+    view[0] = 0xff;
 
     mock.onGet('/').reply(200, buffer);
 
@@ -487,7 +491,7 @@ describe('MockAdapter basics', function() {
       responseType: 'arraybuffer'
     }).then(function(response) {
       var view = new Uint8Array(response.data);
-      expect(view[0]).to.equal(0xFF);
+      expect(view[0]).to.equal(0xff);
     });
   });
 
