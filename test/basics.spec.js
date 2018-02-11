@@ -593,6 +593,22 @@ describe('MockAdapter basics', function() {
       });
   });
 
+  it.only('should overwrite replys using RegEx', function() {
+    mock.onGet(/foo\/bar/).reply(500);
+    mock.onGet(/foo\/bar/).reply(200);
+    mock.onGet(/foo\/baz\/.+/).reply(200);
+
+    return instance.get('/foo/bar')
+      .then(function(response) {
+        expect(mock.handlers['get'].length).to.equal(2);
+        expect(response.status).to.equal(200);
+        return instance.get('/foo/baz/56');
+      })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
   it('should allow overwriting only on reply if replyOnce was used first', function() {
     var counter = 0;
     mock.onGet('/').replyOnce(500);
