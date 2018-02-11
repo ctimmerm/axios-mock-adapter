@@ -550,7 +550,6 @@ describe('MockAdapter basics', function() {
     mock.onGet('/4').reply(200);
 
     expect(mock.handlers['get'].length).to.equal(7);
-    expect(mock.replyOnceHandlers.length).to.equal(2);
   });
 
   it('supports chaining on same path with different params', function () {
@@ -590,20 +589,42 @@ describe('MockAdapter basics', function() {
       })
   })
 
-  it('should allow overwriting on reply when using replyOnce', function() {
+  it('should allow overwriting only on reply if replyOnce was used first', function() {
+    var counter = 0;
     mock.onGet('/').replyOnce(500);
     mock.onGet('/').reply(200);
     mock.onGet('/').reply(401);
 
-    console.log('mock', JSON.stringify(mock, null, 2));
     return instance.get('/')
       .catch(function(error) {
-        console.log('mock', JSON.stringify(mock, null, 2));
         expect(error.response.status).to.equal(500);
+        counter += 1;
         return instance.get('/')
       })
       .catch(function(error) {
         expect(error.response.status).to.equal(401);
-      });
+        counter += 1;
+      })
+      .then(function() { expect(counter).to.equal(2)});
+  });
+
+  it('should not allow overwriting only on reply if replyOnce wasn\'t used first', function () {
+    var counter = 0;
+    mock.onGet('/').reply(200);
+    mock.onGet('/').reply(401);
+    mock.onGet('/').replyOnce(500);
+    mock.onGet('/').reply(500);
+
+    return instance.get('/')
+      .catch(function (error) {
+        expect(error.response.status).to.equal(500);
+        counter += 1;
+        return instance.get('/')
+      })
+      .catch(function (error) {
+        expect(error.response.status).to.equal(500);
+        counter += 1;
+      })
+      .then(function () { expect(counter).to.equal(2) });
   })
 });
