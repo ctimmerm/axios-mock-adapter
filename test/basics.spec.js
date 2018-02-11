@@ -635,4 +635,26 @@ describe('MockAdapter basics', function() {
         expect(counter).to.equal(2);
       });
   });
+  it('allows overwriting mocks with parameters', function() {
+    mock
+      .onGet('/users', { params: { searchText: 'John' } })
+      .reply(500)
+      .onGet('/users', { params: { searchText: 'John' } })
+      .reply(200, { id: 1 });
+
+    return instance.get('/users', { params: { searchText: 'John' } })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('allows overwriting mocks with headers', function() {
+    mock.onGet('/').reply(200, {}, { test: true });
+    mock.onGet('/').reply(200, {}, { test: false });
+
+    return instance.get('/')
+      .then(function(response) {
+        expect(response.headers).to.deep.equal({ test: false });
+      });
+  });
 });
