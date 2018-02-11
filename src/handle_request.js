@@ -20,8 +20,6 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   var handler = utils.findHandler(mockAdapter.handlers, config.method, config.url, config.data, config.params, config.headers, config.baseURL);
 
   if (handler) {
-    utils.purgeIfReplyOnce(mockAdapter, handler);
-
     if (handler.length === 2) { // passThrough handler
       // tell axios to use the original adapter instead of our mock, fixes #35
       config.adapter = mockAdapter.originalAdapter;
@@ -30,7 +28,12 @@ function handleRequest(mockAdapter, resolve, reject, config) {
         .request(config)
         .then(resolve, reject);
     } else if (!(handler[3] instanceof Function)) {
-      utils.settle(resolve, reject, makeResponse(handler.slice(3), config), mockAdapter.delayResponse);
+      if (handler.length === 7) {
+        utils.purgeIfReplyOnce(mockAdapter, handler);
+        utils.settle(resolve, reject, makeResponse(handler.slice(3), config), mockAdapter.delayResponse);
+      } else {
+        utils.settle(resolve, reject, makeResponse(handler.slice(3), config), mockAdapter.delayResponse);
+      }
     } else {
       var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
