@@ -106,8 +106,8 @@ function findInHandlers(method, handlers, handler) {
       : item[0] === handler[0];
     var isSame = (
       comparePaths &&
-      deepEqual(item[1], handler[1]) &&
-      deepEqual(item[2], handler[2])
+      deepEqual(item[1], handler[1], { strict: true }) &&
+      deepEqual(item[2], handler[2], { strict: true })
     );
     if (isSame && !isReplyOnce) {
       index =  i;
