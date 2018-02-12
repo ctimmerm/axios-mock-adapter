@@ -593,7 +593,7 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it.only('should overwrite replys using RegEx', function() {
+  it('should overwrite replys using RegEx', function() {
     mock.onGet(/foo\/bar/).reply(500);
     mock.onGet(/foo\/bar/).reply(200);
     mock.onGet(/foo\/baz\/.+/).reply(200);
@@ -664,13 +664,11 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it('allows overwriting mocks with headers', function() {
-    mock.onGet('/').reply(200, {}, { test: true });
-    mock.onGet('/').reply(200, {}, { test: false });
+  it.only('allows overwriting mocks with headers', function() {
+    mock.onGet('/', {}, { 'Accept-Charset': 'utf-8' }).reply(500);
+    mock.onGet('/', {}, { 'Accept-Charset': 'utf-8' }).reply(200);
 
-    return instance.get('/')
-      .then(function(response) {
-        expect(response.headers).to.deep.equal({ test: false });
-      });
+    expect(mock.handlers['get'].length).to.equal(1);
+    expect(mock.handlers['get'][0][3]).to.equal(200);
   });
 });
