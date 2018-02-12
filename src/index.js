@@ -102,8 +102,8 @@ function findInHandlers(method, handlers, handler) {
     var item = handlers[method][i];
     var isReplyOnce = item.length === 7;
     var comparePaths = item[0] instanceof RegExp && handler[0] instanceof RegExp
-      ? deepEqual(String(item[0]), String(handler[0]))
-      : deepEqual(item[0], handler[0]);
+      ? String(item[0]) === String(handler[0])
+      : item[0] === handler[0];
     var isSame = (
       comparePaths &&
       deepEqual(item[1], handler[1]) &&
