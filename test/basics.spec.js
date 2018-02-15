@@ -532,4 +532,143 @@ describe('MockAdapter basics', function() {
         expect(data[0].bar).to.equal(123);
       });
   });
+
+  it('should overwrite existing mock', function() {
+    mock.onGet('/').reply(500);
+    mock.onGet('/').reply(200);
+
+    return instance
+      .get('/')
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('should not add duplicate handlers', function() {
+    mock.onGet('/').replyOnce(312);
+    mock.onGet('/').reply(200);
+    mock.onGet('/1').reply(200);
+    mock.onGet('/2').reply(200);
+    mock.onGet('/3').replyOnce(300);
+    mock.onGet('/3').reply(200);
+    mock.onGet('/4').reply(200);
+
+    expect(mock.handlers['get'].length).to.equal(7);
+  });
+
+  it('supports chaining on same path with different params', function() {
+    mock
+      .onGet('/users', { params: { searchText: 'John' } }).reply(200, { id: 1 })
+      .onGet('/users', { params: { searchText: 'James' } }).reply(200, { id: 2 })
+      .onGet('/users', { params: { searchText: 'Jake' } }).reply(200, { id: 3 })
+      .onGet('/users', { params: { searchText: 'Jackie' } }).reply(200, { id: 4 });
+
+    return instance.get('/users', { params: { searchText: 'John' } })
+      .then(function(response) {
+        expect(response.data.id).to.equal(1);
+        return instance.get('/users', { params: { searchText: 'James' } });
+      })
+      .then(function(response) {
+        expect(response.data.id).to.equal(2);
+        return instance.get('/users', { params: { searchText: 'Jake' } });
+      })
+      .then(function(response) {
+        expect(response.data.id).to.equal(3);
+        return instance.get('/users', { params: { searchText: 'Jackie' } });
+      })
+      .then(function(response) {
+        expect(response.data.id).to.equal(4);
+      });
+  });
+
+  it('should overwrite replys', function() {
+    mock.onGet('/').reply(500);
+    mock.onGet('/').reply(200);
+    mock.onGet('/').reply(401);
+
+    return instance.get('/')
+      .catch(function(error) {
+        expect(mock.handlers['get'].length).to.equal(1);
+        expect(error.response.status).to.equal(401);
+      });
+  });
+
+  it('should overwrite replys using RegEx', function() {
+    mock.onGet(/foo\/bar/).reply(500);
+    mock.onGet(/foo\/bar/).reply(200);
+    mock.onGet(/foo\/baz\/.+/).reply(200);
+
+    return instance.get('/foo/bar')
+      .then(function(response) {
+        expect(mock.handlers['get'].length).to.equal(2);
+        expect(response.status).to.equal(200);
+        return instance.get('/foo/baz/56');
+      })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('should allow overwriting only on reply if replyOnce was used first', function() {
+    var counter = 0;
+    mock.onGet('/').replyOnce(500);
+    mock.onGet('/').reply(200);
+    mock.onGet('/').reply(401);
+
+    return instance.get('/')
+      .catch(function(error) {
+        expect(error.response.status).to.equal(500);
+        counter += 1;
+        return instance.get('/');
+      })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(401);
+        counter += 1;
+      })
+      .then(function() {
+        expect(counter).to.equal(2);
+      });
+  });
+
+  it('should not allow overwriting only on reply if replyOnce wasn\'t used first', function() {
+    var counter = 0;
+    mock.onGet('/').reply(200);
+    mock.onGet('/').reply(401);
+    mock.onGet('/').replyOnce(500);
+    mock.onGet('/').reply(500);
+
+    return instance.get('/')
+      .catch(function(error) {
+        expect(error.response.status).to.equal(500);
+        counter += 1;
+        return instance.get('/');
+      })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(500);
+        counter += 1;
+      })
+      .then(function() {
+        expect(counter).to.equal(2);
+      });
+  });
+  it('allows overwriting mocks with parameters', function() {
+    mock
+      .onGet('/users', { params: { searchText: 'John' } })
+      .reply(500)
+      .onGet('/users', { params: { searchText: 'John' } })
+      .reply(200, { id: 1 });
+
+    return instance.get('/users', { params: { searchText: 'John' } })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it.only('allows overwriting mocks with headers', function() {
+    mock.onGet('/', {}, { 'Accept-Charset': 'utf-8' }).reply(500);
+    mock.onGet('/', {}, { 'Accept-Charset': 'utf-8' }).reply(200);
+
+    expect(mock.handlers['get'].length).to.equal(1);
+    expect(mock.handlers['get'][0][3]).to.equal(200);
+  });
 });

@@ -1,5 +1,7 @@
 'use strict';
 
+var deepEqual = require('deep-equal');
+
 var handleRequest = require('./handle_request');
 
 var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options'];
@@ -24,7 +26,6 @@ function reset() {
     accumulator[verb] = [];
     return accumulator;
   }, {});
-  this.replyOnceHandlers = [];
 }
 
 function MockAdapter(axiosInstance, options) {
@@ -64,9 +65,8 @@ VERBS.concat('any').forEach(function(method) {
       reply: reply,
 
       replyOnce: function replyOnce(code, response, headers) {
-        var handler = [matcher, body, requestHeaders, code, response, headers];
+        var handler = [matcher, body, requestHeaders, code, response, headers, true];
         addHandler(method, _this.handlers, handler);
-        _this.replyOnceHandlers.push(handler);
         return _this;
       },
 
@@ -96,13 +96,38 @@ VERBS.concat('any').forEach(function(method) {
   };
 });
 
+function findInHandlers(method, handlers, handler) {
+  var index = -1;
+  for (var i = 0; i < handlers[method].length; i += 1) {
+    var item = handlers[method][i];
+    var isReplyOnce = item.length === 7;
+    var comparePaths = item[0] instanceof RegExp && handler[0] instanceof RegExp
+      ? String(item[0]) === String(handler[0])
+      : item[0] === handler[0];
+    var isSame = (
+      comparePaths &&
+      deepEqual(item[1], handler[1], { strict: true }) &&
+      deepEqual(item[2], handler[2], { strict: true })
+    );
+    if (isSame && !isReplyOnce) {
+      index =  i;
+    }
+  }
+  return index;
+}
+
 function addHandler(method, handlers, handler) {
   if (method === 'any') {
     VERBS.forEach(function(verb) {
       handlers[verb].push(handler);
     });
   } else {
-    handlers[method].push(handler);
+    var indexOfExistingHandler = findInHandlers(method, handlers, handler);
+    if (indexOfExistingHandler > -1 && handler.length < 7) {
+      handlers[method].splice(indexOfExistingHandler, 1, handler);
+    } else {
+      handlers[method].push(handler);
+    }
   }
 }
 

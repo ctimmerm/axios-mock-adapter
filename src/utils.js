@@ -75,17 +75,12 @@ function isBodyMatching(body, requiredBody) {
 }
 
 function purgeIfReplyOnce(mock, handler) {
-  var index = mock.replyOnceHandlers.indexOf(handler);
-  if (index > -1) {
-    mock.replyOnceHandlers.splice(index, 1);
-
-    Object.keys(mock.handlers).forEach(function(key) {
-      index = mock.handlers[key].indexOf(handler);
-      if (index > -1) {
-        mock.handlers[key].splice(index, 1);
-      }
-    });
-  }
+  Object.keys(mock.handlers).forEach(function(key) {
+    var index = mock.handlers[key].indexOf(handler);
+    if (index > -1) {
+      mock.handlers[key].splice(index, 1);
+    }
+  });
 }
 
 function settle(resolve, reject, response, delay) {
