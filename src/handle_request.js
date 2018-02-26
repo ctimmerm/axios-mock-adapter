@@ -15,7 +15,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   if (config.baseURL && config.url.substr(0, config.baseURL.length) === config.baseURL) {
     config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
   }
-  config.adapter = null;
+  delete config.adapter;
 
   var handler = utils.findHandler(
     mockAdapter.handlers,
