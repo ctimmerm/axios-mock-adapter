@@ -23,7 +23,8 @@ describe('MockAdapter onAny', function() {
   it('mocks any request with a matching url', function() {
     mock.onAny('/foo').reply(200);
 
-    return instance.head('/foo')
+    return instance
+      .head('/foo')
       .then(function() {
         return instance.patch('/foo');
       })
@@ -36,7 +37,8 @@ describe('MockAdapter onAny', function() {
     var body = [{ object: { with: { deep: 'property' } }, array: ['1', 'abc'] }, 'a'];
     mock.onAny('/anyWithBody', body).reply(200);
 
-    return instance.put('/anyWithBody', body)
+    return instance
+      .put('/anyWithBody', body)
       .then(function() {
         return instance.post('/anyWithBody', body);
       })
@@ -48,10 +50,9 @@ describe('MockAdapter onAny', function() {
   it('removes all handlers after replying with replyOnce', function() {
     mock.onAny('/foo').replyOnce(200);
 
-    return instance.get('/foo')
-      .then(function() {
-        expect(mock.handlers['get']).to.be.empty;
-        expect(mock.handlers['post']).to.be.empty;
-      });
+    return instance.get('/foo').then(function() {
+      expect(mock.handlers['get']).to.be.empty;
+      expect(mock.handlers['post']).to.be.empty;
+    });
   });
 });
