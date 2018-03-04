@@ -724,13 +724,16 @@ describe('MockAdapter basics', function() {
     };
 
     expect(serializer(params)).to.equal('user_id=123&user_id=456');
-
     mock.onGet('/withSerializedParams', { paramsSerializer: serializer, params: params }).reply(200);
 
     return instance
-      .get('/withSerializedParams', { paramsSerializer: serializer, params: params, in: true })
+      .get('/withSerializedParams', { paramsSerializer: serializer, params: params, in: true }) // with serialization
       .then(function(response) {
         expect(response.status).to.equal(200);
+        return instance.get('/withSerializedParams', { params: params, in: true }); // without serialization
+      })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
       });
   });
 });
