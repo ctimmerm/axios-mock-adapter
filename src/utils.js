@@ -83,6 +83,10 @@ function purgeIfReplyOnce(mock, handler) {
   });
 }
 
+function describeConfig(config) {
+  return config.method.toUpperCase() + ' ' + config.url;
+}
+
 function settle(resolve, reject, response, delay) {
   if (delay > 0) {
     setTimeout(function() {
@@ -95,7 +99,7 @@ function settle(resolve, reject, response, delay) {
     response.config.validateStatus(response.status)
       ? resolve(response)
       : reject(createErrorResponse(
-        'Request failed with status code ' + response.status,
+        'Request failed (' + describeConfig(response.config) + ') with status code ' + response.status,
         response.config,
         response
       ));
