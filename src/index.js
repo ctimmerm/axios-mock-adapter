@@ -21,15 +21,24 @@ function adapter() {
   }.bind(this);
 }
 
-function reset() {
-  this.handlers = VERBS.reduce(function(accumulator, verb) {
+function getVerbObject() {
+  return VERBS.reduce(function(accumulator, verb) {
     accumulator[verb] = [];
     return accumulator;
   }, {});
 }
 
+function reset() {
+  this.handlers = getVerbObject();
+}
+
+function resetHistory() {
+  this.history = getVerbObject();
+}
+
 function MockAdapter(axiosInstance, options) {
   reset.call(this);
+  resetHistory.call(this);
 
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
@@ -48,6 +57,7 @@ MockAdapter.prototype.restore = function restore() {
 };
 
 MockAdapter.prototype.reset = reset;
+MockAdapter.prototype.resetHistory = resetHistory;
 
 VERBS.concat('any').forEach(function(method) {
   var methodName = 'on' + method.charAt(0).toUpperCase() + method.slice(1);
