@@ -29,6 +29,11 @@ function getVerbObject() {
 }
 
 function reset() {
+  resetHandlers.call(this);
+  resetHistory.call(this);
+}
+
+function resetHandlers() {
   this.handlers = getVerbObject();
 }
 
@@ -38,7 +43,6 @@ function resetHistory() {
 
 function MockAdapter(axiosInstance, options) {
   reset.call(this);
-  resetHistory.call(this);
 
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
@@ -57,6 +61,7 @@ MockAdapter.prototype.restore = function restore() {
 };
 
 MockAdapter.prototype.reset = reset;
+MockAdapter.prototype.resetHandlers = resetHandlers;
 MockAdapter.prototype.resetHistory = resetHistory;
 
 VERBS.concat('any').forEach(function(method) {
