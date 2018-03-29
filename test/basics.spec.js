@@ -384,6 +384,31 @@ describe('MockAdapter basics', function() {
     expect(mock.handlers['get']).to.be.empty;
   });
 
+  it('resets the history', function() {
+    mock.onAny('/foo').reply(200);
+
+    return instance
+      .get('/foo')
+      .then(function(response) {
+        mock.reset();
+        expect(mock.history['get']).to.eql([]);
+      });
+  });
+
+  it('resets only the registered mock handlers, not the history', function() {
+    mock.onAny('/foo').reply(200);
+    expect(mock.handlers['get']).not.to.be.empty;
+    expect(mock.history['get']).to.eql([]);
+
+    return instance
+      .get('/foo')
+      .then(function(response) {
+        mock.resetHandlers();
+        expect(mock.history.get.length).to.equal(1);
+        expect(mock.handlers['get']).to.be.empty;
+      });
+  });
+
   it('can chain calls to add mock handlers', function() {
     mock
       .onGet('/foo')

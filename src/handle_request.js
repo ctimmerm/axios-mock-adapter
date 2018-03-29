@@ -15,7 +15,9 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   if (config.baseURL && config.url.substr(0, config.baseURL.length) === config.baseURL) {
     config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
   }
+
   delete config.adapter;
+  mockAdapter.history[config.method].push(config);
 
   var handler = utils.findHandler(
     mockAdapter.handlers,
@@ -28,14 +30,16 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   );
 
   if (handler) {
-    if (handler.length === 2) { // passThrough handler
+    if (handler.length === 7) {
+      utils.purgeIfReplyOnce(mockAdapter, handler);
+    }
+
+    if (handler.length === 2) {
+      // passThrough handler
       // tell axios to use the original adapter instead of our mock, fixes #35
       config.adapter = mockAdapter.originalAdapter;
       mockAdapter.axiosInstance.request(config).then(resolve, reject);
     } else if (!(handler[3] instanceof Function)) {
-      if (handler.length === 7) {
-        utils.purgeIfReplyOnce(mockAdapter, handler);
-      }
       utils.settle(
         resolve,
         reject,
