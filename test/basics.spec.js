@@ -701,4 +701,18 @@ describe('MockAdapter basics', function() {
     expect(mock.handlers['get'].length).to.equal(1);
     expect(mock.handlers['get'][0][3]).to.equal(200);
   });
+
+  it('supports a retry', function() {
+    mock.onGet('/').replyOnce(401);
+    mock.onGet('/').replyOnce(201);
+    instance.interceptors.response.use(undefined, function(error) {
+      if (error.response && error.response.status === 401) {
+        return instance(error.config);
+      }
+      return Promise.reject(error);
+    });
+    return instance({ method: 'get', url: '/' }).then(function(response) {
+      expect(response.status).to.equal(201);
+    });
+  });
 });
