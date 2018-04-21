@@ -66,6 +66,23 @@ axios.get('/users', { params: { searchText: 'John' } } )
   });
 ```
 
+For `GET`, `DELETE`, `HEAD` and `OPTIONS` methods, the second argument coresponds to the expected params. For `PUT`, `POST` and `PATCH` methods, this argument coresponds to the expected request body. To match params for these methods, pass the expected params as the fouth argument, and ignore headers with `undefined`.
+
+```js
+// match body and params
+mock.onPut('/product', { name: 'foo' }, undefined, { id: 4 }).reply(204);
+axios.put('/product', { name: 'foo' }, { params: { id: 4 } }).then(console.log)
+// match params only, for onPut, onPost, onPatch
+mock.onPost('/product', undefined , undefined, { id: 4 }).reply(204);
+axios.post('/product', undefined , { params: { id: 4 } }).then(console.log)
+// does not match
+mock.onPut('/product', { name: 'foo' }, undefined, { id: 4 }).reply(204);
+axios.put('/product', { name: 'wrong' }, { params: { id: 4 } }).then(console.log)
+// does not match
+mock.onPut('/product', { name: 'foo' }, undefined, { id: 4 }).reply(204);
+axios.put('/product', { name: 'foo' }, { params: { id: 999 } }).then(console.log)
+```
+
 To add a delay to responses, specify a delay amount (in milliseconds) when instantiating the adapter
 
 ```js
@@ -193,6 +210,14 @@ Mocking a request with a specific request body/data
 
 ```js
 mock.onPut('/product', { id: 4, name: 'foo' }).reply(204);
+```
+
+Mocking a request with a specific request body/data and parameters
+
+Make sure to pass `undefined` as a expected headers, in the third argument
+
+```js
+mock.onPut('/product', { name: 'foo' }, undefined, { id: 4 }).reply(204);
 ```
 
 `.passThrough()` forwards the matched request over network

@@ -29,7 +29,12 @@ function combineUrls(baseURL, url) {
 function findHandler(handlers, method, url, body, parameters, headers, baseURL) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
+      return (
+        ( isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0]) ) &&
+        isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
+        isRequestHeadersMatching(headers, handler[2]) &&
+        isParametersMatching(parameters, handler[3])
+      );
     } else if (handler[0] instanceof RegExp) {
       return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
     }
@@ -48,8 +53,9 @@ function isRequestHeadersMatching(requestHeaders, required) {
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
-  var allowedParamsMethods = ['delete', 'get', 'head', 'options'];
-  if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
+  // for these methods, the body argument represents params.
+  var bodyIsParamsMethods = ['delete', 'get', 'head', 'options'];
+  if (bodyIsParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
     var params = required ? required.params : undefined;
     return isParametersMatching(parameters, params);
   } else {
@@ -64,6 +70,7 @@ function isParametersMatching(parameters, required) {
 }
 
 function isBodyMatching(body, requiredBody) {
+  // check that method is allowed to have a body; else return true
   if (requiredBody === undefined) {
     return true;
   }
