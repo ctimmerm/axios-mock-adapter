@@ -117,10 +117,10 @@ describe('MockAdapter basics', function() {
   });
 
   it("can pass query params for post to match to a handler", function() {
-    mock.onPost('/withParams', undefined, undefined, { params: { foo: 'bar', bar: 'foo' }, in: true  }).reply(200);
+    mock.onPost('/withParams', undefined, undefined, { foo: 'bar', bar: 'foo' }).reply(200);
 
     return instance
-      .post('/withParams', undefined, { params: { foo: 'bar', bar: 'foo' }, in: true })
+      .post('/withParams', undefined, { params: { foo: 'bar', bar: 'foo' }})
       .then(function(response){
         expect(response.status).to.equal(200)
       })
@@ -240,7 +240,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass a body and query params to match a handler', function() {
-    mock.onPost('/withBodyAndParams', { body: { is: 'passed' }, in: true }, undefined, { params: { foo: 'bar', bar: 'baz' }}).reply(200);
+    mock.onPost('/withBodyAndParams', { body: { is: 'passed' }, in: true }, undefined, { foo: 'bar', bar: 'baz' }).reply(200);
 
     return instance
       .post('/withBodyAndParams', { body: { is: 'passed' }, in: true }, { params: { foo: 'bar', bar: 'baz' }})
@@ -775,7 +775,7 @@ describe('MockAdapter basics', function() {
     mock.onGet('/', {}, { 'Accept-Charset': 'utf-8' }).reply(200);
 
     expect(mock.handlers['get'].length).to.equal(1);
-    expect(mock.handlers['get'][0][3]).to.equal(200);
+    expect(mock.handlers['get'][0][4]).to.equal(200);
   });
 
   it('supports a retry', function() {
