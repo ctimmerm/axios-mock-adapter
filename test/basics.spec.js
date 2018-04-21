@@ -116,28 +116,28 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it("can't pass query params for post to match to a handler", function() {
-    mock.onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+  it("can pass query params for post to match to a handler", function() {
+    mock.onPost('/withParams', undefined, undefined, { params: { foo: 'bar', bar: 'foo' }, in: true  }).reply(200);
 
     return instance
-      .post('/withParams', { params: { foo: 'bar', bar: 'foo' }, in: true })
-      .catch(function(error) {
-        expect(error.response.status).to.equal(404);
-      });
+      .post('/withParams', undefined, { params: { foo: 'bar', bar: 'foo' }, in: true })
+      .then(function(response){
+        expect(response.status).to.equal(200)
+      })
   });
 
-  it("can't pass query params for put to match to a handler", function() {
-    mock.onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+  it("can pass query params for put to match to a handler", function() {
+    mock.onPut('/withParams', undefined, undefined, { foo: 'bar', bar: 'foo' }).reply(200);
 
     return instance
-      .put('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
-      .catch(function(error) {
-        expect(error.response.status).to.equal(404);
-      });
+      .put('/withParams', undefined, { params: { bar: 'foo', foo: 'bar'}})
+      .then(function(response){
+        expect(response.status).to.equal(200)
+      })
   });
 
   it('can pass query params to match to a handler with uppercase method', function() {
-    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock.onGet('/withParams', { foo: 'bar', bar: 'foo' }).reply(200);
 
     return instance({
       method: 'GET',
@@ -148,7 +148,7 @@ describe('MockAdapter basics', function() {
     });
   });
 
-  it('does not match when parameters are wrong', function() {
+  it('does not match get when parameters are wrong', function() {
     mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
     return instance
       .get('/withParams', { params: { foo: 'bar', bar: 'other' } })
@@ -157,17 +157,73 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it('does not match when parameters are missing', function() {
+  it('does not match get when parameters are missing', function() {
     mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
     return instance.get('/withParams').catch(function(error) {
       expect(error.response.status).to.equal(404);
     });
   });
 
-  it('matches when parameters were not expected', function() {
+  it('matches get when parameters were not expected', function() {
     mock.onGet('/withParams').reply(200);
     return instance
       .get('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('does not match put when parameters are wrong', function() {
+    mock.onPut('/withParams', undefined, undefined, { foo: 'bar', bar: 'foo' }).reply(200);
+    return instance
+      .put('/withParams', undefined, { params: { foo: 'bar', bar: 'other' } })
+      .then(function(){
+        // fail the test if there is a match
+        expect(false).to.be(true)
+      })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+      });
+  });
+
+  it('does not match put when parameters are wrong but body is right', function() {
+    mock.onPut('/withParams', { baz: 'bar', in: true }, undefined, { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    return instance
+      .put('/withParams', { baz: 'bar', in: true }, { foo: 'bar', bar: 'other' })
+      .then(function(){
+        expect(false).to.be(true)
+      })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+      });
+  });
+
+  it('does not match put when parameters are missing', function() {
+    mock.onPut('/withParams', undefined, undefined, { foo: 'bar', bar: 'foo' }).reply(200);
+    return instance.put('/withParams', undefined)
+    .then(function(){
+      expect(false).to.be(true)
+    })
+    .catch(function(error) {
+      expect(error.response.status).to.equal(404);
+    });
+  });
+
+  it('does not match put when parameters are missing but body is right', function() {
+    mock.onPut('/withParams', { baz: 'bar', in: true }, undefined, { foo: 'bar', bar: 'foo' }).reply(200);
+    return instance.put('/withParams', { baz: 'bar', in: true })
+    .then(function(){
+      expect(false).to.be(true)
+    })
+    .catch(function(error) {
+      expect(error.response.status).to.equal(404);
+    });
+  });
+
+  it('matches put when parameters were not expected', function() {
+    mock.onPut('/withParams').reply(200);
+    return instance
+      .put('/withParams', { params: { foo: 'bar', bar: 'foo' } })
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
@@ -183,11 +239,31 @@ describe('MockAdapter basics', function() {
       });
   });
 
+  it('can pass a body and query params to match a handler', function() {
+    mock.onPost('/withBodyAndParams', { body: { is: 'passed' }, in: true }, undefined, { params: { foo: 'bar', bar: 'baz' }}).reply(200);
+
+    return instance
+      .post('/withBodyAndParams', { body: { is: 'passed' }, in: true }, { params: { foo: 'bar', bar: 'baz' }})
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
   it('does not match when body is wrong', function() {
     var body = { body: { is: 'passed' }, in: true };
     mock.onPatch('/wrongObjBody', body).reply(200);
 
     return instance.patch('/wrongObjBody', { wrong: 'body' }).catch(function(error) {
+      expect(error.response.status).to.equal(404);
+    });
+  });
+
+  it('does not match when body is right but params are wrong', function() {
+    var body = { body: { is: 'passed' }, in: true };
+    mock.onPut('/rightObjBodyBadParams', body, { params: { foo: 'bar' }}).reply(200);
+
+    return instance.put('/rightObjBodyBadParams', { body: { is: 'passed' }, in: true }, { params: { wrong: 'parameter' }})
+    .catch(function(error) {
       expect(error.response.status).to.equal(404);
     });
   });
