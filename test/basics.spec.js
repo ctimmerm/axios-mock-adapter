@@ -132,7 +132,7 @@ describe('MockAdapter basics', function() {
     return instance
       .post('/withParams', undefined, { params: { foo: 'bar', bar: 'foo' }})
       .then(function(response){
-        expect(response.status).to.equal(200)
+        expect(response.status).to.equal(200);
       })
   });
 
@@ -142,7 +142,7 @@ describe('MockAdapter basics', function() {
     return instance
       .put('/withParams', undefined, { params: { bar: 'foo', foo: 'bar'}})
       .then(function(response){
-        expect(response.status).to.equal(200)
+        expect(response.status).to.equal(200);
       })
   });
 
