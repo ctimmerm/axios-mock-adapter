@@ -87,7 +87,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for get to match to a handler', function() {
-    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock.onGet('/withParams', { foo: 'bar', bar: 'foo' }).reply(200);
 
     return instance
       .get('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -107,7 +107,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for delete to match to a handler', function() {
-    mock.onDelete('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock.onDelete('/withParams', { foo: 'bar', bar: 'foo' }).reply(200);
 
     return instance
       .delete('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -117,7 +117,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for head to match to a handler', function() {
-    mock.onHead('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock.onHead('/withParams', { foo: 'bar', bar: 'foo' }).reply(200);
 
     return instance
       .head('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -159,7 +159,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('does not match get when parameters are wrong', function() {
-    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock.onGet('/withParams', { foo: 'bar', bar: 'foo' }).reply(200);
     return instance
       .get('/withParams', { params: { foo: 'bar', bar: 'other' } })
       .catch(function(error) {
