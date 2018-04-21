@@ -30,7 +30,6 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   );
 
   if (handler) {
-    // console.log(handler)
     if (handler.length === 8) {
       utils.purgeIfReplyOnce(mockAdapter, handler);
     }
