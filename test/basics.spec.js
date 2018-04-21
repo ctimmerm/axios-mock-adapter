@@ -96,6 +96,16 @@ describe('MockAdapter basics', function() {
       });
   });
 
+  it('can pass query params with empty body for get to match to a handler', function() {
+    mock.onGet('/withParams', undefined, undefined, { foo: 'bar', bar: 'foo' }).reply(200);
+
+    return instance
+      .get('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
   it('can pass query params for delete to match to a handler', function() {
     mock.onDelete('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
 
@@ -240,10 +250,25 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass a body and query params to match a handler', function() {
-    mock.onPost('/withBodyAndParams', { body: { is: 'passed' }, in: true }, undefined, { foo: 'bar', bar: 'baz' }).reply(200);
+    mock.onPost('/withBodyAndParams', { data: { is: 'passed' }, in: true }, undefined, { foo: 'bar', bar: 'baz' }).reply(200);
 
     return instance
-      .post('/withBodyAndParams', { body: { is: 'passed' }, in: true }, { params: { foo: 'bar', bar: 'baz' }})
+      .post('/withBodyAndParams', { data: { is: 'passed' }, in: true }, { params: { foo: 'bar', bar: 'baz' }})
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
+  it('can pass a body, query params, and headers to match a handler', function() {
+    var headers = {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Header-test': 'test-header'
+    };
+    mock.onPost('/withBodyAndParams', { data: { is: 'passed' }, in: true }, headers, { foo: 'bar', bar: 'baz' }).reply(200);
+    
+    return instance
+      .post('/withBodyAndParams', { data: { is: 'passed' }, in: true }, { headers: headers, params: { foo: 'bar', bar: 'baz' }})
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
