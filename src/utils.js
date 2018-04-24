@@ -95,7 +95,7 @@ function settle(resolve, reject, response, delay) {
     response.config.validateStatus(response.status)
       ? resolve(response)
       : reject(createErrorResponse(
-        'Request failed with status code ' + response.status,
+        'Request failed with status code ' + response.status + '\n' + 'Response config ' + JSON.stringify(response.config),
         response.config,
         response
       ));
