@@ -76,14 +76,16 @@ VERBS.concat('any').forEach(function(method) {
       return _this;
     }
 
+    function replyOnce(code, response, headers) {
+      var handler = [matcher, body, requestHeaders, code, response, headers, true];
+      addHandler(method, _this.handlers, handler);
+      return _this;
+    }
+
     return {
       reply: reply,
 
-      replyOnce: function replyOnce(code, response, headers) {
-        var handler = [matcher, body, requestHeaders, code, response, headers, true];
-        addHandler(method, _this.handlers, handler);
-        return _this;
-      },
+      replyOnce: replyOnce,
 
       passThrough: function passThrough() {
         var handler = [matcher, body];
