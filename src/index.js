@@ -99,8 +99,25 @@ VERBS.concat('any').forEach(function(method) {
         });
       },
 
+      networkErrorOnce: function() {
+        replyOnce(function(config) {
+          var error = new Error('Network Error');
+          error.config = config;
+          return Promise.reject(error);
+        });
+      },
+
       timeout: function() {
         reply(function(config) {
+          var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
+          error.config = config;
+          error.code = 'ECONNABORTED';
+          return Promise.reject(error);
+        });
+      },
+
+      timeoutOnce: function() {
+        replyOnce(function(config) {
           var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
           error.config = config;
           error.code = 'ECONNABORTED';

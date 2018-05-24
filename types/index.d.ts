@@ -7,6 +7,8 @@ type ResponseSpecFunc = (statusOrCallback: number | CallbackResponseSpecFunc, da
 interface RequestHandler {
   reply: ResponseSpecFunc;
   replyOnce: ResponseSpecFunc;
+  timeoutOnce: ResponseSpecFunc;
+  networkErrorOnce: ResponseSpecFunc;
 
   passThrough(): void;
   networkError(): void;
