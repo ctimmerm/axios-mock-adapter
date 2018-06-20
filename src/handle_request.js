@@ -12,8 +12,9 @@ function makeResponse(result, config) {
 }
 
 function handleRequest(mockAdapter, resolve, reject, config) {
+  var url = config.url;
   if (config.baseURL && config.url.substr(0, config.baseURL.length) === config.baseURL) {
-    config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+    url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
   }
 
   delete config.adapter;
@@ -22,7 +23,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   var handler = utils.findHandler(
     mockAdapter.handlers,
     config.method,
-    config.url,
+    url,
     config.data,
     config.params,
     config.headers,
