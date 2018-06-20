@@ -40,7 +40,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       // tell axios to use the original adapter instead of our mock, fixes #35
       config.adapter = mockAdapter.originalAdapter;
       mockAdapter.axiosInstance.request(config).then(resolve, reject);
-    } else if (!(handler[3] instanceof Function)) {
+    } else if (typeof handler[3] !== 'function') {
       utils.settle(
         resolve,
         reject,
@@ -50,7 +50,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     } else {
       var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
-      if (!(result.then instanceof Function)) {
+      if (typeof result.then !== 'function') {
         utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
       } else {
         result.then(
