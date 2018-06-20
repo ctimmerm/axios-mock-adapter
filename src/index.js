@@ -76,14 +76,16 @@ VERBS.concat('any').forEach(function(method) {
       return _this;
     }
 
+    function replyOnce(code, response, headers) {
+      var handler = [matcher, body, requestHeaders, code, response, headers, true];
+      addHandler(method, _this.handlers, handler);
+      return _this;
+    }
+
     return {
       reply: reply,
 
-      replyOnce: function replyOnce(code, response, headers) {
-        var handler = [matcher, body, requestHeaders, code, response, headers, true];
-        addHandler(method, _this.handlers, handler);
-        return _this;
-      },
+      replyOnce: replyOnce,
 
       passThrough: function passThrough() {
         var handler = [matcher, body];
@@ -99,8 +101,25 @@ VERBS.concat('any').forEach(function(method) {
         });
       },
 
+      networkErrorOnce: function() {
+        replyOnce(function(config) {
+          var error = new Error('Network Error');
+          error.config = config;
+          return Promise.reject(error);
+        });
+      },
+
       timeout: function() {
         reply(function(config) {
+          var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
+          error.config = config;
+          error.code = 'ECONNABORTED';
+          return Promise.reject(error);
+        });
+      },
+
+      timeoutOnce: function() {
+        replyOnce(function(config) {
           var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
           error.config = config;
           error.code = 'ECONNABORTED';
