@@ -35,10 +35,6 @@ function isArrayBuffer(val) {
   return toString.call(val) === '[object ArrayBuffer]';
 }
 
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
 function combineUrls(baseURL, url) {
   if (baseURL) {
     return baseURL.replace(/\/+$/, '') + '/' + url.replace(/^\/+/, '');
@@ -149,6 +145,5 @@ module.exports = {
   isArrayBuffer: isArrayBuffer,
   isFunction: isFunction,
   isObject: isObject,
-  isUndefined: isUndefined,
   isBuffer: isBuffer
 };
