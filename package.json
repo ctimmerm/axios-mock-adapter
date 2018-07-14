@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "test": "mocha",
-    "test:coverage": "istanbul cover node_modules/.bin/_mocha",
+    "test": "nyc mocha",
+    "test:coverage": "npm run test && nyc report --reporter=html",
     "lint": "eslint src test",
     "build:umd": "webpack src/index.js dist/axios-mock-adapter.js",
     "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/axios-mock-adapter.min.js",
@@ -46,10 +46,12 @@
     "eslint": "^4.17.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.0.0",
+    "nyc": "^12.0.2",
     "rimraf": "^2.6.1",
     "webpack": "^3.3.0"
   },
   "dependencies": {
-    "deep-equal": "^1.0.1"
+    "deep-equal": "^1.0.1",
+    "is-buffer": "^2.0.3"
   }
 }
