@@ -2,7 +2,7 @@
 
 var utils = require('./utils');
 
-function tansformRequest(data, headers) {
+function tansformRequest(data) {
   if (utils.isArrayBuffer(data) ||
     utils.isBuffer(data) ||
     utils.isStream(data)
@@ -22,7 +22,7 @@ function tansformRequest(data, headers) {
 function makeResponse(result, config) {
   return {
     status: result[0],
-    data: tansformRequest(result[1], result[2]),
+    data: tansformRequest(result[1]),
     headers: result[2],
     config: config
   };
