@@ -30,7 +30,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     config.baseURL
   );
 
-  let responseInterceptors = mockAdapter.axiosInstance.interceptors.response;
+  var responseInterceptors = mockAdapter.axiosInstance.interceptors.response;
   if (handler) {
     if (handler.length === 7) {
       utils.purgeIfReplyOnce(mockAdapter, handler);

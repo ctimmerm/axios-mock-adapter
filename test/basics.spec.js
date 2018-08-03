@@ -705,7 +705,9 @@ describe('MockAdapter basics', function() {
   it('supports a retry', function() {
     mock.onGet('/').replyOnce(401);
     mock.onGet('/').replyOnce(201);
-    instance.interceptors.response.use(undefined, function(error) {
+    instance.interceptors.response.use(function(response) {
+      return response;
+    }, function(error) {
       if (error.response && error.response.status === 401) {
         return instance(error.config);
       }
