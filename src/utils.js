@@ -83,21 +83,20 @@ function purgeIfReplyOnce(mock, handler) {
   });
 }
 
-function settle(resolve, reject, response, delay) {
+function settle(resolve, reject, response, delay, responseInterceptors = []) {
   if (delay > 0) {
     setTimeout(function() {
-      settle(resolve, reject, response);
+      settle(resolve, reject, response, 0, responseInterceptors);
     }, delay);
     return;
   }
-
   if (response.config && response.config.validateStatus) {
     response.config.validateStatus(response.status)
-      ? resolve(response)
+      ? resolve(responseInterceptors.handlers.reduce((resp, interceptor) => interceptor.fulfilled(resp), response))
       : reject(createErrorResponse(
-        'Request failed with status code ' + response.status,
-        response.config,
-        response
+      'Request failed with status code ' + response.status,
+      response.config,
+      responseInterceptors.handlers.reduce((resp, interceptor) => interceptor.rejected(resp), response)
       ));
     return;
   }

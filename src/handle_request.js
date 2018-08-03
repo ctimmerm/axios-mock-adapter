@@ -30,6 +30,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     config.baseURL
   );
 
+  let responseInterceptors = mockAdapter.axiosInstance.interceptors.response;
   if (handler) {
     if (handler.length === 7) {
       utils.purgeIfReplyOnce(mockAdapter, handler);
@@ -45,17 +46,18 @@ function handleRequest(mockAdapter, resolve, reject, config) {
         resolve,
         reject,
         makeResponse(handler.slice(3), config),
-        mockAdapter.delayResponse
+        mockAdapter.delayResponse,
+        responseInterceptors
       );
     } else {
       var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
       if (typeof result.then !== 'function') {
-        utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
+        utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse, responseInterceptors);
       } else {
         result.then(
           function(result) {
-            utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
+            utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse, responseInterceptors);
           },
           function(error) {
             if (mockAdapter.delayResponse > 0) {
@@ -78,7 +80,8 @@ function handleRequest(mockAdapter, resolve, reject, config) {
         status: 404,
         config: config
       },
-      mockAdapter.delayResponse
+      mockAdapter.delayResponse,
+      responseInterceptors
     );
   }
 }
