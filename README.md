@@ -31,7 +31,7 @@ var mock = new MockAdapter(axios);
 
 // Mock any GET request to /users
 // arguments for reply are (status, data, headers)
-mock.onGet('/users').reply(200, {
+var handler = mock.onGet('/users').reply(200, {
   users: [
     { id: 1, name: 'John Smith' }
   ]
@@ -41,6 +41,9 @@ axios.get('/users')
   .then(function(response) {
     console.log(response.data);
   });
+
+// Assert mock was called
+expect(handler.called).to.equal(1);
 ```
 
 Mocking a `GET` request with specific parameters
