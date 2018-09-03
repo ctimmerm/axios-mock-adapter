@@ -52,7 +52,7 @@ var MockAdapter = require('axios-mock-adapter');
 // This sets the mock adapter on the default instance
 var mock = new MockAdapter(axios);
 
-// Mock GET request to /users when param `searchText` is 'John' 
+// Mock GET request to /users when param `searchText` is 'John'
 // arguments for reply are (status, data, headers)
 mock.onGet('/users', { params: { searchText: 'John' } }).reply(200, {
   users: [
@@ -114,6 +114,14 @@ mock.onGet('/users').reply(function(config) {
       { id: 1, name: 'John Smith' }
     ]
   }];
+});
+```
+
+Passing a function to `reply` that returns an axios request, essentially mocking a redirect
+
+```js
+mock.onPost('/foo').reply(function(config) {
+  return axios.get('/bar');
 });
 ```
 

@@ -55,7 +55,11 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       } else {
         result.then(
           function(result) {
-            utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
+            if (result.config && result.status) {
+              utils.settle(resolve, reject, makeResponse([result.status, result.data, result.headers], result.config), 0);
+            } else {
+              utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
+            }
           },
           function(error) {
             if (mockAdapter.delayResponse > 0) {

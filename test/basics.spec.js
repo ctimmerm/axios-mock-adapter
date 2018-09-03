@@ -78,6 +78,20 @@ describe('MockAdapter basics', function() {
     });
   });
 
+  it('accepts a callback that returns an axios request', function() {
+    mock
+      .onGet('/bar').reply(200, { foo: 'bar' })
+      .onGet('/foo').reply(function() {
+        return instance.get('/bar')
+      });
+
+    return instance.get('/foo').then(function(response) {
+      expect(response.status).to.equal(200);
+      expect(response.config.url).to.equal('/bar');
+      expect(response.data.foo).to.equal('bar');
+    });
+  });
+
   it('matches on a regex', function() {
     mock.onGet(/\/fo+/).reply(200);
 
