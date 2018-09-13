@@ -240,7 +240,7 @@ Composing from multiple sources with Promises:
 ```js
 var normalAxios = axios.create();
 var mockAxios = axios.create();
-var mock = MockAdapter(mockAxios);
+var mock = new MockAdapter(mockAxios);
 
 mock
   .onGet('/orders')
