@@ -26,17 +26,23 @@ function combineUrls(baseURL, url) {
   return url;
 }
 
-function findHandler(handlers, method, url, body, parameters, headers, baseURL) {
+function findHandler(handlers, method, url, body, parameters, headers, baseURL, ignoreQueryParms) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
+      return (isUrlMatching(url, handler[0], ignoreQueryParms) || isUrlMatching(combineUrls(baseURL, url), handler[0], ignoreQueryParms)) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
     } else if (handler[0] instanceof RegExp) {
       return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
     }
   });
 }
 
-function isUrlMatching(url, required) {
+function isUrlMatching(url, required, ignoreQueryParms) {
+  if (ignoreQueryParms === true)
+  {
+    let tmp1 = ~url.indexOf("?") ? url.substring(0, url.indexOf("?")) : url;
+    let tmp2 = ~required.indexOf("?") ? required.substring(0, required.indexOf("?")) : required;
+    if (tmp1 === tmp2) return true;
+  }
   var noSlashUrl = url[0] === '/' ? url.substr(1) : url;
   var noSlashRequired = required[0] === '/' ? required.substr(1) : required;
   return (noSlashUrl === noSlashRequired);

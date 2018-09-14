@@ -17,6 +17,7 @@ interface RequestHandler {
 
 interface MockAdapterOptions {
   delayResponse?: number;
+  ignoreQueryString?: boolean;
 }
 
 interface RequestDataMatcher {
