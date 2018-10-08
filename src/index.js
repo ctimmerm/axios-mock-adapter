@@ -4,7 +4,7 @@ var deepEqual = require('deep-equal');
 
 var handleRequest = require('./handle_request');
 
-var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options'];
+var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options', 'list'];
 
 function adapter() {
   return function(config) {
