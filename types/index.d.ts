@@ -26,7 +26,11 @@ interface RequestDataMatcher {
   };
 }
 
-type RequestMatcherFunc = (matcher?: string | RegExp, body?: string | RequestDataMatcher) => RequestHandler;
+interface HeadersMatcher {
+  [header: string]: string;
+}
+
+type RequestMatcherFunc = (matcher?: string | RegExp, body?: string | RequestDataMatcher, headers?: HeadersMatcher) => RequestHandler;
 
 declare class MockAdapter {
   constructor(axiosInstance: AxiosInstance, options?: MockAdapterOptions);
