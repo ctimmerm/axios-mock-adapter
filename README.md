@@ -126,6 +126,14 @@ mock.onGet(/\/users\/\d+/).reply(function(config) {
   return [200, {}];
 });
 ```
+Using variables in regex
+```js
+const usersUri = '/users';
+const url = new RegExp(`${usersUri}/*`);
+
+mock.onGet(url).reply(200, users);
+```
+
 
 Specify no path to match by verb alone
 
