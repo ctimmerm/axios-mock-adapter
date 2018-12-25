@@ -258,3 +258,26 @@ mock
     )
   );
 ```
+
+## History
+
+The `history` property allows you to enumerate existing axios request objects. The property is an object of verb keys referencing arrays of request objects.
+
+This is useful for testing.
+
+```js
+describe('Feature', () => {
+  it('requests an endpoint', (done) => {
+    var mock = new AxiosMockAdapter(axios);
+    mock.onPost('/endpoint').replyOnce(200);
+
+    feature.request()
+      .then(() => {
+        expect(mock.history.post.length).toBe(1);
+        expect(mock.history.post[0].data).toBe(JSON.stringify({ foo: 'bar' }));
+      })
+      .then(done)
+      .catch(done.fail);
+  });
+});
+```
