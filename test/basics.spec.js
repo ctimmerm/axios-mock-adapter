@@ -16,6 +16,25 @@ describe('MockAdapter basics', function() {
     expect(instance.defaults.adapter).to.exist;
   });
 
+  it('calls interceptors', function() {
+    instance.interceptors.response.use(
+      function(config) {
+        return config.data;
+      },
+      function(error) {
+        return Promise.reject(error);
+      }
+    );
+
+    mock.onGet('/foo').reply(200, {
+      foo: 'bar'
+    });
+
+    return instance.get('/foo').then(function(response) {
+      expect(response.foo).to.equal('bar');
+    });
+  });
+
   it('supports all verbs', function() {
     expect(mock.onGet).to.be.a('function');
     expect(mock.onPost).to.be.a('function');
@@ -80,9 +99,11 @@ describe('MockAdapter basics', function() {
 
   it('accepts a callback that returns an axios request', function() {
     mock
-      .onGet('/bar').reply(200, { foo: 'bar' })
-      .onGet('/foo').reply(function() {
-        return instance.get('/bar')
+      .onGet('/bar')
+      .reply(200, { foo: 'bar' })
+      .onGet('/foo')
+      .reply(function() {
+        return instance.get('/bar');
       });
 
     return instance.get('/foo').then(function(response) {
@@ -101,7 +122,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for get to match to a handler', function() {
-    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
 
     return instance
       .get('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -111,7 +134,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for delete to match to a handler', function() {
-    mock.onDelete('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onDelete('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
 
     return instance
       .delete('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -121,7 +146,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params for head to match to a handler', function() {
-    mock.onHead('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onHead('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
 
     return instance
       .head('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -131,7 +158,9 @@ describe('MockAdapter basics', function() {
   });
 
   it("can't pass query params for post to match to a handler", function() {
-    mock.onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
 
     return instance
       .post('/withParams', { params: { foo: 'bar', bar: 'foo' }, in: true })
@@ -141,7 +170,9 @@ describe('MockAdapter basics', function() {
   });
 
   it("can't pass query params for put to match to a handler", function() {
-    mock.onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
 
     return instance
       .put('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
@@ -151,7 +182,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass query params to match to a handler with uppercase method', function() {
-    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
 
     return instance({
       method: 'GET',
@@ -163,7 +196,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('does not match when parameters are wrong', function() {
-    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
     return instance
       .get('/withParams', { params: { foo: 'bar', bar: 'other' } })
       .catch(function(error) {
@@ -172,7 +207,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('does not match when parameters are missing', function() {
-    mock.onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } }).reply(200);
+    mock
+      .onGet('/withParams', { params: { foo: 'bar', bar: 'foo' } })
+      .reply(200);
     return instance.get('/withParams').catch(function(error) {
       expect(error.response.status).to.equal(404);
     });
@@ -201,9 +238,11 @@ describe('MockAdapter basics', function() {
     var body = { body: { is: 'passed' }, in: true };
     mock.onPatch('/wrongObjBody', body).reply(200);
 
-    return instance.patch('/wrongObjBody', { wrong: 'body' }).catch(function(error) {
-      expect(error.response.status).to.equal(404);
-    });
+    return instance
+      .patch('/wrongObjBody', { wrong: 'body' })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+      });
   });
 
   it('does not match when string body is wrong', function() {
@@ -231,9 +270,11 @@ describe('MockAdapter basics', function() {
 
     mock.onPost('/withHeaders', undefined, headers).reply(200);
 
-    return instance.post('/withHeaders', undefined, { headers: headers }).then(function(response) {
-      expect(response.status).to.equal(200);
-    });
+    return instance
+      .post('/withHeaders', undefined, { headers: headers })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
   });
 
   it('does not match when request header is wrong', function() {
@@ -241,7 +282,9 @@ describe('MockAdapter basics', function() {
     mock.onPatch('/wrongObjHeader', undefined, headers).reply(200);
 
     return instance
-      .patch('/wrongObjHeader', undefined, { headers: { 'Header-test': 'wrong-header' } })
+      .patch('/wrongObjHeader', undefined, {
+        headers: { 'Header-test': 'wrong-header' }
+      })
       .catch(function(error) {
         expect(error.response.status).to.equal(404);
       });
@@ -401,12 +444,10 @@ describe('MockAdapter basics', function() {
   it('resets the history', function() {
     mock.onAny('/foo').reply(200);
 
-    return instance
-      .get('/foo')
-      .then(function(response) {
-        mock.reset();
-        expect(mock.history['get']).to.eql([]);
-      });
+    return instance.get('/foo').then(function(response) {
+      mock.reset();
+      expect(mock.history['get']).to.eql([]);
+    });
   });
 
   it('resets only the registered mock handlers, not the history', function() {
@@ -414,13 +455,11 @@ describe('MockAdapter basics', function() {
     expect(mock.handlers['get']).not.to.be.empty;
     expect(mock.history['get']).to.eql([]);
 
-    return instance
-      .get('/foo')
-      .then(function(response) {
-        mock.resetHandlers();
-        expect(mock.history.get.length).to.equal(1);
-        expect(mock.handlers['get']).to.be.empty;
-      });
+    return instance.get('/foo').then(function(response) {
+      mock.resetHandlers();
+      expect(mock.history.get.length).to.equal(1);
+      expect(mock.handlers['get']).to.be.empty;
+    });
   });
 
   it('can chain calls to add mock handlers', function() {
@@ -485,10 +524,12 @@ describe('MockAdapter basics', function() {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal('bar');
       }),
-      instance.get('/xyz' + Math.round(100000 * Math.random())).then(function(response) {
-        expect(response.status).to.equal(200);
-        expect(response.data).to.equal('bar');
-      })
+      instance
+        .get('/xyz' + Math.round(100000 * Math.random()))
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+          expect(response.data).to.equal('bar');
+        })
     ]);
   });
 
@@ -703,9 +744,11 @@ describe('MockAdapter basics', function() {
       .onGet('/users', { params: { searchText: 'John' } })
       .reply(200, { id: 1 });
 
-    return instance.get('/users', { params: { searchText: 'John' } }).then(function(response) {
-      expect(response.status).to.equal(200);
-    });
+    return instance
+      .get('/users', { params: { searchText: 'John' } })
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
   });
 
   it('allows overwriting mocks with headers', function() {
