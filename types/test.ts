@@ -1,5 +1,5 @@
-import axios from "axios";
-import MockAdapter from "axios-mock-adapter";
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 
 const instance = axios.create();
 const mock = new MockAdapter(instance);
@@ -10,7 +10,7 @@ namespace AllowsConstructing {
 
 namespace AllowsConstructingWithOptions {
   new MockAdapter(instance, {
-    delayResponse: 2000,
+    delayResponse: 2000
   });
 }
 
@@ -33,6 +33,7 @@ namespace SupportsAllHttpVerbs {
   mock.onHead;
   mock.onDelete;
   mock.onPatch;
+  mock.onList;
 }
 
 namespace SupportsAnyVerb {
@@ -44,7 +45,7 @@ namespace AllowsVerbOnlyMatcher {
 }
 
 namespace AllowsUrlMatcher {
-  mock.onGet("/foo");
+  mock.onGet('/foo');
 }
 
 namespace AllowsUrlRegExpMatcher {
@@ -52,21 +53,21 @@ namespace AllowsUrlRegExpMatcher {
 }
 
 namespace AllowsStringBodyMatcher {
-  mock.onPatch("/foo", "bar");
+  mock.onPatch('/foo', 'bar');
 }
 
 namespace AllowsBodyMatcher {
-  mock.onGet("/foo", {
+  mock.onGet('/foo', {
     id: 4,
-    name: "foo",
+    name: 'foo'
   });
 }
 
 namespace AllowsParameterMatcher {
-  mock.onGet("/foo", {
+  mock.onGet('/foo', {
     params: {
-      searchText: "John",
-    },
+      searchText: 'John'
+    }
   });
 }
 
@@ -87,27 +88,29 @@ namespace SupportsTimeout {
 }
 
 namespace AllowsFunctionReply {
-  mock.onGet().reply((config) => {
-    return [
-      200,
-      { data: "foo" },
-      { RequestedURL: config.url },
-    ];
+  mock.onGet().reply(config => {
+    return [200, { data: 'foo' }, { RequestedURL: config.url }];
   });
 }
 
 namespace AllowsPromiseReply {
-  mock.onGet().reply((config) => {
+  mock.onGet().reply(config => {
     return Promise.resolve([
       200,
-      { data: "bar" },
-      { RequestedURL: config.url },
+      { data: 'bar' },
+      { RequestedURL: config.url }
     ]);
   });
 }
 
 namespace SupportsChanining {
   mock
-    .onGet("/users").reply(200, [/* users */])
-    .onGet("/posts").reply(200, [/* posts */]);
+    .onGet('/users')
+    .reply(200, [
+      /* users */
+    ])
+    .onGet('/posts')
+    .reply(200, [
+      /* posts */
+    ]);
 }
