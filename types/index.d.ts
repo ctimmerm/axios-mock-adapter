@@ -48,6 +48,8 @@ declare class MockAdapter {
   adapter(): AxiosAdapter;
   reset(): void;
   restore(): void;
+  
+  history: { [method:string]:AxiosRequestConfig[]; };
 
   onGet: RequestMatcherFunc;
   onPost: RequestMatcherFunc;
