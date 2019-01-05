@@ -93,6 +93,9 @@ Mock a low level network error
 ```js
 // Returns a failed promise with Error('Network Error');
 mock.onGet('/users').networkError();
+
+// networkErrorOnce can be used to mock a network error only once 
+mock.onGet('/users').networkErrorOnce();
 ```
 
 Mock a network timeout
@@ -100,6 +103,9 @@ Mock a network timeout
 ```js
 // Returns a failed promise with Error with code set to 'ECONNABORTED'
 mock.onGet('/users').timeout();
+
+// timeoutOnce can be used to mock a timeout only once 
+mock.onGet('/users').timeoutOnce();
 ```
 
 Passing a function to `reply`
