@@ -109,4 +109,60 @@ describe('passThrough tests (requires Node)', function() {
         })
     ]);
   });
+  it('handles request transformations properly', function() {
+    mock.onGet('/foo').passThrough();
+
+    return instance.get('/foo', {
+      data: 'foo',
+      transformRequest: [function(data) {
+        return data + 'foo';
+      }]
+    })
+      .then(function(response) {
+        expect(response.config.data).to.equal('foofoo');
+      });
+  });
+  it('handles request interceptors properly', function() {
+    instance.interceptors.request.use(function god(req) {
+      if (req.data === 'foofoo') {
+      }
+      req.data += 'foo';
+      return req;
+    }, Promise.reject);
+    mock.onGet('/foo').passThrough();
+
+    return instance.get('/foo', {
+      data: 'foo'
+    })
+      .then(function(response) {
+        expect(response.config.data).to.equal('foofoo');
+      });
+  });
+
+  it('handles response transformations properly', function() {
+    mock.onGet('/foo').passThrough();
+
+    return instance.get('/foo', {
+      transformResponse: [function(data) {
+        return data + 'foo';
+      }]
+    })
+      .then(function(response) {
+        expect(response.data).to.equal('foofoo');
+      });
+  });
+  it('handles response interceptors properly', function() {
+    instance.interceptors.response.use(function(res) {
+      res.data += 'foo';
+      return res;
+    }, Promise.reject);
+    mock.onGet('/foo').passThrough();
+
+    return instance.get('/foo', {
+      data: 'foo'
+    })
+      .then(function(response) {
+        expect(response.data).to.equal('foofoo');
+      });
+  });
 });

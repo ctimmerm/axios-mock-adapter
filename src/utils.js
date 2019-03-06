@@ -124,10 +124,46 @@ function isSimpleObject(value) {
   return value !== null && value !== undefined && value.toString() === '[object Object]';
 }
 
+function retrieve(obj, prop) {
+  var val = obj[prop];
+  delete obj[prop];
+  return val;
+}
+
+function retrieveTransforms(instance, config) {
+  var requestInterceptors = [];
+  while (instance.interceptors.request.handlers.length) {
+    requestInterceptors.push(instance.interceptors.request.handlers.pop());
+  }
+  var responseInterceptors = [];
+  while (instance.interceptors.response.handlers.length) {
+    responseInterceptors.push(instance.interceptors.response.handlers.pop());
+  }
+  return {
+    requestInterceptors: requestInterceptors,
+    responseInterceptors: responseInterceptors,
+    transformRequest: retrieve(config, 'transformRequest'),
+    transformResponse: retrieve(config, 'transformResponse')
+  };
+}
+
+function injectTransforms(transforms, instance, config) {
+  transforms.requestInterceptors.forEach(function(i) {
+    instance.interceptors.request.use(i);
+  });
+  transforms.responseInterceptors.forEach(function(i) {
+    instance.interceptors.response.use(i);
+  });
+  config.transformRequest = transforms.transformRequest;
+  config.transformResponse = transforms.transformResponse;
+}
+
 module.exports = {
   find: find,
   findHandler: findHandler,
   isSimpleObject: isSimpleObject,
   purgeIfReplyOnce: purgeIfReplyOnce,
-  settle: settle
+  settle: settle,
+  retrieveTransforms: retrieveTransforms,
+  injectTransforms: injectTransforms
 };

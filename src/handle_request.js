@@ -39,7 +39,11 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       // passThrough handler
       // tell axios to use the original adapter instead of our mock, fixes #35
       config.adapter = mockAdapter.originalAdapter;
+      // don't use the transforms because they are called by axios, fixes #61
+      // TODO: write a more elegant solution that isn't turning transforms off and on
+      var transforms = utils.retrieveTransforms(mockAdapter.axiosInstance, config);
       mockAdapter.axiosInstance.request(config).then(resolve, reject);
+      utils.injectTransforms(transforms, mockAdapter.axiosInstance, config);
     } else if (typeof handler[3] !== 'function') {
       utils.settle(
         resolve,
