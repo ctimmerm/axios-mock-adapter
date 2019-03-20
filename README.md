@@ -79,7 +79,13 @@ You can restore the original adapter (which will remove the mocking behavior)
 mock.restore();
 ```
 
-You can also reset the registered mock handlers with `reset`
+You can also reset the registered mock handlers with `resetHandlers`
+
+```js
+mock.resetHandlers();
+```
+
+You can reset both registered mock handlers and history items with `reset`
 
 ```js
 mock.reset();
@@ -302,4 +308,10 @@ describe('Feature', () => {
       .catch(done.fail);
   });
 });
+```
+
+You can clear the history with `resetHistory`
+
+```js
+mock.resetHistory();
 ```
