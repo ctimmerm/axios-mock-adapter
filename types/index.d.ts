@@ -47,6 +47,8 @@ declare class MockAdapter {
 
   adapter(): AxiosAdapter;
   reset(): void;
+  resetHandlers(): void;
+  resetHistory(): void;
   restore(): void;
   
   history: { [method:string]:AxiosRequestConfig[]; };

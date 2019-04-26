@@ -22,6 +22,14 @@ namespace SupportsReset {
   mock.reset();
 }
 
+namespace SupportsResetHandlers {
+  mock.resetHandlers();
+}
+
+namespace SupportsResetHistory {
+  mock.resetHistory();
+}
+
 namespace SupportsRestore {
   mock.restore();
 }
