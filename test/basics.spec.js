@@ -1,6 +1,6 @@
 var axios = require('axios');
 var expect = require('chai').expect;
-
+var FormData = require('formdata-node').default;
 var MockAdapter = require('../src');
 
 describe('MockAdapter basics', function() {
@@ -308,6 +308,50 @@ describe('MockAdapter basics', function() {
 
     return instance.post('/foo', { bar: 'baz' }).then(function(response) {
       expect(response.data).to.equal('baz');
+    });
+  });
+
+  describe('with FormData', function() {
+    it('works when multipart FormData body matches', function() {
+      var body = new FormData();
+      body.append('key', 'value');
+      var matchBody = new FormData;
+      matchBody.append('key', 'value');
+      mock.onPost('/formDataMatch', body).replyOnce(200);
+
+      return instance
+        .post('/formDataMatch', matchBody)
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+        });
+    });
+
+    it('does not reply on FormData keys mismatch', function() {
+      var body = new FormData();
+      body.append('key', 'value');
+      var matchBody = new FormData;
+      matchBody.append('some-other-key', 'value');
+      mock.onPost('/formDataMatch', body).replyOnce(200);
+
+      return instance
+        .post('/formDataNoMatch', matchBody)
+        .catch(function(error) {
+          expect(error.response.status).to.equal(404);
+        });
+    });
+
+    it('does not reply on FormData data mismatch', function() {
+      var body = new FormData();
+      body.append('key', 'value');
+      var matchBody = new FormData;
+      matchBody.append('key', 'another value');
+      mock.onPost('/formDataMatch', body).replyOnce(200);
+
+      return instance
+        .post('/formDataNoMatch', matchBody)
+        .catch(function(error) {
+          expect(error.response.status).to.equal(404);
+        });
     });
   });
 
