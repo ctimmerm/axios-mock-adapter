@@ -50,8 +50,8 @@ declare class MockAdapter {
   resetHandlers(): void;
   resetHistory(): void;
   restore(): void;
-  
-  history: { [method:string]:AxiosRequestConfig[]; };
+
+  history: { [method: string]: AxiosRequestConfig[] };
 
   onGet: RequestMatcherFunc;
   onPost: RequestMatcherFunc;
