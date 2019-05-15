@@ -13,12 +13,11 @@ type ResponseSpecFunc = (
 interface RequestHandler {
   reply: ResponseSpecFunc;
   replyOnce: ResponseSpecFunc;
-  timeoutOnce: ResponseSpecFunc;
-  networkErrorOnce: ResponseSpecFunc;
-
   passThrough(): MockAdapter;
-  networkError(): MockAdapter;
-  timeout(): MockAdapter;
+  networkError(): void;
+  networkErrorOnce(): void;
+  timeout(): void;
+  timeoutOnce(): void;
 }
 
 interface MockAdapterOptions {
