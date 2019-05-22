@@ -124,10 +124,45 @@ function isSimpleObject(value) {
   return value !== null && value !== undefined && value.toString() === '[object Object]';
 }
 
+function getRouteParams(knownRouteParams, route, config) {
+  var routeParams = {}
+
+  if (knownRouteParams == null || typeof route !== 'string') {
+    return routeParams;
+  }
+
+  var paramsUsedInRoute = route.split('/').filter(function (param) {
+    return knownRouteParams[param] !== undefined;
+  });
+  if (paramsUsedInRoute.length == 0) {
+    return routeParams;
+  }
+
+  paramsUsedInRoute.forEach(function(param) {
+    route = route.replace(param, '(' + knownRouteParams[param] + ')');
+  });
+
+  var actualUrl = config.baseURL ? config.url.slice(config.baseURL.length) : config.url;
+  var routeMatches = actualUrl.match(new RegExp('^' + route + '$'));
+
+  paramsUsedInRoute.forEach(function(param, index) {
+    var paramNameMatches = param.match(/^:(.+)|{(.+)}$/) || [];
+    var paramName = paramNameMatches[1] || paramNameMatches[2];
+    if (paramName === undefined) {
+      return;
+    }
+
+    routeParams[paramName] = routeMatches[index+1];
+  })
+
+  return routeParams;
+}
+
 module.exports = {
   find: find,
   findHandler: findHandler,
   isSimpleObject: isSimpleObject,
   purgeIfReplyOnce: purgeIfReplyOnce,
-  settle: settle
+  settle: settle,
+  getRouteParams: getRouteParams,
 };

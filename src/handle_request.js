@@ -31,9 +31,10 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   );
 
   if (handler) {
-    if (handler.length === 7) {
+    if (handler.length === 8) {
       utils.purgeIfReplyOnce(mockAdapter, handler);
     }
+    config.routeParams = utils.getRouteParams(mockAdapter.knownRouteParams, handler[6], config);
 
     if (handler.length === 2) {
       // passThrough handler
