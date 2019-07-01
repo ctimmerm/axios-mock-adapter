@@ -15,8 +15,8 @@ function makeResponse(
     return {
       status,
       statusText: `${status}`,
-      data,
-      headers,
+      data,  // may be undefined if result is 1-tuple
+      headers, // may be undefined if result is 1-tuple or 2-tuple
       config
     };
   }

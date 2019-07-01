@@ -29,8 +29,10 @@ export type ResponseTuple = [
   number, // status
   any | undefined // body
 ];
-
-export type ResponseType = ResponseTuple | ResponseTriple | AxiosResponse;
+export type ResponseSingle = [
+  number // status
+];
+export type ResponseType = ResponseTuple | ResponseTriple | ResponseSingle | AxiosResponse;
 export type CallbackResponseSpecFunc = (
   config: AxiosRequestConfig
 ) => ResponseType | Promise<ResponseType> | AxiosPromise;
