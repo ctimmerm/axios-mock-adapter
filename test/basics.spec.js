@@ -757,7 +757,7 @@ describe('MockAdapter basics', function() {
     mock.onGet('/', {}, { 'Accept-Charset': 'utf-8' }).reply(200);
 
     expect(mock.handlers['get'].length).to.equal(1);
-    expect(mock.handlers['get'][0][3]).to.equal(200);
+    expect(mock.handlers['get'][0].response.status).to.equal(200);
   });
 
   it('supports a retry', function() {
