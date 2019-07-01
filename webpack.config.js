@@ -6,6 +6,14 @@ var config = {
   externals: {
     axios: 'axios'
   },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js']
+  },
+  module: {
+    rules: [
+      { test: /\.tsx?$/, loader: 'ts-loader' }
+    ]
+  },
   plugins: []
 };
 

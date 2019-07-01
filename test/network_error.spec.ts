@@ -1,11 +1,10 @@
-var axios = require('axios');
-var expect = require('chai').expect;
-
-var MockAdapter = require('../src');
+import axios, { AxiosInstance } from 'axios';
+import MockAdapter from '../src/MockAdapter';
+import { expect } from 'chai';
 
 describe('networkError spec', function() {
-  var instance;
-  var mock;
+  var instance: AxiosInstance;
+  var mock: MockAdapter;
 
   beforeEach(function() {
     instance = axios.create();

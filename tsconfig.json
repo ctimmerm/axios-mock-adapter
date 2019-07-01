@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "./src",
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "strict": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test"
+  ]
+}
