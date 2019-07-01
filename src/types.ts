@@ -38,7 +38,7 @@ export type CallbackResponseSpecFunc = (
 export type StatusOrCallback = number | CallbackResponseSpecFunc;
 
 export interface MockAdapterOptions {
-  delayResponse?: number;
+  delayResponse: number;
 }
 
 export interface RequestDataMatcher {

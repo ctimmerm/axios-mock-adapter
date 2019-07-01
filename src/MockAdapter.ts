@@ -21,7 +21,7 @@ type ConfiguratorAcquirer = (
 export default class MockAdapter {
   public readonly axiosInstance?: AxiosInstance;
   public readonly originalAdapter: AxiosAdapter | undefined;
-  public readonly delayResponse: number = 0;
+  public readonly options: MockAdapterOptions;
   public handlers: HandlerMap = getVerbObject();
   public history: {
     [method in HttpVerb]: AxiosRequestConfig[];
@@ -29,15 +29,15 @@ export default class MockAdapter {
 
   public constructor(
     axiosInstance: AxiosInstance,
-    options?: MockAdapterOptions
+    options?: Partial<MockAdapterOptions>
   ) {
+    this.options = {
+      delayResponse: 0,
+      ...options
+    };
     if (axiosInstance) {
       this.axiosInstance = axiosInstance;
       this.originalAdapter = axiosInstance.defaults.adapter;
-      this.delayResponse =
-        options && options.delayResponse && options.delayResponse > 0
-          ? options.delayResponse
-          : 0;
       axiosInstance.defaults.adapter = this.adapter();
     }
   }

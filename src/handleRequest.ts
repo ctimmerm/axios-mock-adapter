@@ -128,7 +128,7 @@ export default function handleRequest(
           [response.status, response.body, response.headers],
           config
         ),
-        mockAdapter.delayResponse
+        mockAdapter.options.delayResponse
       );
     }
     const result = Promise.resolve(response.status(config));
@@ -139,14 +139,14 @@ export default function handleRequest(
           resolve,
           reject,
           makeResponse(result, config),
-          mockAdapter.delayResponse
+          mockAdapter.options.delayResponse
         );
       },
       error => {
-        if (mockAdapter.delayResponse > 0) {
+        if (mockAdapter.options.delayResponse > 0) {
           setTimeout(() => {
             reject(error);
-          }, mockAdapter.delayResponse);
+          }, mockAdapter.options.delayResponse);
         } else {
           reject(error);
         }
