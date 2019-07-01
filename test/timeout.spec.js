@@ -1,7 +1,7 @@
 var axios = require('axios');
 var expect = require('chai').expect;
 
-var MockAdapter = require('../src');
+var MockAdapter = require('../src').default;
 
 describe('timeout spec', function() {
   var mock;
