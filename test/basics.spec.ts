@@ -1,11 +1,12 @@
-var axios = require('axios');
-var expect = require('chai').expect;
-
-var MockAdapter = require('../src').default;
+import axios from 'axios';
+import MockAdapter from '../src/MockAdapter';
+import { AxiosInstance } from 'axios';
+import { expect } from 'chai';
+import { RespondingHandler } from '../src/types';
 
 describe('MockAdapter basics', function() {
-  var instance;
-  var mock;
+  var instance: AxiosInstance;
+  var mock: MockAdapter;
 
   beforeEach(function() {
     instance = axios.create();
@@ -31,7 +32,7 @@ describe('MockAdapter basics', function() {
     });
 
     return instance.get('/foo').then(function(response) {
-      expect(response.foo).to.equal('bar');
+      expect((response as any).foo).to.equal('bar');
     });
   });
 
@@ -128,7 +129,7 @@ describe('MockAdapter basics', function() {
       .reply(200);
 
     return instance
-      .get('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .get('/withParams', { params: { bar: 'foo', foo: 'bar' } })
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
@@ -140,7 +141,7 @@ describe('MockAdapter basics', function() {
       .reply(200);
 
     return instance
-      .delete('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .delete('/withParams', { params: { bar: 'foo', foo: 'bar' } })
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
@@ -152,31 +153,31 @@ describe('MockAdapter basics', function() {
       .reply(200);
 
     return instance
-      .head('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .head('/withParams', { params: { bar: 'foo', foo: 'bar' } })
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
   });
 
-  it("can't pass query params for post to match to a handler", function() {
+  it('can\'t pass query params for post to match to a handler', function() {
     mock
       .onPost('/withParams', { params: { foo: 'bar', bar: 'foo' } })
       .reply(200);
 
     return instance
-      .post('/withParams', { params: { foo: 'bar', bar: 'foo' }, in: true })
+      .post('/withParams', { params: { foo: 'bar', bar: 'foo' } })
       .catch(function(error) {
         expect(error.response.status).to.equal(404);
       });
   });
 
-  it("can't pass query params for put to match to a handler", function() {
+  it('can\'t pass query params for put to match to a handler', function() {
     mock
       .onPut('/withParams', { params: { foo: 'bar', bar: 'foo' } })
       .reply(200);
 
     return instance
-      .put('/withParams', { params: { bar: 'foo', foo: 'bar' }, in: true })
+      .put('/withParams', { params: { bar: 'foo', foo: 'bar' } })
       .catch(function(error) {
         expect(error.response.status).to.equal(404);
       });
@@ -226,17 +227,17 @@ describe('MockAdapter basics', function() {
   });
 
   it('can pass a body to match to a handler', function() {
-    mock.onPost('/withBody', { body: { is: 'passed' }, in: true }).reply(200);
+    mock.onPost('/withBody', { body: { is: 'passed' } }).reply(200);
 
     return instance
-      .post('/withBody', { body: { is: 'passed' }, in: true })
+      .post('/withBody', { body: { is: 'passed' } })
       .then(function(response) {
         expect(response.status).to.equal(200);
       });
   });
 
   it('does not match when body is wrong', function() {
-    var body = { body: { is: 'passed' }, in: true };
+    var body = { body: { is: 'passed' } };
     mock.onPatch('/wrongObjBody', body).reply(200);
 
     return instance
@@ -293,7 +294,7 @@ describe('MockAdapter basics', function() {
 
   it('passes the config to the callback', function() {
     mock.onGet(/\/products\/\d+/).reply(function(config) {
-      return [200, {}, { RequestedURL: config.url }];
+      return [200, {}, { RequestedURL: config.url || 'x' }];
     });
 
     return instance.get('/products/25').then(function(response) {
@@ -425,7 +426,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('restores the previous adapter (if any)', function() {
-    var adapter = function() {};
+    var adapter = () => Promise.reject();
     var newInstance = axios.create();
     newInstance.defaults.adapter = adapter;
     var newMock = new MockAdapter(newInstance);
@@ -715,7 +716,7 @@ describe('MockAdapter basics', function() {
       });
   });
 
-  it("should not allow overwriting only on reply if replyOnce wasn't used first", function() {
+  it('should not allow overwriting only on reply if replyOnce wasn\'t used first', function() {
     var counter = 0;
     mock.onGet('/').reply(200);
     mock.onGet('/').reply(401);
@@ -757,7 +758,7 @@ describe('MockAdapter basics', function() {
     mock.onGet('/', {}, { 'Accept-Charset': 'utf-8' }).reply(200);
 
     expect(mock.handlers['get'].length).to.equal(1);
-    expect(mock.handlers['get'][0].response.status).to.equal(200);
+    expect((mock.handlers['get'][0] as RespondingHandler).response.status).to.equal(200);
   });
 
   it('supports a retry', function() {

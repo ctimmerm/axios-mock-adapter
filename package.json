@@ -5,8 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "test": "ts-mocha",
-    "test:coverage": "nyc ts-mocha",
+    "test": "ts-mocha test/*.ts",
+    "test:coverage": "nyc ts-mocha test/*.ts",
     "lint": "eslint src test",
     "build:ts": "tsc",
     "build:umd": "webpack --mode development ./src/index.ts --output ./dist/axios-mock-adapter.js",
@@ -45,6 +45,7 @@
     "@types/deep-equal": "^1.0.1",
     "@types/expect": "^1.20.4",
     "@types/mocha": "^5.2.7",
+    "@types/node": "^12.0.10",
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
     "axios": "^0.18.0",
@@ -70,7 +71,10 @@
       ".tsx"
     ],
     "exclude": [
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "coverage/**",
+      "dist/**",
+      "webpack.config.js"
     ],
     "reporter": [
       "html"

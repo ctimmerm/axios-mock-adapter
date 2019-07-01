@@ -1,11 +1,10 @@
-var axios = require('axios');
-var expect = require('chai').expect;
-
-var MockAdapter = require('../src').default;
+import axios, { AxiosInstance } from 'axios';
+import MockAdapter from '../src/MockAdapter';
+import { expect } from 'chai';
 
 describe('MockAdapter replyOnce', function() {
-  var instance;
-  var mock;
+  var instance: AxiosInstance;
+  var mock: MockAdapter;
 
   beforeEach(function() {
     instance = axios.create();
@@ -89,11 +88,11 @@ describe('MockAdapter replyOnce', function() {
     mock
       .onGet('/foo')
       .replyOnce(function() {
-        return [200];
+        return [200, ''];
       })
       .onGet('/foo')
       .replyOnce(function() {
-        return [202];
+        return [202, ''];
       });
 
     return instance

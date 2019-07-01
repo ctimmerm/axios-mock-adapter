@@ -1,32 +1,18 @@
-var axios = require('axios');
-var expect = require('chai').expect;
-var createServer = require('http').createServer;
-
-var MockAdapter = require('../src').default;
+import axios, { AxiosInstance } from 'axios';
+import MockAdapter from '../src/MockAdapter';
+import { expect } from 'chai';
+import createReplyServer from './reply-server';
 
 describe('trailing slash in axios baseUrl issue (requires Node)', function() {
-  var instance;
-  var mock;
+  var instance: AxiosInstance;
+  var mock: MockAdapter;
   var httpServer;
   var serverUrl;
 
   before('set up Node server', function() {
-    return new Promise(function(resolve, reject) {
-      httpServer = createServer(function(req, resp) {
-        if (req.url === '/error') {
-          resp.statusCode = 500;
-          resp.end();
-        } else {
-          resp.statusCode = 200;
-          // Reply with path minus leading /
-          resp.end(req.url.slice(1), 'utf8');
-        }
-      })
-        .listen(0, '127.0.0.1', function() {
-          serverUrl = 'http://127.0.0.1:' + httpServer.address().port;
-          resolve();
-        })
-        .on('error', reject);
+    return createReplyServer().then(([server, url]) => {
+      httpServer = server;
+      serverUrl = url;
     });
   });
 

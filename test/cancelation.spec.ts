@@ -1,12 +1,10 @@
-var axios = require('axios');
-var expect = require('chai').expect;
-
-var MockAdapter = require('../src').default;
-var CancelToken = axios.CancelToken;
+import axios, { AxiosInstance } from 'axios';
+import MockAdapter from '../src/MockAdapter';
+import { expect } from 'chai';
 
 describe('MockAdapter basics', function() {
-  var instance;
-  var mock;
+  var instance: AxiosInstance;
+  var mock: MockAdapter;
 
   beforeEach(function() {
     instance = axios.create();
@@ -14,7 +12,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('handles canceled requests', function() {
-    var source = CancelToken.source();
+    var source = axios.CancelToken.source();
 
     mock.onGet('/foo').reply(200);
 
@@ -34,7 +32,7 @@ describe('MockAdapter basics', function() {
   });
 
   it('works as normal is request is not canceled', function() {
-    var source = CancelToken.source();
+    var source = axios.CancelToken.source();
 
     mock.onGet('/foo').reply(200);
 
