@@ -1,7 +1,7 @@
 import * as utils from './utils';
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import MockAdapter from './MockAdapter';
-import { RespondingHandler, ResponseType } from './types';
+import { MockAdapterOptions, RespondingHandler, ResponseType } from './types';
 
 function makeResponse(
   result: ResponseType,
@@ -29,19 +29,12 @@ function makeResponse(
   }
 }
 
-function settle(
+function settleImmediate(
   resolve,
   reject,
   response: AxiosResponse,
-  delay?: number
+  options: MockAdapterOptions
 ) {
-  if (delay && delay > 0) {
-    setTimeout(() => {
-      settle(resolve, reject, response);
-    }, delay);
-    return;
-  }
-
   if (response.config && response.config.validateStatus) {
     if (response.config.validateStatus(response.status)) {
       return resolve(response);
@@ -60,6 +53,22 @@ function settle(
       reject(response);
     }
   }
+}
+
+function settle(
+  resolve,
+  reject,
+  response: AxiosResponse,
+  options: MockAdapterOptions
+) {
+  if (options.delayResponse && options.delayResponse > 0) {
+    setTimeout(() => {
+      settleImmediate(resolve, reject, response, options);
+    }, options.delayResponse);
+    return;
+  }
+
+  return settleImmediate(resolve, reject, response, options);
 }
 
 function createErrorResponse(
@@ -99,7 +108,7 @@ export default function handleRequest(
       resolve,
       reject,
       makeResponse([404, 'No handler', undefined], config),
-      mockAdapter.delayResponse
+      mockAdapter.options
     );
   }
 
@@ -128,7 +137,7 @@ export default function handleRequest(
           [response.status, response.body, response.headers],
           config
         ),
-        mockAdapter.options.delayResponse
+        mockAdapter.options
       );
     }
     const result = Promise.resolve(response.status(config));
@@ -139,7 +148,7 @@ export default function handleRequest(
           resolve,
           reject,
           makeResponse(result, config),
-          mockAdapter.options.delayResponse
+          mockAdapter.options
         );
       },
       error => {
