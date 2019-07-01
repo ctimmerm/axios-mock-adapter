@@ -2,14 +2,15 @@
   "name": "axios-mock-adapter",
   "version": "1.16.0",
   "description": "Axios adapter that allows to easily mock requests",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "test": "mocha",
-    "test:coverage": "istanbul cover node_modules/.bin/_mocha",
+    "test": "ts-mocha",
+    "test:coverage": "nyc ts-mocha",
     "lint": "eslint src test",
-    "build:umd": "webpack --mode development ./src/index.js --output ./dist/axios-mock-adapter.js",
-    "build:umd:min": "webpack --mode production ./src/index.js --output ./dist/axios-mock-adapter.min.js",
+    "build:ts": "tsc",
+    "build:umd": "webpack --mode development ./src/index.ts --output ./dist/axios-mock-adapter.js",
+    "build:umd:min": "webpack --mode production ./src/index.ts --output ./dist/axios-mock-adapter.min.js",
     "prepublish": "npm run clean && npm run build:umd && npm run build:umd:min"
   },
   "files": [
@@ -37,19 +38,43 @@
   },
   "homepage": "https://github.com/ctimmerm/axios-mock-adapter#readme",
   "peerDependencies": {
-    "axios": ">= 0.9.0"
+    "axios": ">= 0.15.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/deep-equal": "^1.0.1",
+    "@types/expect": "^1.20.4",
+    "@types/mocha": "^5.2.7",
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
     "axios": "^0.18.0",
     "chai": "^4.1.0",
     "eslint": "^5.2.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
+    "nyc": "^14.1.1",
+    "prettier": "^1.18.2",
     "rimraf": "^2.6.1",
+    "ts-loader": "^6.0.4",
+    "ts-mocha": "^6.0.0",
+    "typescript": "^3.5.2",
     "webpack": "^4.16.4",
-    "webpack-command": "^0.4.1"
+    "webpack-cli": "^3.3.5"
   },
   "dependencies": {
     "deep-equal": "^1.0.1"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "all": true
   }
 }

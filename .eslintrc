@@ -1,4 +1,7 @@
 {
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": ["plugin:@typescript-eslint/recommended"],
   "rules": {
     "brace-style": [2, "1tbs", {"allowSingleLine": false}],
     "comma-dangle": 2,
@@ -20,6 +23,8 @@
     "quotes": [2, "single", "avoid-escape"],
     "semi": [2, "always"],
     "space-before-blocks": [2, "always"],
-    "space-before-function-paren": [2, "never"]
+    "space-before-function-paren": [2, "never"],
+    "@typescript-eslint/indent": [2, 2],
+    "@typescript-eslint/no-use-before-define": 0
   }
 }
