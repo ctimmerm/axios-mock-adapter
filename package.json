@@ -45,6 +45,7 @@
     "eslint": "^5.2.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
+    "qs": "^6.5.1",
     "rimraf": "^2.6.1",
     "webpack": "^4.16.4",
     "webpack-command": "^0.4.1"

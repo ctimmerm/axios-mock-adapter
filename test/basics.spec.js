@@ -1,5 +1,6 @@
 var axios = require('axios');
 var expect = require('chai').expect;
+var qs = require('qs');
 
 var MockAdapter = require('../src');
 
@@ -772,5 +773,25 @@ describe('MockAdapter basics', function() {
     return instance({ method: 'get', url: '/' }).then(function(response) {
       expect(response.status).to.equal(201);
     });
+  });
+
+  it('can pass serialized query params', function() {
+    var params = { user_id: [123, 456] };
+    var serializer = function(params) {
+      return qs.stringify(params, { arrayFormat: 'repeat' });
+    };
+
+    expect(serializer(params)).to.equal('user_id=123&user_id=456');
+    mock.onGet('/withSerializedParams', { paramsSerializer: serializer, params: params }).reply(200);
+
+    return instance
+      .get('/withSerializedParams', { paramsSerializer: serializer, params: params, in: true }) // with serialization
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+        return instance.get('/withSerializedParams', { params: params, in: true }); // without serialization
+      })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+      });
   });
 });

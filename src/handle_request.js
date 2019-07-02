@@ -25,7 +25,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     config.method,
     url,
     config.data,
-    config.params,
+    typeof config.paramsSerializer === 'function' ? config.paramsSerializer(config.params) : config.params,
     config.headers,
     config.baseURL
   );

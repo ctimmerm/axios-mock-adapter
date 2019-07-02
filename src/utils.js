@@ -51,6 +51,7 @@ function isBodyOrParametersMatching(method, body, parameters, required) {
   var allowedParamsMethods = ['delete', 'get', 'head', 'options'];
   if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
     var params = required ? required.params : undefined;
+    if (params && typeof required.paramsSerializer === 'function') params = required.paramsSerializer(params);
     return isParametersMatching(parameters, params);
   } else {
     return isBodyMatching(body, required);
@@ -60,7 +61,7 @@ function isBodyOrParametersMatching(method, body, parameters, required) {
 function isParametersMatching(parameters, required) {
   if (required === undefined) return true;
 
-  return isEqual(parameters, required);
+  return isEqual(parameters, required) || parameters === required;
 }
 
 function isBodyMatching(body, requiredBody) {
