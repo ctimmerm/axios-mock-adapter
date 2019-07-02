@@ -12,9 +12,8 @@ function makeResponse(result, config) {
 }
 
 function handleRequest(mockAdapter, resolve, reject, config) {
-  var url = config.url;
   if (config.baseURL && config.url.substr(0, config.baseURL.length) === config.baseURL) {
-    url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+    config.url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
   }
 
   delete config.adapter;
@@ -23,11 +22,12 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   var handler = utils.findHandler(
     mockAdapter.handlers,
     config.method,
-    url,
+    config.url,
     config.data,
     config.params,
     config.headers,
-    config.baseURL
+    config.baseURL,
+    mockAdapter.optionIgnoreQueryString
   );
 
   if (handler) {
@@ -40,7 +40,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       // tell axios to use the original adapter instead of our mock, fixes #35
       config.adapter = mockAdapter.originalAdapter;
       mockAdapter.axiosInstance.request(config).then(resolve, reject);
-    } else if (typeof handler[3] !== 'function') {
+    } else if (!(handler[3] instanceof Function)) {
       utils.settle(
         resolve,
         reject,
@@ -50,7 +50,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     } else {
       var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
-      if (typeof result.then !== 'function') {
+      if (!(result.then instanceof Function)) {
         utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
       } else {
         result.then(
