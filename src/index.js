@@ -2,6 +2,7 @@
 
 var deepEqual = require('deep-equal');
 
+var utils = require('./utils');
 var handleRequest = require('./handle_request');
 
 var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options', 'list'];
@@ -54,6 +55,10 @@ function MockAdapter(axiosInstance, options) {
 
 MockAdapter.prototype.adapter = adapter;
 
+MockAdapter.prototype.removeHandler = function removeHanlder(handler) {
+  utils.purgeIfReplyOnce(this, handler);
+};
+
 MockAdapter.prototype.restore = function restore() {
   if (this.axiosInstance) {
     this.axiosInstance.defaults.adapter = this.originalAdapter;
@@ -73,13 +78,13 @@ VERBS.concat('any').forEach(function(method) {
     function reply(code, response, headers) {
       var handler = [matcher, body, requestHeaders, code, response, headers];
       addHandler(method, _this.handlers, handler);
-      return _this;
+      return handler;
     }
 
     function replyOnce(code, response, headers) {
       var handler = [matcher, body, requestHeaders, code, response, headers, true];
       addHandler(method, _this.handlers, handler);
-      return _this;
+      return handler;
     }
 
     return {
@@ -90,7 +95,7 @@ VERBS.concat('any').forEach(function(method) {
       passThrough: function passThrough() {
         var handler = [matcher, body];
         addHandler(method, _this.handlers, handler);
-        return _this;
+        return handler;
       },
 
       networkError: function() {
@@ -151,6 +156,8 @@ function findInHandlers(method, handlers, handler) {
 }
 
 function addHandler(method, handlers, handler) {
+  handler.called = 0;
+  // const handler = originalHandler
   if (method === 'any') {
     VERBS.forEach(function(verb) {
       handlers[verb].push(handler);

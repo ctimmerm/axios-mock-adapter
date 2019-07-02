@@ -85,9 +85,8 @@ describe('passThrough tests (requires Node)', function() {
   });
 
   it('allows setting default passThrough handler', function() {
-    mock
-      .onGet('/foo').reply(200, 'bar')
-      .onAny().passThrough();
+    mock.onGet('/foo').reply(200, 'bar');
+    mock.onAny().passThrough();
 
     var randomPath = 'xyz' + Math.round(10000 * Math.random());
 

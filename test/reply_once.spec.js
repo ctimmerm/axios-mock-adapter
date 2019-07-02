@@ -12,19 +12,6 @@ describe('MockAdapter replyOnce', function() {
     mock = new MockAdapter(instance);
   });
 
-  it('supports chaining', function() {
-    mock
-      .onGet('/foo')
-      .replyOnce(200)
-      .onAny('/foo')
-      .replyOnce(500)
-      .onPost('/foo')
-      .replyOnce(201);
-
-    expect(mock.handlers['get'].length).to.equal(2);
-    expect(mock.handlers['post'].length).to.equal(2);
-  });
-
   it('replies as normally on the first call', function() {
     mock.onGet('/foo').replyOnce(200, {
       foo: 'bar'
@@ -90,8 +77,8 @@ describe('MockAdapter replyOnce', function() {
       .onGet('/foo')
       .replyOnce(function() {
         return [200];
-      })
-      .onGet('/foo')
+      });
+    mock.onGet('/foo')
       .replyOnce(function() {
         return [202];
       });

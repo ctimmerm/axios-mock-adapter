@@ -1,6 +1,6 @@
 var axios = require('axios');
 var expect = require('chai').expect;
-
+var FormData = require('formdata-node').default;
 var MockAdapter = require('../src');
 
 describe('MockAdapter basics', function() {
@@ -101,8 +101,8 @@ describe('MockAdapter basics', function() {
   it('accepts a callback that returns an axios request', function() {
     mock
       .onGet('/bar')
-      .reply(200, { foo: 'bar' })
-      .onGet('/foo')
+      .reply(200, { foo: 'bar' });
+    mock.onGet('/foo')
       .reply(function() {
         return instance.get('/bar');
       });
@@ -216,6 +216,18 @@ describe('MockAdapter basics', function() {
     });
   });
 
+  it('allow removing mock handler', function() {
+    const handler = mock.onGet('/').reply(200);
+    return instance.get('/').then(function(response) {
+      expect(response.status).to.equal(200);
+      mock.removeHandler(handler);
+      return instance.get('/');
+    }).catch(function(error) {
+      expect(error.response.status).to.equal(404);
+      expect(handler.called).to.equal(1);
+    });
+  });
+
   it('matches when parameters were not expected', function() {
     mock.onGet('/withParams').reply(200);
     return instance
@@ -308,6 +320,50 @@ describe('MockAdapter basics', function() {
 
     return instance.post('/foo', { bar: 'baz' }).then(function(response) {
       expect(response.data).to.equal('baz');
+    });
+  });
+
+  describe('with FormData', function() {
+    it('works when multipart FormData body matches', function() {
+      var body = new FormData();
+      body.append('key', 'value');
+      var matchBody = new FormData;
+      matchBody.append('key', 'value');
+      mock.onPost('/formDataMatch', body).replyOnce(200);
+
+      return instance
+        .post('/formDataMatch', matchBody)
+        .then(function(response) {
+          expect(response.status).to.equal(200);
+        });
+    });
+
+    it('does not reply on FormData keys mismatch', function() {
+      var body = new FormData();
+      body.append('key', 'value');
+      var matchBody = new FormData;
+      matchBody.append('some-other-key', 'value');
+      mock.onPost('/formDataMatch', body).replyOnce(200);
+
+      return instance
+        .post('/formDataNoMatch', matchBody)
+        .catch(function(error) {
+          expect(error.response.status).to.equal(404);
+        });
+    });
+
+    it('does not reply on FormData data mismatch', function() {
+      var body = new FormData();
+      body.append('key', 'value');
+      var matchBody = new FormData;
+      matchBody.append('key', 'another value');
+      mock.onPost('/formDataMatch', body).replyOnce(200);
+
+      return instance
+        .post('/formDataNoMatch', matchBody)
+        .catch(function(error) {
+          expect(error.response.status).to.equal(404);
+        });
     });
   });
 
@@ -466,10 +522,10 @@ describe('MockAdapter basics', function() {
   it('can chain calls to add mock handlers', function() {
     mock
       .onGet('/foo')
-      .reply(200)
-      .onAny('/bar')
-      .reply(404)
-      .onPost('/baz')
+      .reply(200);
+    mock.onAny('/bar')
+      .reply(404);
+    mock.onPost('/baz')
       .reply(500);
 
     expect(mock.handlers['get'].length).to.equal(2);
@@ -510,10 +566,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('maps empty GET path to any path', function() {
-    mock
-      .onGet('/foo')
-      .reply(200, 'foo')
-      .onGet()
+    mock.onGet('/foo')
+      .reply(200, 'foo');
+    mock.onGet()
       .reply(200, 'bar');
 
     return Promise.all([
@@ -636,14 +691,13 @@ describe('MockAdapter basics', function() {
   });
 
   it('supports chaining on same path with different params', function() {
-    mock
-      .onGet('/users', { params: { searchText: 'John' } })
-      .reply(200, { id: 1 })
-      .onGet('/users', { params: { searchText: 'James' } })
-      .reply(200, { id: 2 })
-      .onGet('/users', { params: { searchText: 'Jake' } })
-      .reply(200, { id: 3 })
-      .onGet('/users', { params: { searchText: 'Jackie' } })
+    mock.onGet('/users', { params: { searchText: 'John' } })
+      .reply(200, { id: 1 });
+    mock.onGet('/users', { params: { searchText: 'James' } })
+      .reply(200, { id: 2 });
+    mock.onGet('/users', { params: { searchText: 'Jake' } })
+      .reply(200, { id: 3 });
+    mock.onGet('/users', { params: { searchText: 'Jackie' } })
       .reply(200, { id: 4 });
 
     return instance
@@ -739,10 +793,9 @@ describe('MockAdapter basics', function() {
   });
 
   it('allows overwriting mocks with parameters', function() {
-    mock
-      .onGet('/users', { params: { searchText: 'John' } })
-      .reply(500)
-      .onGet('/users', { params: { searchText: 'John' } })
+    mock.onGet('/users', { params: { searchText: 'John' } })
+      .reply(500);
+    mock.onGet('/users', { params: { searchText: 'John' } })
       .reply(200, { id: 1 });
 
     return instance

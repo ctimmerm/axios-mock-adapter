@@ -1,6 +1,7 @@
 {
   "name": "axios-mock-adapter",
   "version": "1.16.0",
+  "engines" : { "node" : ">=8" },
   "description": "Axios adapter that allows to easily mock requests",
   "main": "src/index.js",
   "scripts": {
@@ -43,6 +44,7 @@
     "axios": "^0.18.0",
     "chai": "^4.1.0",
     "eslint": "^5.2.0",
+    "formdata-node": "^1.5.2",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.1",

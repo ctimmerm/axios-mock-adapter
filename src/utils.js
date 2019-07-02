@@ -64,6 +64,26 @@ function isParametersMatching(parameters, required) {
 }
 
 function isBodyMatching(body, requiredBody) {
+  if (requiredBody instanceof FormData) {
+    if (!(body instanceof FormData)) {
+      return false;
+    }
+    var requiredBodyFormData = {};
+    // eslint-disable-next-line
+    for (var pair of requiredBody.entries()) {
+      requiredBodyFormData[pair[0]] = pair[1];
+    }
+    var bodyFormData = {};
+    for (pair of body.entries()) {
+      bodyFormData[pair[0]] = pair[1];
+    }
+    for(var key in requiredBodyFormData) {
+      if(!(key in bodyFormData) || requiredBodyFormData[key]!==bodyFormData[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
   if (requiredBody === undefined) {
     return true;
   }
