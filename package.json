@@ -42,7 +42,7 @@
   "devDependencies": {
     "axios": "^0.19.0",
     "chai": "^4.1.0",
-    "eslint": "^5.2.0",
+    "eslint": "^6.0.1",
     "istanbul": "^0.4.5",
     "mocha": "^6.1.4",
     "rimraf": "^2.6.1",
