@@ -124,4 +124,37 @@ describe('passThrough tests (requires Node)', function() {
       expect(response.data).to.equal('http://null/test/foo');
     });
   });
+
+  it('handles request transformations properly', function() {
+    mock.onGet('/foo').passThrough();
+
+    return instance
+      .get('/foo', {
+        data: 'foo',
+        transformRequest: [
+          function(data) {
+            return data + 'foo';
+          }
+        ]
+      })
+      .then(function(response) {
+        expect(response.config.data).to.equal('foofoo');
+      });
+  });
+
+  it('handles response transformations properly', function() {
+    mock.onGet('/foo').passThrough();
+
+    return instance
+      .get('/foo', {
+        transformResponse: [
+          function(data) {
+            return data + 'foo';
+          }
+        ]
+      })
+      .then(function(response) {
+        expect(response.data).to.equal('/foofoo');
+      });
+  });
 });
