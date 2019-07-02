@@ -154,6 +154,48 @@ const url = new RegExp(`${usersUri}/*`);
 mock.onGet(url).reply(200, users);
 ```
 
+Using route params (colon notation)
+
+```js
+const routeParams = {
+  ':userId': '[0-9]{1,8}',
+  ':filter': 'active|inactive|all',
+}
+const mock = new MockAdapter(axios, {}, routeParams);
+
+mock.onGet('/users/:userId/posts/:filter').reply(function(config) {
+  const { userId, filter } = config.routeParams;
+  
+  // userId === '123'
+  // filter === 'active'
+
+  return [200, {}];
+});
+
+axios.get('/users/123/posts/active');
+```
+
+Using route params (curly braces notation)
+
+```js
+const routeParams = {
+  '{uuid}': '[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}',
+  '{page}': '\\d?',
+}
+const mock = new MockAdapter(axios, {}, routeParams);
+
+mock.onGet('/users/{uuid}/posts/{page}').reply(function(config) {
+  const { uuid, page } = config.routeParams;
+  
+  // uuid === 'b67c0749-656c-4beb-9cd9-17e274a648d9'
+  // page === '3'
+
+  return [200, {}];
+});
+
+axios.get('/users/b67c0749-656c-4beb-9cd9-17e274a648d9/posts/3');
+```
+
 
 Specify no path to match by verb alone
 
