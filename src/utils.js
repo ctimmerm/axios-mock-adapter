@@ -117,6 +117,7 @@ function createErrorResponse(message, config, response) {
   var error = new Error(message);
   error.config = config;
   error.response = response;
+  error.isAxiosError = true;
   return error;
 }
 

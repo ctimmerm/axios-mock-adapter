@@ -97,6 +97,7 @@ VERBS.concat('any').forEach(function(method) {
         reply(function(config) {
           var error = new Error('Network Error');
           error.config = config;
+          error.isAxiosError = true;
           return Promise.reject(error);
         });
       },
@@ -105,6 +106,7 @@ VERBS.concat('any').forEach(function(method) {
         replyOnce(function(config) {
           var error = new Error('Network Error');
           error.config = config;
+          error.isAxiosError = true;
           return Promise.reject(error);
         });
       },
@@ -114,6 +116,7 @@ VERBS.concat('any').forEach(function(method) {
           var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
           error.config = config;
           error.code = 'ECONNABORTED';
+          error.isAxiosError = true;
           return Promise.reject(error);
         });
       },
@@ -123,6 +126,7 @@ VERBS.concat('any').forEach(function(method) {
           var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
           error.config = config;
           error.code = 'ECONNABORTED';
+          error.isAxiosError = true;
           return Promise.reject(error);
         });
       }

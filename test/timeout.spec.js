@@ -25,6 +25,7 @@ describe('timeout spec', function() {
         expect(error.config).to.exist;
         expect(error.code).to.equal('ECONNABORTED');
         expect(error.message).to.equal('timeout of 0ms exceeded');
+        expect(error.isAxiosError).to.be.true;
       }
     );
   });
