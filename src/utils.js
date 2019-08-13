@@ -44,7 +44,14 @@ function isUrlMatching(url, required) {
 
 function isRequestHeadersMatching(requestHeaders, required) {
   if (required === undefined) return true;
-  return isEqual(requestHeaders, required);
+  const headersMatch = isEqual(requestHeaders, required);
+
+  if (process.env.NODE_ENV !== 'production' &&
+    !headersMatch) {
+    throw new Error(`Request Headers Mismatch:\n\nExpected: ${JSON.stringify(required)}\nActual: ${JSON.stringify(requestHeaders)}`);
+  }
+
+  return headersMatch;
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
@@ -60,7 +67,14 @@ function isBodyOrParametersMatching(method, body, parameters, required) {
 function isParametersMatching(parameters, required) {
   if (required === undefined) return true;
 
-  return isEqual(parameters, required);
+  const parametersMatch = isEqual(parameters, required);
+
+  if (process.env.NODE_ENV !== 'production' &&
+    !parametersMatch) {
+    throw new Error(`Parameters Mismatch:\n\nExpected: ${JSON.stringify(required)}\nActual: ${JSON.stringify(parameters)}`);
+  }
+
+  return parametersMatch;
 }
 
 function isBodyMatching(body, requiredBody) {
@@ -71,7 +85,14 @@ function isBodyMatching(body, requiredBody) {
   try {
     parsedBody = JSON.parse(body);
   } catch (e) { }
-  return parsedBody ? isEqual(parsedBody, requiredBody) : isEqual(body, requiredBody);
+  const bodyMatches = parsedBody ? isEqual(parsedBody, requiredBody) : isEqual(body, requiredBody);
+
+  if (process.env.NODE_ENV !== 'production' &&
+    !bodyMatches) {
+    throw new Error(`Parameters Mismatch:\n\nExpected: ${JSON.stringify(requiredBody)}\nActual: ${JSON.stringify(body)}`);
+  }
+
+  return bodyMatches;
 }
 
 function purgeIfReplyOnce(mock, handler) {
