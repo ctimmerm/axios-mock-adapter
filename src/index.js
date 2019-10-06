@@ -151,18 +151,34 @@ function findInHandlers(method, handlers, handler) {
 }
 
 function addHandler(method, handlers, handler) {
-  if (method === 'any') {
-    VERBS.forEach(function(verb) {
-      handlers[verb].push(handler);
-    });
-  } else {
-    var indexOfExistingHandler = findInHandlers(method, handlers, handler);
-    if (indexOfExistingHandler > -1 && handler.length < 7) {
-      handlers[method].splice(indexOfExistingHandler, 1, handler);
-    } else {
-      handlers[method].push(handler);
-    }
-  }
+	const passThroughHandler = [/.*/, undefined]
+
+	if (method === 'any') {
+		VERBS.forEach(function(verb) {
+			handlers[verb].push(handler)
+		})
+	} else {
+		var indexOfExistingHandler = findInHandlers(method, handlers, handler)
+
+		if (indexOfExistingHandler > -1 && handler.length < 7) {
+			handlers[method].splice(indexOfExistingHandler, 1, handler)
+		} else {
+			const methodHandlersLength = handlers[method].length
+			const lastHandlerPosition = methodHandlersLength - 1
+			const lastHandler = handlers[method][lastHandlerPosition]
+
+			if (lastHandlerPosition < 0) {
+				handlers[method].push(handler)
+			} else {
+				if (`${lastHandler[0]}` === '/.*/') {
+					handlers[method][lastHandlerPosition] = handler
+					handlers[method].push(passThroughHandler)
+				} else {
+					handlers[method].push(handler)
+				}
+			}
+		}
+	}
 }
 
 module.exports = MockAdapter;

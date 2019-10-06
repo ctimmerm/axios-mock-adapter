@@ -83,6 +83,33 @@ describe('passThrough tests (requires Node)', function() {
       });
   });
 
+  it('allows setting passThrough handler at beginning', function() {
+    mock
+      .onAny()
+      .passThrough();
+
+    mock
+      .onGet('/foo')
+      .reply(200, 'bar')
+
+    var randomPath = 'xyz' + Math.round(10000 * Math.random());
+
+    return Promise.all([
+      instance.get('/foo').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('bar');
+      }),
+      instance.get('/' + randomPath).then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('/' + randomPath);
+      }),
+      instance.post('/post').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('/post');
+      })
+    ]);
+  });
+
   it('allows setting default passThrough handler', function() {
     mock
       .onGet('/foo')
