@@ -264,12 +264,11 @@ describe('MockAdapter basics', function() {
 
   it('can pass headers to match to a handler', function() {
     var headers = {
-      Accept: 'application/json, text/plain, */*',
       'Content-Type': 'application/x-www-form-urlencoded',
       'Header-test': 'test-header'
     };
 
-    mock.onPost('/withHeaders', undefined, headers).reply(200);
+    mock.onPost('/withHeaders', undefined, { 'Header-test': 'test-header' }).reply(200);
 
     return instance
       .post('/withHeaders', undefined, { headers: headers })
@@ -285,6 +284,19 @@ describe('MockAdapter basics', function() {
     return instance
       .patch('/wrongObjHeader', undefined, {
         headers: { 'Header-test': 'wrong-header' }
+      })
+      .catch(function(error) {
+        expect(error.response.status).to.equal(404);
+      });
+  });
+
+  it('does not match when some required headers is missing on request', function() {
+    var headers = { 'Header-test': 'test-header', 'Header-test2': 'test-header2' };
+    mock.onPatch('/wrongObjHeader', undefined, headers).reply(200);
+
+    return instance
+      .patch('/wrongObjHeader', undefined, {
+        headers: { 'Header-test': 'test-header' }
       })
       .catch(function(error) {
         expect(error.response.status).to.equal(404);

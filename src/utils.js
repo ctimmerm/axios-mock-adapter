@@ -44,7 +44,7 @@ function isUrlMatching(url, required) {
 
 function isRequestHeadersMatching(requestHeaders, required) {
   if (required === undefined) return true;
-  return isEqual(requestHeaders, required);
+  return containsHeaders(required, requestHeaders);
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
@@ -122,6 +122,15 @@ function createErrorResponse(message, config, response) {
 
 function isSimpleObject(value) {
   return value !== null && value !== undefined && value.toString() === '[object Object]';
+}
+
+function containsHeaders(reference, target) {
+  console.log(reference, target);
+  if (!reference || !target) return deepEqual(reference, target);
+  if (typeof reference !== 'object' || typeof target !== 'object') return deepEqual(reference, target);
+  return Object.keys(reference).every(function(index) {
+    return deepEqual(reference[index], target[index]);
+  });
 }
 
 module.exports = {

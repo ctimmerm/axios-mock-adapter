@@ -66,6 +66,30 @@ axios.get('/users', { params: { searchText: 'John' } } )
   });
 ```
 
+Mocking a `POST` request with specifying headers that must be present among request headers(but all extra request headers are ignored):
+
+```js
+var axios = require('axios');
+var MockAdapter = require('axios-mock-adapter');
+
+// This sets the mock adapter on the default instance
+var mock = new MockAdapter(axios);
+
+// Mock POST request to /users when request headers contain 'Content-Type': 'application/json'
+// arguments for reply are (status, data, headers)
+mock.onPost('/users', undefined, {'Content-Type': 'application/json'}).reply(200, {
+  users: [
+    { id: 1, name: 'John Smith' }
+  ]
+});
+
+axios.post('/users', undefined, { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } })
+  .then(function(response) {
+    console.log(response.data);
+  });
+
+```
+
 To add a delay to responses, specify a delay amount (in milliseconds) when instantiating the adapter
 
 ```js
