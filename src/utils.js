@@ -125,7 +125,6 @@ function isSimpleObject(value) {
 }
 
 function containsHeaders(reference, target) {
-  console.log(reference, target);
   if (!reference || !target) return deepEqual(reference, target);
   if (typeof reference !== 'object' || typeof target !== 'object') return deepEqual(reference, target);
   return Object.keys(reference).every(function(index) {
