@@ -4,9 +4,9 @@ type CallbackResponseSpecFunc = (
   config: AxiosRequestConfig
 ) => any[] | Promise<any[]>;
 
-type ResponseSpecFunc = (
+type ResponseSpecFunc = <T = any>(
   statusOrCallback: number | CallbackResponseSpecFunc,
-  data?: any,
+  data?: T,
   headers?: any
 ) => MockAdapter;
 
