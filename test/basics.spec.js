@@ -773,4 +773,17 @@ describe('MockAdapter basics', function() {
       expect(response.status).to.equal(201);
     });
   });
+
+  it('sets isAxiosError property on errors', function() {
+    mock.onGet('/').reply(404);
+
+    return instance
+      .get('/')
+      .then(function() {
+        expect(true).to.be.false;
+      })
+      .catch(function(error) {
+        expect(error.isAxiosError).to.be.true;
+      });
+  });
 });

@@ -94,7 +94,7 @@ function settle(resolve, reject, response, delay) {
   if (response.config && response.config.validateStatus) {
     response.config.validateStatus(response.status)
       ? resolve(response)
-      : reject(createErrorResponse(
+      : reject(createAxiosError(
         'Request failed with status code ' + response.status,
         response.config,
         response
@@ -110,13 +110,19 @@ function settle(resolve, reject, response, delay) {
   }
 }
 
-function createErrorResponse(message, config, response) {
+function createAxiosError(message, config, response, code) {
   // Support for axios < 0.13.0
   if (!rejectWithError) return response;
 
   var error = new Error(message);
+  error.isAxiosError = true;
   error.config = config;
-  error.response = response;
+  if (response !== undefined) {
+    error.response = response;
+  }
+  if (code !== undefined) {
+    error.code = code;
+  }
   return error;
 }
 
@@ -129,5 +135,6 @@ module.exports = {
   findHandler: findHandler,
   isSimpleObject: isSimpleObject,
   purgeIfReplyOnce: purgeIfReplyOnce,
-  settle: settle
+  settle: settle,
+  createAxiosError: createAxiosError
 };

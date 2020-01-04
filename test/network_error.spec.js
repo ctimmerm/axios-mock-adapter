@@ -23,6 +23,7 @@ describe('networkError spec', function() {
         expect(error.config).to.exist;
         expect(error.response).to.not.exist;
         expect(error.message).to.equal('Network Error');
+        expect(error.isAxiosError).to.be.true;
       }
     );
   });
