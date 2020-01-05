@@ -4,21 +4,20 @@ type CallbackResponseSpecFunc = (
   config: AxiosRequestConfig
 ) => any[] | Promise<any[]>;
 
-type ResponseSpecFunc = (
+type ResponseSpecFunc = <T = any>(
   statusOrCallback: number | CallbackResponseSpecFunc,
-  data?: any,
+  data?: T,
   headers?: any
 ) => MockAdapter;
 
 interface RequestHandler {
   reply: ResponseSpecFunc;
   replyOnce: ResponseSpecFunc;
-  timeoutOnce: ResponseSpecFunc;
-  networkErrorOnce: ResponseSpecFunc;
-
   passThrough(): MockAdapter;
-  networkError(): MockAdapter;
-  timeout(): MockAdapter;
+  networkError(): void;
+  networkErrorOnce(): void;
+  timeout(): void;
+  timeoutOnce(): void;
 }
 
 interface MockAdapterOptions {
@@ -47,6 +46,7 @@ declare class MockAdapter {
 
   adapter(): AxiosAdapter;
   reset(): void;
+  resetHandlers(): void;
   resetHistory(): void;
   restore(): void;
 

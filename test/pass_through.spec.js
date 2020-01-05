@@ -18,8 +18,8 @@ describe('passThrough tests (requires Node)', function() {
           resp.end();
         } else {
           resp.statusCode = 200;
-          // Reply with path minus leading /
-          resp.end(req.url.slice(1), 'utf8');
+          // Reply with path
+          resp.end(req.url, 'utf8');
         }
       })
         .listen(0, '127.0.0.1', function() {
@@ -45,22 +45,20 @@ describe('passThrough tests (requires Node)', function() {
     mock.onGet('/bar').passThrough();
 
     return Promise.all([
-      instance.get('/foo')
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal('bar');
-        }),
-      instance.get('/error')
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal('success');
-        }),
-      instance.get('/bar')
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal('bar');
-        }),
-      instance.get('/noHandler')
+      instance.get('/foo').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('bar');
+      }),
+      instance.get('/error').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('success');
+      }),
+      instance.get('/bar').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('/bar');
+      }),
+      instance
+        .get('/noHandler')
         .then(function(response) {
           // Mock adapter should return an error
           expect(true).to.be.false;
@@ -74,7 +72,8 @@ describe('passThrough tests (requires Node)', function() {
   it('handles errors correctly', function() {
     mock.onGet('/error').passThrough();
 
-    return instance.get('/error')
+    return instance
+      .get('/error')
       .then(function() {
         // The server should've returned an error
         expect(false).to.be.true;
@@ -86,27 +85,76 @@ describe('passThrough tests (requires Node)', function() {
 
   it('allows setting default passThrough handler', function() {
     mock
-      .onGet('/foo').reply(200, 'bar')
-      .onAny().passThrough();
+      .onGet('/foo')
+      .reply(200, 'bar')
+      .onAny()
+      .passThrough();
 
     var randomPath = 'xyz' + Math.round(10000 * Math.random());
 
     return Promise.all([
-      instance.get('/foo')
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal('bar');
-        }),
-      instance.get('/' + randomPath)
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal(randomPath);
-        }),
-      instance.post('/post')
-        .then(function(response) {
-          expect(response.status).to.equal(200);
-          expect(response.data).to.equal('post');
-        })
+      instance.get('/foo').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('bar');
+      }),
+      instance.get('/' + randomPath).then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('/' + randomPath);
+      }),
+      instance.post('/post').then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('/post');
+      })
     ]);
+  });
+
+  it('handles baseURL correctly', function() {
+    instance = axios.create({
+      baseURL: '/test',
+      proxy: {
+        host: '127.0.0.1',
+        port: httpServer.address().port
+      }
+    });
+    mock = new MockAdapter(instance);
+
+    mock.onAny().passThrough();
+    return instance.get('/foo').then(function(response) {
+      expect(response.status).to.equal(200);
+      expect(response.data).to.equal('http://null/test/foo');
+    });
+  });
+
+  it('handles request transformations properly', function() {
+    mock.onGet('/foo').passThrough();
+
+    return instance
+      .get('/foo', {
+        data: 'foo',
+        transformRequest: [
+          function(data) {
+            return data + 'foo';
+          }
+        ]
+      })
+      .then(function(response) {
+        expect(response.config.data).to.equal('foofoo');
+      });
+  });
+
+  it('handles response transformations properly', function() {
+    mock.onGet('/foo').passThrough();
+
+    return instance
+      .get('/foo', {
+        transformResponse: [
+          function(data) {
+            return data + 'foo';
+          }
+        ]
+      })
+      .then(function(response) {
+        expect(response.data).to.equal('/foofoo');
+      });
   });
 });
