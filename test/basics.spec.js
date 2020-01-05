@@ -774,6 +774,18 @@ describe('MockAdapter basics', function() {
     });
   });
 
+  it('returns the original request url in the response.request.responseUrl property', function() {
+    mock.onGet('/foo').reply(200, {
+      foo: 'bar'
+    });
+
+    return instance.get('/foo').then(function(response) {
+      expect(response.status).to.equal(200);
+      expect(response.data.foo).to.equal('bar');
+      expect(response.request.responseUrl).to.equal('/foo');
+    });
+  });
+
   it('sets isAxiosError property on errors', function() {
     mock.onGet('/').reply(404);
 

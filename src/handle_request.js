@@ -7,7 +7,10 @@ function makeResponse(result, config) {
     status: result[0],
     data: utils.isSimpleObject(result[1]) ? JSON.parse(JSON.stringify(result[1])) : result[1],
     headers: result[2],
-    config: config
+    config: config,
+    request: {
+      responseUrl: config.url
+    }
   };
 }
 
