@@ -784,6 +784,7 @@ describe('MockAdapter basics', function() {
       expect(response.data.foo).to.equal('bar');
       expect(response.request.responseUrl).to.equal('/foo');
     });
+  });
 
   it('sets isAxiosError property on errors', function() {
     mock.onGet('/').reply(404);
