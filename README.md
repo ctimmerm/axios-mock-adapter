@@ -100,7 +100,7 @@ Mock a low level network error
 // Returns a failed promise with Error('Network Error');
 mock.onGet('/users').networkError();
 
-// networkErrorOnce can be used to mock a network error only once 
+// networkErrorOnce can be used to mock a network error only once
 mock.onGet('/users').networkErrorOnce();
 ```
 
@@ -110,7 +110,7 @@ Mock a network timeout
 // Returns a failed promise with Error with code set to 'ECONNABORTED'
 mock.onGet('/users').timeout();
 
-// timeoutOnce can be used to mock a timeout only once 
+// timeoutOnce can be used to mock a timeout only once
 mock.onGet('/users').timeoutOnce();
 ```
 
@@ -244,6 +244,17 @@ mock
 ```
 
 Note that `passThrough` requests are not subject to delaying by `delayResponse`.
+
+If you set `passThroughByDefault` option all requests would be forwarded over network by default
+
+```js
+// Mock all requests to /foo with HTTP 200, but forward
+// any others requests to server
+var mock = new MockAdapter(axiosInstance, { passThroughByDefault: true });
+
+mock
+  .onAny('/foo').reply(200);
+```
 
 As of 1.7.0, `reply` function may return a Promise:
 

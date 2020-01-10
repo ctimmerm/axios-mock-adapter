@@ -10,7 +10,8 @@ namespace AllowsConstructing {
 
 namespace AllowsConstructingWithOptions {
   new MockAdapter(instance, {
-    delayResponse: 2000
+    delayResponse: 2000,
+    passThroughByDefault: true
   });
 }
 

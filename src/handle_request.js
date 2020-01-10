@@ -76,15 +76,19 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     }
   } else {
     // handler not found
-    utils.settle(
-      resolve,
-      reject,
-      {
-        status: 404,
-        config: config
-      },
-      mockAdapter.delayResponse
-    );
+    if (mockAdapter.passThroughByDefault) {
+      mockAdapter.originalAdapter(config).then(resolve, reject);
+    } else {
+      utils.settle(
+        resolve,
+        reject,
+        {
+          status: 404,
+          config: config
+        },
+        mockAdapter.delayResponse
+      );
+    }
   }
 }
 

@@ -22,6 +22,7 @@ interface RequestHandler {
 
 interface MockAdapterOptions {
   delayResponse?: number;
+  passThroughByDefault?: boolean;
 }
 
 interface RequestDataMatcher {
