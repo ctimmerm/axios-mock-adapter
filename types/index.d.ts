@@ -59,6 +59,7 @@ declare class MockAdapter {
   onDelete: RequestMatcherFunc;
   onPatch: RequestMatcherFunc;
   onList: RequestMatcherFunc;
+  onOptions: RequestMatcherFunc;
   onAny: RequestMatcherFunc;
 }
 
