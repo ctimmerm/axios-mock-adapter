@@ -10,6 +10,10 @@ type ResponseSpecFunc = <T = any>(
   headers?: any
 ) => MockAdapter;
 
+type RequestHandlerInfo = {
+  passThrough: boolean
+}
+
 interface RequestHandler {
   reply: ResponseSpecFunc;
   replyOnce: ResponseSpecFunc;
@@ -50,7 +54,9 @@ declare class MockAdapter {
   resetHistory(): void;
   restore(): void;
 
-  history: { [method: string]: AxiosRequestConfig[] };
+  history: { [method: string]: AxiosRequestConfig & {
+    handler: RequestHandlerInfo
+  }[] };
 
   onGet: RequestMatcherFunc;
   onPost: RequestMatcherFunc;
