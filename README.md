@@ -100,7 +100,7 @@ Mock a low level network error
 // Returns a failed promise with Error('Network Error');
 mock.onGet('/users').networkError();
 
-// networkErrorOnce can be used to mock a network error only once 
+// networkErrorOnce can be used to mock a network error only once
 mock.onGet('/users').networkErrorOnce();
 ```
 
@@ -110,7 +110,7 @@ Mock a network timeout
 // Returns a failed promise with Error with code set to 'ECONNABORTED'
 mock.onGet('/users').timeout();
 
-// timeoutOnce can be used to mock a timeout only once 
+// timeoutOnce can be used to mock a timeout only once
 mock.onGet('/users').timeoutOnce();
 ```
 
@@ -221,6 +221,24 @@ Mocking a request with a specific request body/data
 
 ```js
 mock.onPut('/product', { id: 4, name: 'foo' }).reply(204);
+```
+
+Using an asymmetric matcher, for example Jest matchers
+
+```js
+mock.onPost('/product', { id: 1 }, expect.objectContaining({
+  'Authorization': expect.stringMatching(/^Basic /)
+})).reply(204);
+```
+
+Using a custom asymmetric matcher (any object that has a `asymmetricMatch` property)
+
+```js
+mock.onPost('/product', {
+  asymmetricMatch: function(actual) {
+    return ['computer', 'phone'].includes(actual['type']);
+  }
+}).reply(204);
 ```
 
 `.passThrough()` forwards the matched request over network
