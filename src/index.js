@@ -94,6 +94,30 @@ VERBS.concat('any').forEach(function(method) {
         return _this;
       },
 
+      requestAborted: function() {
+        reply(function(config) {
+          var error = utils.createAxiosError(
+            'Request aborted',
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
+          return Promise.reject(error);
+        });
+      },
+
+      requestAbortedOnce: function() {
+        replyOnce(function(config) {
+          var error = utils.createAxiosError(
+            'Request aborted',
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
+          return Promise.reject(error);
+        });
+      },
+
       networkError: function() {
         reply(function(config) {
           var error = utils.createAxiosError('Network Error', config);
