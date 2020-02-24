@@ -27,6 +27,7 @@ describe('MockAdapter history', function() {
         expect(mock.history.get.length).to.equal(1);
         expect(mock.history.get[0].method).to.equal('get');
         expect(mock.history.get[0].url).to.equal('/foo');
+        expect(mock.history.get[0].handler.passThrough).to.equal(false);
       });
   });
 

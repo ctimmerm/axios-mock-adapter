@@ -21,7 +21,6 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   }
 
   delete config.adapter;
-  mockAdapter.history[config.method].push(config);
 
   var handler = utils.findHandler(
     mockAdapter.handlers,
@@ -32,6 +31,12 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     config.headers,
     config.baseURL
   );
+
+  mockAdapter.history[config.method].push(Object.assign(config, {
+    handler: {
+      passThrough: handler && handler.length === 2
+    }
+  }));
 
   if (handler) {
     if (handler.length === 7) {
