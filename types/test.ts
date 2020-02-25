@@ -95,6 +95,26 @@ namespace SupportsTimeout {
   mock.onGet().timeout();
 }
 
+namespace SupportsTimeoutOnce {
+  mock.onGet().timeoutOnce();
+}
+
+namespace SupportsAbortRequest {
+  mock.onGet().abortRequest();
+}
+
+namespace SupportsAbortRequestOnce {
+  mock.onGet().abortRequestOnce();
+}
+
+namespace SupportsNetworkError {
+  mock.onGet().networkError();
+}
+
+namespace SupportsNetworkErrorOnce {
+  mock.onGet().networkErrorOnce();
+}
+
 namespace AllowsFunctionReply {
   mock.onGet().reply(config => {
     return [200, { data: 'foo' }, { RequestedURL: config.url }];
