@@ -27,4 +27,24 @@ describe('networkError spec', function() {
       }
     );
   });
+
+  it('can mock a network error only once', function() {
+    mock
+      .onGet('/foo')
+      .networkErrorOnce()
+      .onGet('/foo')
+      .reply(200);
+
+    return instance
+      .get('/foo')
+      .then(
+        function() {},
+        function() {
+          return instance.get('/foo');
+        }
+      )
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
+  });
 });

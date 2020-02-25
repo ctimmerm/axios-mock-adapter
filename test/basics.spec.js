@@ -434,6 +434,14 @@ describe('MockAdapter basics', function() {
     expect(newInstance.defaults.adapter).to.equal(adapter);
   });
 
+  it('performs a noop when restore is called more than once', function() {
+    mock.restore();
+    var newAdapter = function() {};
+    instance.defaults.adapter = newAdapter;
+    mock.restore();
+    expect(instance.defaults.adapter).to.equal(newAdapter);
+  });
+
   it('resets the registered mock handlers', function() {
     mock.onGet('/foo').reply(200);
     expect(mock.handlers['get']).not.to.be.empty;
@@ -461,6 +469,11 @@ describe('MockAdapter basics', function() {
       expect(mock.history.get.length).to.equal(1);
       expect(mock.handlers['get']).to.be.empty;
     });
+  });
+
+  it('does not fail if reset is called after restore', function() {
+    mock.restore();
+    expect(mock.reset()).to.not.throw;
   });
 
   it('can chain calls to add mock handlers', function() {

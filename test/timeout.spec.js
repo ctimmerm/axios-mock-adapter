@@ -4,20 +4,18 @@ var expect = require('chai').expect;
 var MockAdapter = require('../src');
 
 describe('timeout spec', function() {
+  var instance;
   var mock;
 
   beforeEach(function() {
-    mock = new MockAdapter(axios);
-  });
-
-  afterEach(function() {
-    mock.restore();
+    instance = axios.create();
+    mock = new MockAdapter(instance);
   });
 
   it('mocks timeout response', function() {
     mock.onGet('/foo').timeout();
 
-    return axios.get('/foo').then(
+    return instance.get('/foo').then(
       function() {
         expect.fail('should not be called');
       },
@@ -28,5 +26,25 @@ describe('timeout spec', function() {
         expect(error.isAxiosError).to.be.true;
       }
     );
+  });
+
+  it('can timeout only once', function() {
+    mock
+      .onGet('/foo')
+      .timeoutOnce()
+      .onGet('/foo')
+      .reply(200);
+
+    return instance
+      .get('/foo')
+      .then(
+        function() {},
+        function() {
+          return instance.get('/foo');
+        }
+      )
+      .then(function(response) {
+        expect(response.status).to.equal(200);
+      });
   });
 });
