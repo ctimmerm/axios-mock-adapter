@@ -14,6 +14,8 @@ interface RequestHandler {
   reply: ResponseSpecFunc;
   replyOnce: ResponseSpecFunc;
   passThrough(): MockAdapter;
+  abortRequest(): void;
+  abortRequestOnce(): void;
   networkError(): void;
   networkErrorOnce(): void;
   timeout(): void;

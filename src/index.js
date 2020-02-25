@@ -94,7 +94,7 @@ VERBS.concat('any').forEach(function(method) {
         return _this;
       },
 
-      requestAborted: function() {
+      abortRequest: function() {
         reply(function(config) {
           var error = utils.createAxiosError(
             'Request aborted',
@@ -106,7 +106,7 @@ VERBS.concat('any').forEach(function(method) {
         });
       },
 
-      requestAbortedOnce: function() {
+      abortRequestOnce: function() {
         replyOnce(function(config) {
           var error = utils.createAxiosError(
             'Request aborted',
