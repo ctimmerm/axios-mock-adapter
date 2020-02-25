@@ -15,7 +15,7 @@ describe('requestAborted spec', function() {
   });
 
   it('mocks requestAborted response', function() {
-    mock.onGet('/foo').requestAborted();
+    mock.onGet('/foo').abortRequest();
 
     return axios.get('/foo').then(
       function() {
