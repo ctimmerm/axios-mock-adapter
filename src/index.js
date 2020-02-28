@@ -137,7 +137,7 @@ VERBS.concat('any').forEach(function(method) {
       timeout: function() {
         return reply(function(config) {
           var error = utils.createAxiosError(
-            'timeout of ' + config.timeout + 'ms exceeded',
+            config.timeoutErrorMessage || ('timeout of ' + config.timeout + 'ms exceeded'),
             config,
             undefined,
             'ECONNABORTED'
@@ -149,7 +149,7 @@ VERBS.concat('any').forEach(function(method) {
       timeoutOnce: function() {
         return replyOnce(function(config) {
           var error = utils.createAxiosError(
-            'timeout of ' + config.timeout + 'ms exceeded',
+            config.timeoutErrorMessage || ('timeout of ' + config.timeout + 'ms exceeded'),
             config,
             undefined,
             'ECONNABORTED'

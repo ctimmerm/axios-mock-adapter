@@ -47,4 +47,23 @@ describe('timeout spec', function() {
         expect(response.status).to.equal(200);
       });
   });
+
+  it('responds with timeoutErrorMessage', function() {
+    mock.onGet('/foo').timeout();
+    var timeoutErrorMessage = 'That request sure did time out';
+
+    return instance.get('/foo', {
+      timeoutErrorMessage: timeoutErrorMessage
+    }).then(
+      function() {
+        expect.fail('should not be called');
+      },
+      function(error) {
+        expect(error.config).to.exist;
+        expect(error.code).to.equal('ECONNABORTED');
+        expect(error.message).to.equal(timeoutErrorMessage);
+        expect(error.isAxiosError).to.be.true;
+      }
+    );
+  });
 });
