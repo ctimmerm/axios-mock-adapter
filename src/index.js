@@ -50,7 +50,7 @@ function MockAdapter(axiosInstance, options) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
     this.delayResponse = options && options.delayResponse > 0 ? options.delayResponse : null;
-    this.passThroughByDefault = !!(options && options.passThroughByDefault);
+    this.onNoMatch = options && options.onNoMatch || null;
     axiosInstance.defaults.adapter = this.adapter.call(this);
   }
 }

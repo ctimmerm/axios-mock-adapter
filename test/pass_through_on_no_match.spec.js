@@ -4,7 +4,7 @@ var createServer = require('http').createServer;
 
 var MockAdapter = require('../src');
 
-describe('passThroughByDefault option tests (requires Node)', function() {
+describe('onNoMatch=passthrough option tests (requires Node)', function() {
   var instance;
   var mock;
   var httpServer;
@@ -36,7 +36,7 @@ describe('passThroughByDefault option tests (requires Node)', function() {
 
   beforeEach(function() {
     instance = axios.create({ baseURL: serverUrl });
-    mock = new MockAdapter(instance, { passThroughByDefault: true });
+    mock = new MockAdapter(instance, { onNoMatch: 'passthrough' });
   });
 
   it('works correctly if set no handlers', function() {
@@ -122,7 +122,7 @@ describe('passThroughByDefault option tests (requires Node)', function() {
         port: httpServer.address().port
       }
     });
-    mock = new MockAdapter(instance, { passThroughByDefault: true });
+    mock = new MockAdapter(instance, { onNoMatch: 'passthrough' });
 
     return instance.get('/foo').then(function(response) {
       expect(response.status).to.equal(200);
