@@ -223,6 +223,24 @@ Mocking a request with a specific request body/data
 mock.onPut('/product', { id: 4, name: 'foo' }).reply(204);
 ```
 
+Using an asymmetric matcher, for example Jest matchers
+
+```js
+mock.onPost('/product', { id: 1 }, expect.objectContaining({
+  'Authorization': expect.stringMatching(/^Basic /)
+})).reply(204);
+```
+
+Using a custom asymmetric matcher (any object that has a `asymmetricMatch` property)
+
+```js
+mock.onPost('/product', {
+  asymmetricMatch: function(actual) {
+    return ['computer', 'phone'].includes(actual['type']);
+  }
+}).reply(204);
+```
+
 `.passThrough()` forwards the matched request over network
 
 ```js

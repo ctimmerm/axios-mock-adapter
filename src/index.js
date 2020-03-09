@@ -45,6 +45,7 @@ function resetHistory() {
 function MockAdapter(axiosInstance, options) {
   reset.call(this);
 
+  // TODO throw error instead when no axios instance is provided
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
@@ -59,6 +60,7 @@ MockAdapter.prototype.adapter = adapter;
 MockAdapter.prototype.restore = function restore() {
   if (this.axiosInstance) {
     this.axiosInstance.defaults.adapter = this.originalAdapter;
+    this.axiosInstance = undefined;
   }
 };
 
@@ -95,24 +97,48 @@ VERBS.concat('any').forEach(function(method) {
         return _this;
       },
 
+      abortRequest: function() {
+        return reply(function(config) {
+          var error = utils.createAxiosError(
+            'Request aborted',
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
+          return Promise.reject(error);
+        });
+      },
+
+      abortRequestOnce: function() {
+        return replyOnce(function(config) {
+          var error = utils.createAxiosError(
+            'Request aborted',
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
+          return Promise.reject(error);
+        });
+      },
+
       networkError: function() {
-        reply(function(config) {
+        return reply(function(config) {
           var error = utils.createAxiosError('Network Error', config);
           return Promise.reject(error);
         });
       },
 
       networkErrorOnce: function() {
-        replyOnce(function(config) {
+        return replyOnce(function(config) {
           var error = utils.createAxiosError('Network Error', config);
           return Promise.reject(error);
         });
       },
 
       timeout: function() {
-        reply(function(config) {
+        return reply(function(config) {
           var error = utils.createAxiosError(
-            'timeout of ' + config.timeout + 'ms exceeded',
+            config.timeoutErrorMessage || ('timeout of ' + config.timeout + 'ms exceeded'),
             config,
             undefined,
             'ECONNABORTED'
@@ -122,9 +148,9 @@ VERBS.concat('any').forEach(function(method) {
       },
 
       timeoutOnce: function() {
-        replyOnce(function(config) {
+        return replyOnce(function(config) {
           var error = utils.createAxiosError(
-            'timeout of ' + config.timeout + 'ms exceeded',
+            config.timeoutErrorMessage || ('timeout of ' + config.timeout + 'ms exceeded'),
             config,
             undefined,
             'ECONNABORTED'

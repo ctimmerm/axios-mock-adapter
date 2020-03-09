@@ -7,7 +7,7 @@
     "clean": "rimraf dist",
     "test": "mocha && npm run test:bundlesize",
     "test:bundlesize": "npm run clean && npm run build:umd:min && bundlesize",
-    "test:coverage": "istanbul cover node_modules/.bin/_mocha",
+    "test:coverage": "nyc --reporter=html --reporter=text-summary mocha",
     "lint": "eslint src test",
     "build:umd": "webpack --mode development ./src/index.js --output ./dist/axios-mock-adapter.js",
     "build:umd:min": "webpack --mode production ./src/index.js --output ./dist/axios-mock-adapter.min.js",
@@ -46,13 +46,14 @@
     "chai": "^4.1.0",
     "eslint": "^6.0.1",
     "istanbul": "^0.4.5",
-    "mocha": "^6.1.4",
-    "rimraf": "^2.6.1",
+    "mocha": "^7.0.1",
+    "nyc": "^15.0.0",
+    "rimraf": "^3.0.2",
     "webpack": "^4.16.4",
-    "webpack-command": "^0.4.1"
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "deep-equal": "^1.0.1"
+    "deep-equal": "^2.0.1"
   },
   "bundlesize": [
     {

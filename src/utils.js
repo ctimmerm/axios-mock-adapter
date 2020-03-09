@@ -29,9 +29,9 @@ function combineUrls(baseURL, url) {
 function findHandler(handlers, method, url, body, parameters, headers, baseURL) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
+      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isObjectMatching(headers, handler[2]);
     } else if (handler[0] instanceof RegExp) {
-      return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
+      return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isObjectMatching(headers, handler[2]);
     }
   });
 }
@@ -42,25 +42,22 @@ function isUrlMatching(url, required) {
   return (noSlashUrl === noSlashRequired);
 }
 
-function isRequestHeadersMatching(requestHeaders, required) {
-  if (required === undefined) return true;
-  return isEqual(requestHeaders, required);
-}
-
 function isBodyOrParametersMatching(method, body, parameters, required) {
   var allowedParamsMethods = ['delete', 'get', 'head', 'options'];
   if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
     var params = required ? required.params : undefined;
-    return isParametersMatching(parameters, params);
+    return isObjectMatching(parameters, params);
   } else {
     return isBodyMatching(body, required);
   }
 }
 
-function isParametersMatching(parameters, required) {
-  if (required === undefined) return true;
-
-  return isEqual(parameters, required);
+function isObjectMatching(actual, expected) {
+  if (expected === undefined) return true;
+  if (typeof expected.asymmetricMatch === 'function') {
+    return expected.asymmetricMatch(actual);
+  }
+  return isEqual(actual, expected);
 }
 
 function isBodyMatching(body, requiredBody) {
@@ -71,7 +68,8 @@ function isBodyMatching(body, requiredBody) {
   try {
     parsedBody = JSON.parse(body);
   } catch (e) { }
-  return parsedBody ? isEqual(parsedBody, requiredBody) : isEqual(body, requiredBody);
+
+  return isObjectMatching(parsedBody ? parsedBody : body, requiredBody);
 }
 
 function purgeIfReplyOnce(mock, handler) {

@@ -14,10 +14,12 @@ interface RequestHandler {
   reply: ResponseSpecFunc;
   replyOnce: ResponseSpecFunc;
   passThrough(): MockAdapter;
-  networkError(): void;
-  networkErrorOnce(): void;
-  timeout(): void;
-  timeoutOnce(): void;
+  abortRequest(): MockAdapter;
+  abortRequestOnce(): MockAdapter;
+  networkError(): MockAdapter;
+  networkErrorOnce(): MockAdapter;
+  timeout(): MockAdapter;
+  timeoutOnce(): MockAdapter;
 }
 
 interface MockAdapterOptions {
@@ -60,6 +62,7 @@ declare class MockAdapter {
   onDelete: RequestMatcherFunc;
   onPatch: RequestMatcherFunc;
   onList: RequestMatcherFunc;
+  onOptions: RequestMatcherFunc;
   onAny: RequestMatcherFunc;
 }
 

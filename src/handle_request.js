@@ -16,8 +16,9 @@ function makeResponse(result, config) {
 
 function handleRequest(mockAdapter, resolve, reject, config) {
   var url = config.url;
+  // TODO we're not hitting this `if` in any of the tests, investigate
   if (config.baseURL && config.url.substr(0, config.baseURL.length) === config.baseURL) {
-    url = config.url.slice(config.baseURL ? config.baseURL.length : 0);
+    url = config.url.slice(config.baseURL.length);
   }
 
   delete config.adapter;
