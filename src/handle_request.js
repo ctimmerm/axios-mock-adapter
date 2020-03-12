@@ -77,15 +77,21 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     }
   } else {
     // handler not found
-    utils.settle(
-      resolve,
-      reject,
-      {
-        status: 404,
-        config: config
-      },
-      mockAdapter.delayResponse
-    );
+    switch (mockAdapter.onNoMatch) {
+      case 'passthrough':
+        mockAdapter.originalAdapter(config).then(resolve, reject);
+        break;
+      default:
+        utils.settle(
+          resolve,
+          reject,
+          {
+            status: 404,
+            config: config
+          },
+          mockAdapter.delayResponse
+        );
+    }
   }
 }
 

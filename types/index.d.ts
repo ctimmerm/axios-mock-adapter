@@ -24,6 +24,7 @@ interface RequestHandler {
 
 interface MockAdapterOptions {
   delayResponse?: number;
+  onNoMatch?: 'passthrough';
 }
 
 interface RequestDataMatcher {

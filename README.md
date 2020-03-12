@@ -263,6 +263,17 @@ mock
 
 Note that `passThrough` requests are not subject to delaying by `delayResponse`.
 
+If you set `onNoMatch` option to `passthrough` all requests would be forwarded over network by default
+
+```js
+// Mock all requests to /foo with HTTP 200, but forward
+// any others requests to server
+var mock = new MockAdapter(axiosInstance, { onNoMatch: 'passthrough' });
+
+mock
+  .onAny('/foo').reply(200);
+```
+
 As of 1.7.0, `reply` function may return a Promise:
 
 ```js
