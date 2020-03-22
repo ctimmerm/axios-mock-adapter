@@ -1,12 +1,8 @@
 "use strict";
 
 var axios = require("axios");
-var deepEqual = require("fast-deep-equal");
+var isEqual = require("fast-deep-equal");
 var isBuffer = require("is-buffer");
-
-function isEqual(a, b) {
-  return deepEqual(a, b);
-}
 
 // < 0.13.0 will not have default headers set on a custom instance
 var rejectWithError = !!axios.create().defaults.headers;
@@ -23,12 +19,12 @@ function isFunction(val) {
   return toString.call(val) === "[object Function]";
 }
 
-function isObject(val) {
+function isObjectOrArray(val) {
   return val !== null && typeof val === "object";
 }
 
 function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
+  return isObjectOrArray(val) && isFunction(val.pipe);
 }
 
 function isArrayBuffer(val) {
@@ -168,7 +164,7 @@ module.exports = {
   isStream: isStream,
   isArrayBuffer: isArrayBuffer,
   isFunction: isFunction,
-  isObject: isObject,
+  isObjectOrArray: isObjectOrArray,
   isBuffer: isBuffer,
   isEqual: isEqual,
   createAxiosError: createAxiosError,

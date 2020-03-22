@@ -2,7 +2,7 @@
 
 var utils = require("./utils");
 
-function tansformRequest(data) {
+function transformRequest(data) {
   if (
     utils.isArrayBuffer(data) ||
     utils.isBuffer(data) ||
@@ -11,8 +11,8 @@ function tansformRequest(data) {
     return data;
   }
 
-  // JSON: returns a deep copy
-  if (utils.isObject(data)) {
+  // Object and Array: returns a deep copy
+  if (utils.isObjectOrArray(data)) {
     return JSON.parse(JSON.stringify(data));
   }
 
@@ -23,7 +23,7 @@ function tansformRequest(data) {
 function makeResponse(result, config) {
   return {
     status: result[0],
-    data: tansformRequest(result[1]),
+    data: transformRequest(result[1]),
     headers: result[2],
     config: config,
     request: {
