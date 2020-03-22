@@ -52,7 +52,7 @@ var MockAdapter = require('axios-mock-adapter');
 // This sets the mock adapter on the default instance
 var mock = new MockAdapter(axios);
 
-// Mock GET request to /users when param `searchText` is 'John' 
+// Mock GET request to /users when param `searchText` is 'John'
 // arguments for reply are (status, data, headers)
 mock.onGet('/users', { params: { searchText: 'John' } }).reply(200, {
   users: [
@@ -79,7 +79,13 @@ You can restore the original adapter (which will remove the mocking behavior)
 mock.restore();
 ```
 
-You can also reset the registered mock handlers with `reset`
+You can also reset the registered mock handlers with `resetHandlers`
+
+```js
+mock.resetHandlers();
+```
+
+You can reset both registered mock handlers and history items with `reset`
 
 ```js
 mock.reset();
@@ -93,6 +99,9 @@ Mock a low level network error
 ```js
 // Returns a failed promise with Error('Network Error');
 mock.onGet('/users').networkError();
+
+// networkErrorOnce can be used to mock a network error only once
+mock.onGet('/users').networkErrorOnce();
 ```
 
 Mock a network timeout
@@ -100,6 +109,9 @@ Mock a network timeout
 ```js
 // Returns a failed promise with Error with code set to 'ECONNABORTED'
 mock.onGet('/users').timeout();
+
+// timeoutOnce can be used to mock a timeout only once
+mock.onGet('/users').timeoutOnce();
 ```
 
 Passing a function to `reply`
@@ -117,6 +129,14 @@ mock.onGet('/users').reply(function(config) {
 });
 ```
 
+Passing a function to `reply` that returns an axios request, essentially mocking a redirect
+
+```js
+mock.onPost('/foo').reply(function(config) {
+  return axios.get('/bar');
+});
+```
+
 Using a regex
 
 ```js
@@ -126,6 +146,14 @@ mock.onGet(/\/users\/\d+/).reply(function(config) {
   return [200, {}];
 });
 ```
+Using variables in regex
+```js
+const usersUri = '/users';
+const url = new RegExp(`${usersUri}/*`);
+
+mock.onGet(url).reply(200, users);
+```
+
 
 Specify no path to match by verb alone
 
@@ -195,6 +223,24 @@ Mocking a request with a specific request body/data
 mock.onPut('/product', { id: 4, name: 'foo' }).reply(204);
 ```
 
+Using an asymmetric matcher, for example Jest matchers
+
+```js
+mock.onPost('/product', { id: 1 }, expect.objectContaining({
+  'Authorization': expect.stringMatching(/^Basic /)
+})).reply(204);
+```
+
+Using a custom asymmetric matcher (any object that has a `asymmetricMatch` property)
+
+```js
+mock.onPost('/product', {
+  asymmetricMatch: function(actual) {
+    return ['computer', 'phone'].includes(actual['type']);
+  }
+}).reply(204);
+```
+
 `.passThrough()` forwards the matched request over network
 
 ```js
@@ -216,6 +262,17 @@ mock
 ```
 
 Note that `passThrough` requests are not subject to delaying by `delayResponse`.
+
+If you set `onNoMatch` option to `passthrough` all requests would be forwarded over network by default
+
+```js
+// Mock all requests to /foo with HTTP 200, but forward
+// any others requests to server
+var mock = new MockAdapter(axiosInstance, { onNoMatch: 'passthrough' });
+
+mock
+  .onAny('/foo').reply(200);
+```
 
 As of 1.7.0, `reply` function may return a Promise:
 
@@ -240,7 +297,7 @@ Composing from multiple sources with Promises:
 ```js
 var normalAxios = axios.create();
 var mockAxios = axios.create();
-var mock = MockAdapter(mockAxios);
+var mock = new MockAdapter(mockAxios);
 
 mock
   .onGet('/orders')
@@ -257,4 +314,33 @@ mock
       sources => [200, sources.reduce((agg, source) => agg.concat(source))]
     )
   );
+```
+
+## History
+
+The `history` property allows you to enumerate existing axios request objects. The property is an object of verb keys referencing arrays of request objects.
+
+This is useful for testing.
+
+```js
+describe('Feature', () => {
+  it('requests an endpoint', (done) => {
+    var mock = new AxiosMockAdapter(axios);
+    mock.onPost('/endpoint').replyOnce(200);
+
+    feature.request()
+      .then(() => {
+        expect(mock.history.post.length).toBe(1);
+        expect(mock.history.post[0].data).toBe(JSON.stringify({ foo: 'bar' }));
+      })
+      .then(done)
+      .catch(done.fail);
+  });
+});
+```
+
+You can clear the history with `resetHistory`
+
+```js
+mock.resetHistory();
 ```

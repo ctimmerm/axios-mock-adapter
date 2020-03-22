@@ -4,7 +4,7 @@ var createServer = require('http').createServer;
 
 var MockAdapter = require('../src');
 
-describe('passThrough tests (requires Node)', function() {
+describe('onNoMatch=passthrough option tests (requires Node)', function() {
   var instance;
   var mock;
   var httpServer;
@@ -36,13 +36,26 @@ describe('passThrough tests (requires Node)', function() {
 
   beforeEach(function() {
     instance = axios.create({ baseURL: serverUrl });
-    mock = new MockAdapter(instance);
+    mock = new MockAdapter(instance, { onNoMatch: 'passthrough' });
+  });
+
+  it('works correctly if set no handlers', function() {
+    var randomPath = 'xyz' + Math.round(10000 * Math.random());
+
+    return Promise.all([
+      instance.get('/' + randomPath).then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('/' + randomPath);
+      })
+    ]);
   });
 
   it('allows selective mocking', function() {
     mock.onGet('/foo').reply(200, 'bar');
     mock.onGet('/error').reply(200, 'success');
     mock.onGet('/bar').passThrough();
+
+    var randomPath = 'xyz' + Math.round(10000 * Math.random());
 
     return Promise.all([
       instance.get('/foo').then(function(response) {
@@ -57,21 +70,14 @@ describe('passThrough tests (requires Node)', function() {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal('/bar');
       }),
-      instance
-        .get('/noHandler')
-        .then(function(response) {
-          // Mock adapter should return an error
-          expect(true).to.be.false;
-        })
-        .catch(function(error) {
-          expect(error).to.have.nested.property('response.status', 404);
-        })
+      instance.get('/' + randomPath).then(function(response) {
+        expect(response.status).to.equal(200);
+        expect(response.data).to.equal('/' + randomPath);
+      })
     ]);
   });
 
   it('handles errors correctly', function() {
-    mock.onGet('/error').passThrough();
-
     return instance
       .get('/error')
       .then(function() {
@@ -83,7 +89,7 @@ describe('passThrough tests (requires Node)', function() {
       });
   });
 
-  it('allows setting default passThrough handler', function() {
+  it('setting passThrough handler don\'t break anything', function() {
     mock
       .onGet('/foo')
       .reply(200, 'bar')
@@ -116,9 +122,8 @@ describe('passThrough tests (requires Node)', function() {
         port: httpServer.address().port
       }
     });
-    mock = new MockAdapter(instance);
+    mock = new MockAdapter(instance, { onNoMatch: 'passthrough' });
 
-    mock.onAny().passThrough();
     return instance.get('/foo').then(function(response) {
       expect(response.status).to.equal(200);
       expect(response.data).to.equal('http://null/test/foo');
@@ -126,8 +131,6 @@ describe('passThrough tests (requires Node)', function() {
   });
 
   it('handles request transformations properly', function() {
-    mock.onGet('/foo').passThrough();
-
     return instance
       .get('/foo', {
         data: 'foo',
@@ -143,8 +146,6 @@ describe('passThrough tests (requires Node)', function() {
   });
 
   it('handles response transformations properly', function() {
-    mock.onGet('/foo').passThrough();
-
     return instance
       .get('/foo', {
         transformResponse: [

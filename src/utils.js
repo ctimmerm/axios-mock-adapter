@@ -46,9 +46,9 @@ function combineUrls(baseURL, url) {
 function findHandler(handlers, method, url, body, parameters, headers, baseURL) {
   return find(handlers[method.toLowerCase()], function(handler) {
     if (typeof handler[0] === 'string') {
-      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isRequestHeadersMatching(headers, handler[2]);
+      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isObjectMatching(headers, handler[2]);
     } else if (handler[0] instanceof RegExp) {
-      return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isRequestHeadersMatching(headers, handler[2]);
+      return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isObjectMatching(headers, handler[2]);
     }
   });
 }
@@ -59,25 +59,22 @@ function isUrlMatching(url, required) {
   return (noSlashUrl === noSlashRequired);
 }
 
-function isRequestHeadersMatching(requestHeaders, required) {
-  if (required === undefined) return true;
-  return isEqual(requestHeaders, required);
-}
-
 function isBodyOrParametersMatching(method, body, parameters, required) {
   var allowedParamsMethods = ['delete', 'get', 'head', 'options'];
   if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
     var params = required ? required.params : undefined;
-    return isParametersMatching(parameters, params);
+    return isObjectMatching(parameters, params);
   } else {
     return isBodyMatching(body, required);
   }
 }
 
-function isParametersMatching(parameters, required) {
-  if (required === undefined) return true;
-
-  return isEqual(parameters, required);
+function isObjectMatching(actual, expected) {
+  if (expected === undefined) return true;
+  if (typeof expected.asymmetricMatch === 'function') {
+    return expected.asymmetricMatch(actual);
+  }
+  return isEqual(actual, expected);
 }
 
 function isBodyMatching(body, requiredBody) {
@@ -88,7 +85,8 @@ function isBodyMatching(body, requiredBody) {
   try {
     parsedBody = JSON.parse(body);
   } catch (e) { }
-  return parsedBody ? isEqual(parsedBody, requiredBody) : isEqual(body, requiredBody);
+
+  return isObjectMatching(parsedBody ? parsedBody : body, requiredBody);
 }
 
 function purgeIfReplyOnce(mock, handler) {
@@ -111,7 +109,7 @@ function settle(resolve, reject, response, delay) {
   if (response.config && response.config.validateStatus) {
     response.config.validateStatus(response.status)
       ? resolve(response)
-      : reject(createErrorResponse(
+      : reject(createAxiosError(
         'Request failed with status code ' + response.status,
         response.config,
         response
@@ -127,15 +125,22 @@ function settle(resolve, reject, response, delay) {
   }
 }
 
-function createErrorResponse(message, config, response) {
+function createAxiosError(message, config, response, code) {
   // Support for axios < 0.13.0
   if (!rejectWithError) return response;
 
   var error = new Error(message);
+  error.isAxiosError = true;
   error.config = config;
-  error.response = response;
+  if (response !== undefined) {
+    error.response = response;
+  }
+  if (code !== undefined) {
+    error.code = code;
+  }
   return error;
 }
+
 module.exports = {
   find: find,
   findHandler: findHandler,
@@ -145,5 +150,6 @@ module.exports = {
   isArrayBuffer: isArrayBuffer,
   isFunction: isFunction,
   isObject: isObject,
-  isBuffer: isBuffer
+  isBuffer: isBuffer,
+  createAxiosError: createAxiosError
 };

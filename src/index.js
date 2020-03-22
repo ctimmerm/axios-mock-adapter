@@ -3,8 +3,9 @@
 var deepEqual = require('deep-equal');
 
 var handleRequest = require('./handle_request');
+var utils = require('./utils');
 
-var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options'];
+var VERBS = ['get', 'post', 'head', 'delete', 'patch', 'put', 'options', 'list'];
 
 function adapter() {
   return function(config) {
@@ -44,10 +45,12 @@ function resetHistory() {
 function MockAdapter(axiosInstance, options) {
   reset.call(this);
 
+  // TODO throw error instead when no axios instance is provided
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
     this.delayResponse = options && options.delayResponse > 0 ? options.delayResponse : null;
+    this.onNoMatch = options && options.onNoMatch || null;
     axiosInstance.defaults.adapter = this.adapter.call(this);
   }
 }
@@ -57,6 +60,7 @@ MockAdapter.prototype.adapter = adapter;
 MockAdapter.prototype.restore = function restore() {
   if (this.axiosInstance) {
     this.axiosInstance.defaults.adapter = this.originalAdapter;
+    this.axiosInstance = undefined;
   }
 };
 
@@ -93,36 +97,64 @@ VERBS.concat('any').forEach(function(method) {
         return _this;
       },
 
+      abortRequest: function() {
+        return reply(function(config) {
+          var error = utils.createAxiosError(
+            'Request aborted',
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
+          return Promise.reject(error);
+        });
+      },
+
+      abortRequestOnce: function() {
+        return replyOnce(function(config) {
+          var error = utils.createAxiosError(
+            'Request aborted',
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
+          return Promise.reject(error);
+        });
+      },
+
       networkError: function() {
-        reply(function(config) {
-          var error = new Error('Network Error');
-          error.config = config;
+        return reply(function(config) {
+          var error = utils.createAxiosError('Network Error', config);
           return Promise.reject(error);
         });
       },
 
       networkErrorOnce: function() {
-        replyOnce(function(config) {
-          var error = new Error('Network Error');
-          error.config = config;
+        return replyOnce(function(config) {
+          var error = utils.createAxiosError('Network Error', config);
           return Promise.reject(error);
         });
       },
 
       timeout: function() {
-        reply(function(config) {
-          var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
-          error.config = config;
-          error.code = 'ECONNABORTED';
+        return reply(function(config) {
+          var error = utils.createAxiosError(
+            config.timeoutErrorMessage || ('timeout of ' + config.timeout + 'ms exceeded'),
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
           return Promise.reject(error);
         });
       },
 
       timeoutOnce: function() {
-        replyOnce(function(config) {
-          var error = new Error('timeout of ' + config.timeout + 'ms exceeded');
-          error.config = config;
-          error.code = 'ECONNABORTED';
+        return replyOnce(function(config) {
+          var error = utils.createAxiosError(
+            config.timeoutErrorMessage || ('timeout of ' + config.timeout + 'ms exceeded'),
+            config,
+            undefined,
+            'ECONNABORTED'
+          );
           return Promise.reject(error);
         });
       }
