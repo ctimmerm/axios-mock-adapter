@@ -1,7 +1,5 @@
 "use strict";
 
-var deepEqual = require("deep-equal");
-
 var handleRequest = require("./handle_request");
 var utils = require("./utils");
 
@@ -193,8 +191,8 @@ function findInHandlers(method, handlers, handler) {
         : item[0] === handler[0];
     var isSame =
       comparePaths &&
-      deepEqual(item[1], handler[1], { strict: true }) &&
-      deepEqual(item[2], handler[2], { strict: true });
+      utils.isEqual(item[1], handler[1]) &&
+      utils.isEqual(item[2], handler[2]);
     if (isSame && !isReplyOnce) {
       index = i;
     }

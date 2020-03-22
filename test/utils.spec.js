@@ -1,5 +1,6 @@
 var expect = require("chai").expect;
 var find = require("../src/utils").find;
+var isEqual = require("../src/utils").isEqual;
 
 describe("utility functions", function () {
   context("find", function () {
@@ -28,6 +29,14 @@ describe("utility functions", function () {
         return value === 4;
       });
       expect(value).to.be.undefined;
+    });
+  });
+
+  context("isEqual", function () {
+    it("checks with strict equality", function () {
+      var a = { foo: "5" };
+      var b = { foo: 5 };
+      expect(isEqual(a, b)).to.be.false;
     });
   });
 });

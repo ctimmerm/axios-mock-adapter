@@ -1,11 +1,11 @@
 "use strict";
 
 var axios = require("axios");
-var deepEqual = require("deep-equal");
+var deepEqual = require("fast-deep-equal");
 var isBuffer = require("is-buffer");
 
 function isEqual(a, b) {
-  return deepEqual(a, b, { strict: true });
+  return deepEqual(a, b);
 }
 
 // < 0.13.0 will not have default headers set on a custom instance
@@ -170,5 +170,6 @@ module.exports = {
   isFunction: isFunction,
   isObject: isObject,
   isBuffer: isBuffer,
+  isEqual: isEqual,
   createAxiosError: createAxiosError,
 };
