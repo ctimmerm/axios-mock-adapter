@@ -59,7 +59,7 @@
   "bundlesize": [
     {
       "path": "./dist/axios-mock-adapter.min.js",
-      "maxSize": "2.7 kB"
+      "maxSize": "3.0 kB"
     }
   ]
 }
