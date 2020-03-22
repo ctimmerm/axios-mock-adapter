@@ -1,25 +1,23 @@
 {
   "rules": {
-    "brace-style": [2, "1tbs", {"allowSingleLine": false}],
-    "comma-dangle": 2,
+    "brace-style": [2, "1tbs", { "allowSingleLine": false }],
+    "comma-dangle": [2, "only-multiline"],
     "curly": [2, "multi-line"],
     "eol-last": 2,
     "eqeqeq": 2,
-    "indent": [2, 2, {"SwitchCase": 1}],
-    "key-spacing": [2, {"beforeColon": false, "afterColon": true}],
+    "indent": [2, 2, { "SwitchCase": 1 }],
+    "key-spacing": [2, { "beforeColon": false, "afterColon": true }],
     "keyword-spacing": 2,
     "new-cap": 0,
     "no-extra-semi": 2,
-    "no-multiple-empty-lines": [2, {"max": 1}],
-    "no-param-reassign": [2, {"props": false}],
+    "no-multiple-empty-lines": [2, { "max": 1 }],
+    "no-param-reassign": [2, { "props": false }],
     "no-trailing-spaces": 2,
     "no-underscore-dangle": 0,
-    "no-unused-vars": [2, {"args": "none"}],
+    "no-unused-vars": [2, { "args": "none" }],
     "object-curly-spacing": [2, "always"],
     "padded-blocks": [2, "never"],
-    "quotes": [2, "single", "avoid-escape"],
     "semi": [2, "always"],
-    "space-before-blocks": [2, "always"],
-    "space-before-function-paren": [2, "never"]
+    "space-before-blocks": [2, "always"]
   }
 }

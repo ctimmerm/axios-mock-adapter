@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-var axios = require('axios');
-var deepEqual = require('deep-equal');
-var isBuffer = require('is-buffer');
+var axios = require("axios");
+var deepEqual = require("deep-equal");
+var isBuffer = require("is-buffer");
 
 function isEqual(a, b) {
   return deepEqual(a, b, { strict: true });
@@ -20,11 +20,11 @@ function find(array, predicate) {
 }
 
 function isFunction(val) {
-  return toString.call(val) === '[object Function]';
+  return toString.call(val) === "[object Function]";
 }
 
 function isObject(val) {
-  return val !== null && typeof val === 'object';
+  return val !== null && typeof val === "object";
 }
 
 function isStream(val) {
@@ -32,36 +32,53 @@ function isStream(val) {
 }
 
 function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
+  return toString.call(val) === "[object ArrayBuffer]";
 }
 
 function combineUrls(baseURL, url) {
   if (baseURL) {
-    return baseURL.replace(/\/+$/, '') + '/' + url.replace(/^\/+/, '');
+    return baseURL.replace(/\/+$/, "") + "/" + url.replace(/^\/+/, "");
   }
 
   return url;
 }
 
-function findHandler(handlers, method, url, body, parameters, headers, baseURL) {
-  return find(handlers[method.toLowerCase()], function(handler) {
-    if (typeof handler[0] === 'string') {
-      return (isUrlMatching(url, handler[0]) || isUrlMatching(combineUrls(baseURL, url), handler[0])) && isBodyOrParametersMatching(method, body, parameters, handler[1])  && isObjectMatching(headers, handler[2]);
+function findHandler(
+  handlers,
+  method,
+  url,
+  body,
+  parameters,
+  headers,
+  baseURL
+) {
+  return find(handlers[method.toLowerCase()], function (handler) {
+    if (typeof handler[0] === "string") {
+      return (
+        (isUrlMatching(url, handler[0]) ||
+          isUrlMatching(combineUrls(baseURL, url), handler[0])) &&
+        isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
+        isObjectMatching(headers, handler[2])
+      );
     } else if (handler[0] instanceof RegExp) {
-      return (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) && isBodyOrParametersMatching(method, body, parameters, handler[1]) && isObjectMatching(headers, handler[2]);
+      return (
+        (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) &&
+        isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
+        isObjectMatching(headers, handler[2])
+      );
     }
   });
 }
 
 function isUrlMatching(url, required) {
-  var noSlashUrl = url[0] === '/' ? url.substr(1) : url;
-  var noSlashRequired = required[0] === '/' ? required.substr(1) : required;
-  return (noSlashUrl === noSlashRequired);
+  var noSlashUrl = url[0] === "/" ? url.substr(1) : url;
+  var noSlashRequired = required[0] === "/" ? required.substr(1) : required;
+  return noSlashUrl === noSlashRequired;
 }
 
 function isBodyOrParametersMatching(method, body, parameters, required) {
-  var allowedParamsMethods = ['delete', 'get', 'head', 'options'];
-  if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0 ) {
+  var allowedParamsMethods = ["delete", "get", "head", "options"];
+  if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0) {
     var params = required ? required.params : undefined;
     return isObjectMatching(parameters, params);
   } else {
@@ -71,7 +88,7 @@ function isBodyOrParametersMatching(method, body, parameters, required) {
 
 function isObjectMatching(actual, expected) {
   if (expected === undefined) return true;
-  if (typeof expected.asymmetricMatch === 'function') {
+  if (typeof expected.asymmetricMatch === "function") {
     return expected.asymmetricMatch(actual);
   }
   return isEqual(actual, expected);
@@ -84,13 +101,13 @@ function isBodyMatching(body, requiredBody) {
   var parsedBody;
   try {
     parsedBody = JSON.parse(body);
-  } catch (e) { }
+  } catch (e) {}
 
   return isObjectMatching(parsedBody ? parsedBody : body, requiredBody);
 }
 
 function purgeIfReplyOnce(mock, handler) {
-  Object.keys(mock.handlers).forEach(function(key) {
+  Object.keys(mock.handlers).forEach(function (key) {
     var index = mock.handlers[key].indexOf(handler);
     if (index > -1) {
       mock.handlers[key].splice(index, 1);
@@ -100,7 +117,7 @@ function purgeIfReplyOnce(mock, handler) {
 
 function settle(resolve, reject, response, delay) {
   if (delay > 0) {
-    setTimeout(function() {
+    setTimeout(function () {
       settle(resolve, reject, response);
     }, delay);
     return;
@@ -109,11 +126,13 @@ function settle(resolve, reject, response, delay) {
   if (response.config && response.config.validateStatus) {
     response.config.validateStatus(response.status)
       ? resolve(response)
-      : reject(createAxiosError(
-        'Request failed with status code ' + response.status,
-        response.config,
-        response
-      ));
+      : reject(
+        createAxiosError(
+          "Request failed with status code " + response.status,
+          response.config,
+          response
+        )
+      );
     return;
   }
 
@@ -151,5 +170,5 @@ module.exports = {
   isFunction: isFunction,
   isObject: isObject,
   isBuffer: isBuffer,
-  createAxiosError: createAxiosError
+  createAxiosError: createAxiosError,
 };

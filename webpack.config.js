@@ -1,12 +1,12 @@
 var config = {
   output: {
-    library: 'AxiosMockAdapter',
-    libraryTarget: 'umd'
+    library: "AxiosMockAdapter",
+    libraryTarget: "umd",
   },
   externals: {
-    axios: 'axios'
+    axios: "axios",
   },
-  plugins: []
+  plugins: [],
 };
 
 module.exports = config;

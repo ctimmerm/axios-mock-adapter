@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
-var utils = require('./utils');
+var utils = require("./utils");
 
 function tansformRequest(data) {
-  if (utils.isArrayBuffer(data) ||
+  if (
+    utils.isArrayBuffer(data) ||
     utils.isBuffer(data) ||
     utils.isStream(data)
   ) {
@@ -26,15 +27,18 @@ function makeResponse(result, config) {
     headers: result[2],
     config: config,
     request: {
-      responseUrl: config.url
-    }
+      responseUrl: config.url,
+    },
   };
 }
 
 function handleRequest(mockAdapter, resolve, reject, config) {
   var url = config.url;
   // TODO we're not hitting this `if` in any of the tests, investigate
-  if (config.baseURL && config.url.substr(0, config.baseURL.length) === config.baseURL) {
+  if (
+    config.baseURL &&
+    config.url.substr(0, config.baseURL.length) === config.baseURL
+  ) {
     url = config.url.slice(config.baseURL.length);
   }
 
@@ -59,7 +63,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     if (handler.length === 2) {
       // passThrough handler
       mockAdapter.originalAdapter(config).then(resolve, reject);
-    } else if (typeof handler[3] !== 'function') {
+    } else if (typeof handler[3] !== "function") {
       utils.settle(
         resolve,
         reject,
@@ -69,20 +73,38 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     } else {
       var result = handler[3](config);
       // TODO throw a sane exception when return value is incorrect
-      if (typeof result.then !== 'function') {
-        utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
+      if (typeof result.then !== "function") {
+        utils.settle(
+          resolve,
+          reject,
+          makeResponse(result, config),
+          mockAdapter.delayResponse
+        );
       } else {
         result.then(
-          function(result) {
+          function (result) {
             if (result.config && result.status) {
-              utils.settle(resolve, reject, makeResponse([result.status, result.data, result.headers], result.config), 0);
+              utils.settle(
+                resolve,
+                reject,
+                makeResponse(
+                  [result.status, result.data, result.headers],
+                  result.config
+                ),
+                0
+              );
             } else {
-              utils.settle(resolve, reject, makeResponse(result, config), mockAdapter.delayResponse);
+              utils.settle(
+                resolve,
+                reject,
+                makeResponse(result, config),
+                mockAdapter.delayResponse
+              );
             }
           },
-          function(error) {
+          function (error) {
             if (mockAdapter.delayResponse > 0) {
-              setTimeout(function() {
+              setTimeout(function () {
                 reject(error);
               }, mockAdapter.delayResponse);
             } else {
@@ -95,7 +117,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   } else {
     // handler not found
     switch (mockAdapter.onNoMatch) {
-      case 'passthrough':
+      case "passthrough":
         mockAdapter.originalAdapter(config).then(resolve, reject);
         break;
       default:
@@ -104,7 +126,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
           reject,
           {
             status: 404,
-            config: config
+            config: config,
           },
           mockAdapter.delayResponse
         );
