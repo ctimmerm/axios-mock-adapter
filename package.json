@@ -11,7 +11,7 @@
     "lint": "eslint src test",
     "build:umd": "webpack --mode development ./src/index.js --output ./dist/axios-mock-adapter.js",
     "build:umd:min": "webpack --mode production ./src/index.js --output ./dist/axios-mock-adapter.min.js",
-    "prepublish": "npm run clean && npm run build:umd && npm run build:umd:min && npm run test:bundlesize"
+    "prepublish": "npm run clean && npm run build:umd && npm run build:umd:min"
   },
   "files": [
     "src",
