@@ -847,4 +847,21 @@ describe("MockAdapter basics", function () {
         expect(error.isAxiosError).to.be.true;
       });
   });
+
+  it("sets toJSON method on errors", function () {
+    mock.onGet("/").reply(404);
+
+    return instance
+      .get("/")
+      .then(function () {
+        expect(true).to.be.false;
+      })
+      .catch(function (error) {
+        var serializableError = error.toJSON();
+        expect(serializableError.message).to.equal("Request failed with status code 404");
+        expect(serializableError.name).to.equal("Error");
+        expect(serializableError.stack).to.exist;
+        expect(serializableError.config).to.exist;
+      });
+  });
 });
