@@ -1,5 +1,5 @@
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+import MockAdapter, { RequestHandler } from 'axios-mock-adapter';
 
 const instance = axios.create();
 const mock = new MockAdapter(instance);
@@ -135,11 +135,12 @@ namespace AllowsPromiseReply {
 namespace SupportsChanining {
   mock
     .onGet('/users')
-    .reply(200, [
-      /* users */
-    ])
+    .reply(200, [])
     .onGet('/posts')
-    .reply(200, [
-      /* posts */
-    ]);
+    .reply(200, []);
+}
+
+namespace ExportsRequestHandlerInterface {
+  const handler: RequestHandler = mock.onAny();
+  handler.reply(200);
 }

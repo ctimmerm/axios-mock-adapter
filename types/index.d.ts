@@ -10,7 +10,7 @@ type ResponseSpecFunc = <T = any>(
   headers?: any
 ) => MockAdapter;
 
-interface RequestHandler {
+export interface RequestHandler {
   reply: ResponseSpecFunc;
   replyOnce: ResponseSpecFunc;
   passThrough(): MockAdapter;
