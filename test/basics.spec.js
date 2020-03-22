@@ -1,4 +1,5 @@
 var axios = require('axios');
+var fs = require('fs');
 var expect = require('chai').expect;
 
 var MockAdapter = require('../src');
@@ -564,31 +565,6 @@ describe('MockAdapter basics', function() {
     ]);
   });
 
-  it('allows sending an array as response', function() {
-    mock.onGet('/').reply(200, [1, 2, 3]);
-
-    return instance.get('/').then(function(response) {
-      expect(response.data).to.deep.equal([1, 2, 3]);
-    });
-  });
-
-  it('allows sending an any object as response', function() {
-    var buffer = new ArrayBuffer(1);
-    var view = new Uint8Array(buffer);
-    view[0] = 0xff;
-
-    mock.onGet('/').reply(200, buffer);
-
-    return instance({
-      url: '/',
-      method: 'GET',
-      responseType: 'arraybuffer'
-    }).then(function(response) {
-      var view = new Uint8Array(response.data);
-      expect(view[0]).to.equal(0xff);
-    });
-  });
-
   it('returns a deep copy of the mock data in the response when the data is an object', function() {
     var data = {
       foo: {
@@ -784,6 +760,66 @@ describe('MockAdapter basics', function() {
     });
     return instance({ method: 'get', url: '/' }).then(function(response) {
       expect(response.status).to.equal(201);
+    });
+  });
+
+  it('allows sending a stream as response', function(done) {
+    instance.defaults.baseURL = 'http://www.example.org';
+
+    mock.onAny().reply(function(config) {
+      return [200, fs.createReadStream(__filename)];
+    });
+
+    instance.get('http://www.foo.com/bar', { responseType: 'stream' }).then(function(response) {
+      expect(response.status).to.equal(200);
+      var stream = response.data;
+      var string = '';
+      stream.on('data', function(chunk) {
+        string += chunk.toString('utf8');
+      });
+      stream.on('end', function() {
+        expect(string).to.equal(fs.readFileSync(__filename, 'utf8'));
+        done();
+      });
+    });
+  });
+
+  it('allows sending a buffer as response', function() {
+    instance.defaults.baseURL = 'http://www.example.org';
+
+    mock.onAny().reply(function(config) {
+      return [200, Buffer.from('fooBar', 'utf8')];
+    });
+
+    return instance.get('http://www.foo.com/bar', { responseType: 'stream' }).then(function(response) {
+      expect(response.status).to.equal(200);
+      var string = response.data.toString('utf8');
+      expect(string).to.equal('fooBar');
+    });
+  });
+
+  it('allows sending an array as response', function() {
+    mock.onGet('/').reply(200, [1, 2, 3]);
+
+    return instance.get('/').then(function(response) {
+      expect(response.data).to.deep.equal([1, 2, 3]);
+    });
+  });
+
+  it('allows sending an Uint8Array as response', function() {
+    var buffer = new ArrayBuffer(1);
+    var view = new Uint8Array(buffer);
+    view[0] = 0xff;
+
+    mock.onGet('/').reply(200, buffer);
+
+    return instance({
+      url: '/',
+      method: 'GET',
+      responseType: 'arraybuffer'
+    }).then(function(response) {
+      var view = new Uint8Array(response.data);
+      expect(view[0]).to.equal(0xff);
     });
   });
 

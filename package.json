@@ -53,7 +53,8 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "deep-equal": "1.0.1"
+    "deep-equal": "1.0.1",
+    "is-buffer": "^2.0.3"
   },
   "bundlesize": [
     {

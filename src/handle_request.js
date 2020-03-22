@@ -2,10 +2,27 @@
 
 var utils = require('./utils');
 
+function tansformRequest(data) {
+  if (utils.isArrayBuffer(data) ||
+    utils.isBuffer(data) ||
+    utils.isStream(data)
+  ) {
+    return data;
+  }
+
+  // JSON: returns a deep copy
+  if (utils.isObject(data)) {
+    return JSON.parse(JSON.stringify(data));
+  }
+
+  // for primitives like string, undefined, null, number
+  return data;
+}
+
 function makeResponse(result, config) {
   return {
     status: result[0],
-    data: utils.isSimpleObject(result[1]) ? JSON.parse(JSON.stringify(result[1])) : result[1],
+    data: tansformRequest(result[1]),
     headers: result[2],
     config: config,
     request: {

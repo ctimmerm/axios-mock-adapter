@@ -2,6 +2,7 @@
 
 var axios = require('axios');
 var deepEqual = require('deep-equal');
+var isBuffer = require('is-buffer');
 
 function isEqual(a, b) {
   return deepEqual(a, b, { strict: true });
@@ -16,6 +17,22 @@ function find(array, predicate) {
     var value = array[i];
     if (predicate(value)) return value;
   }
+}
+
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
 }
 
 function combineUrls(baseURL, url) {
@@ -124,15 +141,15 @@ function createAxiosError(message, config, response, code) {
   return error;
 }
 
-function isSimpleObject(value) {
-  return value !== null && value !== undefined && value.toString() === '[object Object]';
-}
-
 module.exports = {
   find: find,
   findHandler: findHandler,
-  isSimpleObject: isSimpleObject,
   purgeIfReplyOnce: purgeIfReplyOnce,
   settle: settle,
+  isStream: isStream,
+  isArrayBuffer: isArrayBuffer,
+  isFunction: isFunction,
+  isObject: isObject,
+  isBuffer: isBuffer,
   createAxiosError: createAxiosError
 };
