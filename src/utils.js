@@ -97,7 +97,7 @@ function isBodyMatching(body, requiredBody) {
   var parsedBody;
   try {
     parsedBody = JSON.parse(body);
-  } catch (e) {}
+  } catch (e) { }
 
   return isObjectMatching(parsedBody ? parsedBody : body, requiredBody);
 }
@@ -156,6 +156,15 @@ function createAxiosError(message, config, response, code) {
   return error;
 }
 
+function createCouldNotFindMockError(config) {
+  var message = "Could not find mock for: \n" + JSON.stringify(config, ['method', 'url'], 2);
+  var error = new Error(message);
+  error.isCouldNotFindMockError = true;
+  error.url = config.url;
+  error.method = config.method;
+  return error;
+}
+
 module.exports = {
   find: find,
   findHandler: findHandler,
@@ -168,4 +177,5 @@ module.exports = {
   isBuffer: isBuffer,
   isEqual: isEqual,
   createAxiosError: createAxiosError,
+  createCouldNotFindMockError: createCouldNotFindMockError
 };
