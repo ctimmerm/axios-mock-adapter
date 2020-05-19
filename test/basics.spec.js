@@ -847,4 +847,17 @@ describe("MockAdapter basics", function () {
         expect(error.isAxiosError).to.be.true;
       });
   });
+
+  it("sets the original request url in the response.request.responseUrl property on errors", function () {
+    mock.onGet("/foo").reply(404);
+
+    return instance
+      .get("/foo")
+      .then(function () {
+        expect(true).to.be.false;
+      })
+      .catch(function (error) {
+        expect(error.request.responseUrl).to.equal("/foo");
+      });
+  });
 });

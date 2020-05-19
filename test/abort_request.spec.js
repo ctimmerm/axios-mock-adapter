@@ -28,6 +28,7 @@ describe("requestAborted spec", function () {
         expect(error.code).to.equal("ECONNABORTED");
         expect(error.message).to.equal("Request aborted");
         expect(error.isAxiosError).to.be.true;
+        expect(error.request.responseUrl).to.equal("/foo");
       }
     );
   });

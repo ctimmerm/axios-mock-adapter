@@ -24,6 +24,7 @@ describe("timeout spec", function () {
         expect(error.code).to.equal("ECONNABORTED");
         expect(error.message).to.equal("timeout of 0ms exceeded");
         expect(error.isAxiosError).to.be.true;
+        expect(error.request.responseUrl).to.equal("/foo");
       }
     );
   });
@@ -61,6 +62,7 @@ describe("timeout spec", function () {
           expect(error.code).to.equal("ECONNABORTED");
           expect(error.message).to.equal(timeoutErrorMessage);
           expect(error.isAxiosError).to.be.true;
+          expect(error.request.responseUrl).to.equal("/foo");
         }
       );
   });
