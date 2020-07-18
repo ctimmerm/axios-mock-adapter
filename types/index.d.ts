@@ -27,6 +27,10 @@ interface MockAdapterOptions {
   onNoMatch?: 'passthrough';
 }
 
+interface AsymmetricMatcher {
+  asymmetricMatch: Function;
+}
+
 interface RequestDataMatcher {
   [index: string]: any;
   params?: {
@@ -38,10 +42,14 @@ interface HeadersMatcher {
   [header: string]: string;
 }
 
+type AsymmetricHeadersMatcher = AsymmetricMatcher | HeadersMatcher;
+
+type AsymmetricRequestDataMatcher = AsymmetricMatcher | RequestDataMatcher;
+
 type RequestMatcherFunc = (
   matcher?: string | RegExp,
-  body?: string | RequestDataMatcher,
-  headers?: HeadersMatcher
+  body?: string | AsymmetricRequestDataMatcher,
+  headers?: AsymmetricHeadersMatcher
 ) => RequestHandler;
 
 declare class MockAdapter {
