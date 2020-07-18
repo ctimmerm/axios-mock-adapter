@@ -284,6 +284,24 @@ var mock = new MockAdapter(axiosInstance, { onNoMatch: "passthrough" });
 mock.onAny("/foo").reply(200);
 ```
 
+Using `onNoMatch` option with `throwException` to throw an exception when a request is made without match any handler. It's helpful to debug your test mocks.
+
+```js
+var mock = new MockAdapter(axiosInstance, { onNoMatch: "throwException" });
+
+mock.onAny("/foo").reply(200);
+
+axios.get("/unexistent-path");
+
+// Exception message on console:
+//
+// Could not find mock for: 
+// {
+//   "method": "get",
+//   "url": "http://localhost/unexistent-path"
+// }
+```
+
 As of 1.7.0, `reply` function may return a Promise:
 
 ```js

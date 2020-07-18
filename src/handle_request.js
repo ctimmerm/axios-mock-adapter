@@ -120,6 +120,8 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       case "passthrough":
         mockAdapter.originalAdapter(config).then(resolve, reject);
         break;
+      case 'throwException':
+        throw utils.createCouldNotFindMockError(config);
       default:
         utils.settle(
           resolve,
