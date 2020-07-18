@@ -132,7 +132,7 @@ namespace AllowsPromiseReply {
   });
 }
 
-namespace SupportsChanining {
+namespace SupportsChaining {
   mock
     .onGet('/users')
     .reply(200, [])
