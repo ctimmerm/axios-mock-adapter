@@ -24,6 +24,7 @@ describe("networkError spec", function () {
         expect(error.response).to.not.exist;
         expect(error.message).to.equal("Network Error");
         expect(error.isAxiosError).to.be.true;
+        expect(error.request.responseUrl).to.equal("/foo");
       }
     );
   });

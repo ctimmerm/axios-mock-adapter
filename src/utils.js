@@ -148,6 +148,9 @@ function createAxiosError(message, config, response, code) {
   var error = new Error(message);
   error.isAxiosError = true;
   error.config = config;
+  error.request = {
+    responseUrl: config.url,
+  };
   if (response !== undefined) {
     error.response = response;
   }
