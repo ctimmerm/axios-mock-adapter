@@ -33,13 +33,13 @@ function makeResponse(result, config) {
 }
 
 function handleRequest(mockAdapter, resolve, reject, config) {
-  var url = config.url;
+  var url = config.url || "";
   // TODO we're not hitting this `if` in any of the tests, investigate
   if (
     config.baseURL &&
-    config.url.substr(0, config.baseURL.length) === config.baseURL
+    url.substr(0, config.baseURL.length) === config.baseURL
   ) {
-    url = config.url.slice(config.baseURL.length);
+    url = url.slice(config.baseURL.length);
   }
 
   delete config.adapter;
@@ -120,7 +120,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       case "passthrough":
         mockAdapter.originalAdapter(config).then(resolve, reject);
         break;
-      case 'throwException':
+      case "throwException":
         throw utils.createCouldNotFindMockError(config);
       default:
         utils.settle(

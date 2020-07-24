@@ -121,6 +121,14 @@ describe("passThrough tests (requires Node)", function () {
     });
   });
 
+  it("handle request with baseURL only", function () {
+    mock.onAny().passThrough();
+
+    return instance.get(undefined).then(function (response) {
+      expect(response.data).to.equal("/");
+    });
+  });
+
   it("handles request transformations properly", function () {
     mock.onGet("/foo").passThrough();
 
