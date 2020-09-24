@@ -77,6 +77,8 @@ function isBodyOrParametersMatching(method, body, parameters, required) {
   var allowedParamsMethods = ["delete", "get", "head", "options"];
   if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0) {
     var params = required ? required.params : undefined;
+    if (params && typeof required.paramsSerializer === "function")
+      params = required.paramsSerializer(params);
     return isObjectMatching(parameters, params);
   } else {
     return isBodyMatching(body, required);
@@ -88,7 +90,7 @@ function isObjectMatching(actual, expected) {
   if (typeof expected.asymmetricMatch === "function") {
     return expected.asymmetricMatch(actual);
   }
-  return isEqual(actual, expected);
+  return isEqual(parameters, required) || parameters === required;
 }
 
 function isBodyMatching(body, requiredBody) {
@@ -98,7 +100,7 @@ function isBodyMatching(body, requiredBody) {
   var parsedBody;
   try {
     parsedBody = JSON.parse(body);
-  } catch (e) { }
+  } catch (e) {}
 
   return isObjectMatching(parsedBody ? parsedBody : body, requiredBody);
 }
@@ -124,12 +126,12 @@ function settle(resolve, reject, response, delay) {
     response.config.validateStatus(response.status)
       ? resolve(response)
       : reject(
-        createAxiosError(
-          "Request failed with status code " + response.status,
-          response.config,
-          response
-        )
-      );
+          createAxiosError(
+            "Request failed with status code " + response.status,
+            response.config,
+            response
+          )
+        );
     return;
   }
 
@@ -170,14 +172,16 @@ function createAxiosError(message, config, response, code) {
       stack: this.stack,
       // Axios
       config: this.config,
-      code: this.code
+      code: this.code,
     };
   };
   return error;
 }
 
 function createCouldNotFindMockError(config) {
-  var message = "Could not find mock for: \n" + JSON.stringify(config, ['method', 'url'], 2);
+  var message =
+    "Could not find mock for: \n" +
+    JSON.stringify(config, ["method", "url"], 2);
   var error = new Error(message);
   error.isCouldNotFindMockError = true;
   error.url = config.url;
@@ -197,5 +201,5 @@ module.exports = {
   isBuffer: isBuffer,
   isEqual: isEqual,
   createAxiosError: createAxiosError,
-  createCouldNotFindMockError: createCouldNotFindMockError
+  createCouldNotFindMockError: createCouldNotFindMockError,
 };

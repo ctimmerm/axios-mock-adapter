@@ -1,6 +1,7 @@
 var axios = require("axios");
 var fs = require("fs");
 var expect = require("chai").expect;
+var qs = require("qs");
 
 var MockAdapter = require("../src");
 
@@ -858,10 +859,44 @@ describe("MockAdapter basics", function () {
       })
       .catch(function (error) {
         var serializableError = error.toJSON();
-        expect(serializableError.message).to.equal("Request failed with status code 404");
+        expect(serializableError.message).to.equal(
+          "Request failed with status code 404"
+        );
         expect(serializableError.name).to.equal("Error");
         expect(serializableError.stack).to.exist;
         expect(serializableError.config).to.exist;
+      });
+  });
+
+  it("can pass serialized query params", function () {
+    var params = { user_id: [123, 456] };
+    var serializer = function (params) {
+      return qs.stringify(params, { arrayFormat: "repeat" });
+    };
+
+    expect(serializer(params)).to.equal("user_id=123&user_id=456");
+    mock
+      .onGet("/withSerializedParams", {
+        paramsSerializer: serializer,
+        params: params,
+      })
+      .reply(200);
+
+    return instance
+      .get("/withSerializedParams", {
+        paramsSerializer: serializer,
+        params: params,
+        in: true,
+      }) // with serialization
+      .then(function (response) {
+        expect(response.status).to.equal(200);
+        return instance.get("/withSerializedParams", {
+          params: params,
+          in: true,
+        }); // without serialization
+      })
+      .catch(function (error) {
+        expect(error.response.status).to.equal(404);
       });
   });
 });
