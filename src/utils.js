@@ -90,7 +90,7 @@ function isObjectMatching(actual, expected) {
   if (typeof expected.asymmetricMatch === "function") {
     return expected.asymmetricMatch(actual);
   }
-  return isEqual(parameters, required) || parameters === required;
+  return isEqual(actual, expected) || actual === expected;
 }
 
 function isBodyMatching(body, requiredBody) {
