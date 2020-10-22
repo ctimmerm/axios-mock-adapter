@@ -63,6 +63,8 @@ axios
   });
 ```
 
+When using `params`, you must match _all_ key/value pairs passed to that option.
+
 To add a delay to responses, specify a delay amount (in milliseconds) when instantiating the adapter
 
 ```js
