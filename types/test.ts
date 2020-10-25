@@ -15,6 +15,12 @@ namespace AllowsConstructingWithOptions {
   });
 }
 
+namespace SupportsOnNoMatchThrowException {
+  new MockAdapter(instance, {
+    onNoMatch: 'throwException'
+  });
+}
+
 namespace ExposesAdapter {
   mock.adapter();
 }

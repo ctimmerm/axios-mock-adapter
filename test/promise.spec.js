@@ -32,7 +32,7 @@ describe("MockAdapter reply with Promise", function () {
 
   it("rejects after Promise resolves to error response", function () {
     mock.onGet("/bad/promise").reply(function () {
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         resolve([400, { bad: "request" }]);
       });
     });
