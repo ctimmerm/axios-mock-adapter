@@ -29,7 +29,7 @@ describe("onNoMatch=throwException option tests (requires Node)", function () {
   });
 
   it("handles errors correctly when could not find mock for requested url", function () {
-    var expectedUrl = 'http://127.0.0.1/unexistent_path';
+    var expectedUrl = "http://127.0.0.1/unexistent_path";
     var expectedMethod = "get";
 
     return instance
