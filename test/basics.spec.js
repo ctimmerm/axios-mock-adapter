@@ -823,7 +823,7 @@ describe("MockAdapter basics", function () {
     });
   });
 
-  it("returns the original request url in the response.request.responseUrl property", function () {
+  it("returns the original request url in the response.request.responseURL property", function () {
     mock.onGet("/foo").reply(200, {
       foo: "bar",
     });
@@ -831,7 +831,7 @@ describe("MockAdapter basics", function () {
     return instance.get("/foo").then(function (response) {
       expect(response.status).to.equal(200);
       expect(response.data.foo).to.equal("bar");
-      expect(response.request.responseUrl).to.equal("/foo");
+      expect(response.request.responseURL).to.equal("/foo");
     });
   });
 

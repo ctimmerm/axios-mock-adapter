@@ -27,7 +27,7 @@ function makeResponse(result, config) {
     headers: result[2],
     config: config,
     request: {
-      responseUrl: config.url,
+      responseURL: config.url,
     },
   };
 }
