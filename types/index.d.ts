@@ -24,7 +24,7 @@ export interface RequestHandler {
 
 interface MockAdapterOptions {
   delayResponse?: number;
-  onNoMatch?: 'passthrough';
+  onNoMatch?: 'passthrough' | 'throwException';
 }
 
 interface AsymmetricMatcher {
