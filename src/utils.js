@@ -64,7 +64,7 @@ function isParametersMatching(parameters, required) {
 }
 
 function isBodyMatching(body, requiredBody) {
-  if (requiredBody instanceof FormData) {
+  if (typeof FormData !=='undefined' && requiredBody instanceof FormData) {
     if (!(body instanceof FormData)) {
       return false;
     }
