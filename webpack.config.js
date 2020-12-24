@@ -1,12 +1,16 @@
-var config = {
-  output: {
-    library: "AxiosMockAdapter",
-    libraryTarget: "umd",
-  },
-  externals: {
-    axios: "axios",
-  },
-  plugins: [],
+module.exports = function (env, argv) {
+  return {
+    output: {
+      library: "AxiosMockAdapter",
+      libraryTarget: "umd",
+      filename:
+        argv.mode === "production"
+          ? "axios-mock-adapter.min.js"
+          : "axios-mock-adapter.js",
+    },
+    externals: {
+      axios: "axios",
+    },
+    plugins: [],
+  };
 };
-
-module.exports = config;
