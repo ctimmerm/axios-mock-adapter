@@ -17,6 +17,16 @@ describe("MockAdapter basics", function () {
     expect(instance.defaults.adapter).to.exist;
   });
 
+  it("correctly throws an error when attempting to instantiate an undefined axios instance", function () {
+    var emptyInstance = undefined;
+    var constructorFunc = function () {
+      new MockAdapter(emptyInstance);
+    };
+    expect(constructorFunc).to.throw(
+      "Please provide an instance of axios to mock"
+    );
+  });
+
   it("calls interceptors", function () {
     instance.interceptors.response.use(
       function (config) {
