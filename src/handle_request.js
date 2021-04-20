@@ -60,6 +60,10 @@ function handleRequest(mockAdapter, resolve, reject, config) {
       utils.purgeIfReplyOnce(mockAdapter, handler);
     }
 
+    if (handler[0] instanceof RegExp) {
+      config.urlParams = utils.getURLParams(handler[0], url, config.baseURL);
+    }
+
     if (handler.length === 2) {
       // passThrough handler
       mockAdapter.originalAdapter(config).then(resolve, reject);
