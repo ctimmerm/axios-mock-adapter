@@ -2,6 +2,7 @@ var expect = require("chai").expect;
 var find = require("../src/utils").find;
 var isEqual = require("../src/utils").isEqual;
 var isObjectOrArray = require("../src/utils").isObjectOrArray;
+var isBlob = require("../src/utils").isBlob;
 
 describe("utility functions", function () {
   context("find", function () {
@@ -61,6 +62,23 @@ describe("utility functions", function () {
       expect(isObjectOrArray("")).to.be.false;
       expect(isObjectOrArray(" ")).to.be.false;
       expect(isObjectOrArray("1")).to.be.false;
+    });
+  });
+
+  context("isBlob", function () {
+    it("returns false for anything that is not a Blob", function () {
+      expect(isBlob(true)).to.be.false;
+      expect(isBlob(false)).to.be.false;
+      expect(isBlob(null)).to.be.false;
+      expect(isBlob(undefined)).to.be.false;
+      expect(isBlob(function () {})).to.be.false;
+      expect(isBlob(0)).to.be.false;
+      expect(isBlob(1)).to.be.false;
+      expect(isBlob("")).to.be.false;
+      expect(isBlob(" ")).to.be.false;
+      expect(isBlob("1")).to.be.false;
+      expect(isBlob({ foo: "bar" })).to.be.false;
+      expect(isBlob([1, 2, 3])).to.be.false;
     });
   });
 });

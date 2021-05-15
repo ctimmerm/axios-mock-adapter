@@ -6,7 +6,8 @@ function transformRequest(data) {
   if (
     utils.isArrayBuffer(data) ||
     utils.isBuffer(data) ||
-    utils.isStream(data)
+    utils.isStream(data) ||
+    utils.isBlob(data)
   ) {
     return data;
   }
