@@ -52,7 +52,6 @@ function resetHistory() {
 function MockAdapter(axiosInstance, options) {
   reset.call(this);
 
-  // TODO throw error instead when no axios instance is provided
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
     this.originalAdapter = axiosInstance.defaults.adapter;
@@ -60,6 +59,8 @@ function MockAdapter(axiosInstance, options) {
       options && options.delayResponse > 0 ? options.delayResponse : null;
     this.onNoMatch = (options && options.onNoMatch) || null;
     axiosInstance.defaults.adapter = this.adapter.call(this);
+  } else {
+    throw new Error("Please provide an instance of axios to mock");
   }
 }
 
