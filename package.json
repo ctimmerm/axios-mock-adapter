@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "fast-deep-equal": "^3.1.3",
+    "is-blob": "^2.1.0",
     "is-buffer": "^2.0.5"
   },
   "bundlesize": [

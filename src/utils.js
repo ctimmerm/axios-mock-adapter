@@ -3,6 +3,7 @@
 var axios = require("axios");
 var isEqual = require("fast-deep-equal");
 var isBuffer = require("is-buffer");
+var isBlob = require("is-blob");
 var toString = Object.prototype.toString;
 
 // < 0.13.0 will not have default headers set on a custom instance
@@ -197,6 +198,7 @@ module.exports = {
   isFunction: isFunction,
   isObjectOrArray: isObjectOrArray,
   isBuffer: isBuffer,
+  isBlob: isBlob,
   isEqual: isEqual,
   createAxiosError: createAxiosError,
   createCouldNotFindMockError: createCouldNotFindMockError,
