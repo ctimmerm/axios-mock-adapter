@@ -16,8 +16,15 @@ describe("MockAdapter onAny", function () {
     mock.onAny("/foo").reply(200);
 
     expect(mock.handlers["get"]).not.to.be.empty;
+    expect(mock.handlers["post"]).not.to.be.empty;
+    expect(mock.handlers["head"]).not.to.be.empty;
+    expect(mock.handlers["delete"]).not.to.be.empty;
     expect(mock.handlers["patch"]).not.to.be.empty;
     expect(mock.handlers["put"]).not.to.be.empty;
+    expect(mock.handlers["options"]).not.to.be.empty;
+    expect(mock.handlers["list"]).not.to.be.empty;
+    expect(mock.handlers["link"]).not.to.be.empty;
+    expect(mock.handlers["unlink"]).not.to.be.empty;
   });
 
   it("mocks any request with a matching url", function () {

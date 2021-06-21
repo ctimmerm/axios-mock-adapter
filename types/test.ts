@@ -53,6 +53,8 @@ namespace SupportsAllHttpVerbs {
   mock.onDelete;
   mock.onPatch;
   mock.onList;
+  mock.onLink;
+  mock.onUnlink;
 }
 
 namespace SupportsAnyVerb {
