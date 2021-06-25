@@ -56,13 +56,13 @@ function findHandler(
         (isUrlMatching(url, handler[0]) ||
           isUrlMatching(combineUrls(baseURL, url), handler[0])) &&
         isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
-        isObjectMatching(headers, handler[2])
+        isHeadersMatching(headers, handler[2])
       );
     } else if (handler[0] instanceof RegExp) {
       return (
         (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) &&
         isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
-        isObjectMatching(headers, handler[2])
+        isHeadersMatching(headers, handler[2])
       );
     }
   });
@@ -90,6 +90,27 @@ function isObjectMatching(actual, expected) {
     return expected.asymmetricMatch(actual);
   }
   return isEqual(actual, expected);
+}
+
+/**
+ * @description This function checks if there are only headers configured in the mock, excluding headers injected by browsers.
+ *
+ * @param {*} actual
+ * @param {*} expected
+ * @returns Boolean
+ */
+function isHeadersMatching(actual, expected) {
+  if (isObjectMatching(actual, expected)) return true;
+
+  var searchProps = 0;
+  var expectedProps = Object.keys(expected).length;
+  for ( var prop in actual ) {
+    if ( expected.hasOwnProperty(prop) ) {
+      console.log(prop);
+      searchProps += 1;
+    }
+  }
+  return searchProps === expectedProps;
 }
 
 function isBodyMatching(body, requiredBody) {
