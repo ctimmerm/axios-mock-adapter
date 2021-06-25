@@ -302,6 +302,27 @@ describe("MockAdapter basics", function () {
       });
   });
 
+  it("can pass headers without inject headers browsers to match to a handler ", function () {
+    var expectHeader = {
+      "Header-test": "test-header",
+    };
+
+    var actualHeaders = Object.assign({
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    expectHeader
+    );
+
+    mock.onPost("/withHeaders", undefined, actualHeaders).reply(200);
+
+    return instance
+      .post("/withHeaders", undefined, { headers: expectHeader })
+      .then(function (response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
   it("passes the config to the callback", function () {
     mock.onGet(/\/products\/\d+/).reply(function (config) {
       return [200, {}, { RequestedURL: config.url }];
