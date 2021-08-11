@@ -414,6 +414,15 @@ describe("MockAdapter basics", function () {
     });
   });
 
+  it("supports providing a validateStatus null value", function () {
+    instance.defaults.validateStatus = null;
+    mock.onGet("/foo").reply(500);
+
+    return instance.get("/foo").then(function (response) {
+      expect(response.status).to.equal(500);
+    });
+  });
+
   it("respects validatesStatus when requesting unhandled urls", function () {
     instance.defaults.validateStatus = function () {
       return true;
