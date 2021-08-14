@@ -120,7 +120,10 @@ function settle(resolve, reject, response, delay) {
   }
 
   // Support for axios < 0.13
-  if (!rejectWithError && (!response.config || !response.config.validateStatus)) {
+  if (
+    !rejectWithError &&
+    (!response.config || !response.config.validateStatus)
+  ) {
     if (response.status >= 200 && response.status < 300) {
       resolve(response);
     } else {
@@ -139,11 +142,13 @@ function settle(resolve, reject, response, delay) {
       return reject(response);
     }
 
-    reject(createAxiosError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      response
-    ));
+    reject(
+      createAxiosError(
+        "Request failed with status code " + response.status,
+        response.config,
+        response
+      )
+    );
   }
 }
 
