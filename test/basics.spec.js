@@ -555,6 +555,20 @@ describe("MockAdapter basics", function () {
       expect(message).to.equal("error");
     });
   });
+  
+  it("allows delay in milliseconds", function () {
+    mock = new MockAdapter(instance);
+    const start = new Date().getTime();
+    const delayInMs = 10;
+    mock.delayInMs(delayInMs).onGet("/foo").reply(200);
+
+    return instance.get("/foo").then(function (response) {
+      const end = new Date().getTime();
+      const totalTime = end - start;
+      expect(response.status).to.equal(200);
+      expect(totalTime).greaterThan(delayInMs);
+    });
+  });
 
   it("maps empty GET path to any path", function () {
     mock.onGet("/foo").reply(200, "foo").onGet().reply(200, "bar");
