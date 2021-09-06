@@ -75,6 +75,11 @@ MockAdapter.prototype.restore = function restore() {
   }
 };
 
+MockAdapter.prototype.delayInMs = function delay(delay){
+  this.delayResponse = delay;
+  return this;
+};
+
 MockAdapter.prototype.reset = reset;
 MockAdapter.prototype.resetHandlers = resetHandlers;
 MockAdapter.prototype.resetHistory = resetHistory;
