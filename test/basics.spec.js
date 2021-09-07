@@ -556,18 +556,34 @@ describe("MockAdapter basics", function () {
     });
   });
   
-  it("allows delay in milliseconds", function () {
+  it("allows delay in millsecond per request", function () {
     mock = new MockAdapter(instance);
     const start = new Date().getTime();
-    const delayInMs = 10;
-    mock.delayInMs(delayInMs).onGet("/foo").reply(200);
+    const firstDelay = 100;
+    const secondDelay = 500;
+    const success = 200;
 
-    return instance.get("/foo").then(function (response) {
-      const end = new Date().getTime();
-      const totalTime = end - start;
-      expect(response.status).to.equal(200);
-      expect(totalTime).greaterThan(delayInMs);
-    });
+    const fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(firstDelay);
+    fooOnDelayResponds(success);
+    const barOnDelayResponds = mock.onGet("/bar").withDelayInMs(secondDelay);
+    barOnDelayResponds(success);
+
+    return Promise.all([
+      instance.get("/foo").then(function (response) {
+        const end = new Date().getTime();
+        const totalTime = end - start;
+        
+        expect(response.status).to.equal(success);
+        expect(totalTime).greaterThanOrEqual(firstDelay);
+      }),
+      instance.get("/bar").then(function (response) {
+        const end = new Date().getTime();
+        const totalTime = end - start;
+
+        expect(response.status).to.equal(success);
+        expect(totalTime).greaterThanOrEqual(secondDelay);
+      })
+    ]);
   });
 
   it("maps empty GET path to any path", function () {
