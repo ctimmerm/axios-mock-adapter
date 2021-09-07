@@ -94,7 +94,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
         resolve,
         reject,
         makeResponse(handler.slice(3), config),
-        mockAdapter.delayResponse
+        getEffectiveDelay(mockAdapter, handler)
       );
     } else {
       var result = handler[3](config);
@@ -104,7 +104,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
           resolve,
           reject,
           makeResponse(result, config),
-          mockAdapter.delayResponse
+          getEffectiveDelay(mockAdapter, handler)
         );
       } else {
         result.then(
@@ -124,7 +124,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
                 resolve,
                 reject,
                 makeResponse(result, config),
-                mockAdapter.delayResponse
+                getEffectiveDelay(mockAdapter, handler)
               );
             }
           },
@@ -132,7 +132,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
             if (mockAdapter.delayResponse > 0) {
               setTimeout(function () {
                 reject(error);
-              }, mockAdapter.delayResponse);
+              }, getEffectiveDelay(mockAdapter, handler));
             } else {
               reject(error);
             }
@@ -160,6 +160,14 @@ function handleRequest(mockAdapter, resolve, reject, config) {
         );
     }
   }
+}
+
+function getEffectiveDelay(adapter, handler){
+  var delayPerRequest = 0;
+  if(handler.length === 8){
+    delayPerRequest = handler[7];
+  }
+  return adapter.delayResponse + delayPerRequest
 }
 
 module.exports = handleRequest;
