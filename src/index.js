@@ -75,11 +75,6 @@ MockAdapter.prototype.restore = function restore() {
   }
 };
 
-MockAdapter.prototype.delayInMs = function delay(delay){
-  this.delayResponse = delay;
-  return this;
-};
-
 MockAdapter.prototype.reset = reset;
 MockAdapter.prototype.resetHandlers = resetHandlers;
 MockAdapter.prototype.resetHistory = resetHistory;
@@ -94,6 +89,16 @@ VERBS.concat("any").forEach(function (method) {
       var handler = [matcher, body, requestHeaders, code, response, headers];
       addHandler(method, _this.handlers, handler);
       return _this;
+    }
+
+    function replyWithDelay(delay, code, response, headers) {
+      var handler = [matcher, body, requestHeaders, code, response, headers, false, delay];
+      addHandler(method, _this.handlers, handler);
+      return _this;
+    }
+
+    function withDelayInMs(delay){
+      return (code, response, headers) => replyWithDelay(delay, code, response, headers);
     }
 
     function replyOnce(code, response, headers) {
@@ -114,6 +119,8 @@ VERBS.concat("any").forEach(function (method) {
       reply: reply,
 
       replyOnce: replyOnce,
+      
+      withDelayInMs: withDelayInMs,
 
       passThrough: function passThrough() {
         var handler = [matcher, body];
