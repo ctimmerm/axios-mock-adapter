@@ -25,10 +25,6 @@ namespace ExposesAdapter {
   mock.adapter();
 }
 
-namespace ExposesOriginalAdapter {
-  mock.originalAdapter();
-}
-
 namespace SupportsReset {
   mock.reset();
 }

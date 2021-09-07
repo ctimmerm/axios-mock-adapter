@@ -56,7 +56,6 @@ declare class MockAdapter {
   constructor(axiosInstance: AxiosInstance, options?: MockAdapterOptions);
 
   adapter(): AxiosAdapter;
-  originalAdapter(): AxiosAdapter;
   reset(): void;
   resetHandlers(): void;
   resetHistory(): void;
