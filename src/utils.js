@@ -3,7 +3,6 @@
 var axios = require("axios");
 var isEqual = require("fast-deep-equal");
 var isBuffer = require("is-buffer");
-var isBlob = require("is-blob");
 var toString = Object.prototype.toString;
 
 // < 0.13.0 will not have default headers set on a custom instance
@@ -15,6 +14,14 @@ function find(array, predicate) {
     var value = array[i];
     if (predicate(value)) return value;
   }
+}
+
+function isBlob(value) {
+  if (typeof Blob === 'undefined') {
+		return false;
+	}
+
+	return value instanceof Blob || Object.prototype.toString.call(value) === '[object Blob]';
 }
 
 function isFunction(val) {
