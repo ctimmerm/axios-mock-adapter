@@ -43,13 +43,17 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     url = url.slice(config.baseURL.length);
   }
 
+  if (url.indexOf("?") !== -1) {
+    url = url.substring(0, url.indexOf("?"))
+  }
+
   delete config.adapter;
   mockAdapter.history[config.method].push(config);
 
   var handler = utils.findHandler(
     mockAdapter.handlers,
     config.method,
-    url.substring(0,url.indexOf("?")),
+    url,
     config.data,
     config.params,
     config.headers,
