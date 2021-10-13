@@ -49,7 +49,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   var handler = utils.findHandler(
     mockAdapter.handlers,
     config.method,
-    url,
+    url.substring(0,url.indexOf("?")),
     config.data,
     config.params,
     config.headers,
