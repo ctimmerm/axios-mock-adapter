@@ -3,6 +3,7 @@ var find = require("../src/utils").find;
 var isEqual = require("../src/utils").isEqual;
 var isObjectOrArray = require("../src/utils").isObjectOrArray;
 var isBlob = require("../src/utils").isBlob;
+var isBodyOrParametersMatching = require("../src/utils").isBodyOrParametersMatching;
 
 describe("utility functions", function () {
   context("find", function () {
@@ -79,6 +80,22 @@ describe("utility functions", function () {
       expect(isBlob("1")).to.be.false;
       expect(isBlob({ foo: "bar" })).to.be.false;
       expect(isBlob([1, 2, 3])).to.be.false;
+    });
+  });
+
+  context("isBodyOrParametersMatching", function() {
+    it('delete has params only', function () {
+      expect(isBodyOrParametersMatching('delete', null, { 'a': 2 }, { 'params': { 'a': 2 } } )).to.be.true;
+      expect(isBodyOrParametersMatching('delete', null, { 'a': 2 }, { 'params': { 'b': 2 } } )).to.be.false;
+    });
+    it('delete has data only', function () {
+      expect(isBodyOrParametersMatching('delete', { 'x': 1 }, null, { 'data': { 'x': 1 } })).to.be.true;
+      expect(isBodyOrParametersMatching('delete', { 'x': 1 }, null, { 'data': { 'y': 1 } })).to.be.false;
+    });
+    it('delete has body and params', function () {
+      expect(isBodyOrParametersMatching('delete', { 'x': 1 }, { 'a': 2 }, { 'data': { 'x': 1 }, 'params': { 'a': 2 } })).to.be.true;
+      expect(isBodyOrParametersMatching('delete', { 'x': 1 }, { 'a': 2 }, { 'data': { 'x': 1 }, 'params': { 'b': 2 } })).to.be.false;
+      expect(isBodyOrParametersMatching('delete', { 'x': 1 }, { 'a': 2 }, { 'data': { 'y': 1 }, 'params': { 'a': 2 } })).to.be.false;
     });
   });
 });
