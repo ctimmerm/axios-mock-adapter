@@ -43,10 +43,14 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     url = url.slice(config.baseURL.length);
   }
 
+  if (url[0] !== '/') {
+    url = "/" + url;
+  }
+
   delete config.adapter;
   mockAdapter.history[config.method].push(config);
 
-  var handler = utils.findHandler(
+  var result = utils.findHandler(
     mockAdapter.handlers,
     config.method,
     url,
@@ -55,8 +59,12 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     config.headers,
     config.baseURL
   );
+  var handler;
 
-  if (handler) {
+  if (result) {
+    handler = result[0];
+    config.urlParams = result[1].params;
+
     if (handler.length === 7) {
       utils.purgeIfReplyOnce(mockAdapter, handler);
     }

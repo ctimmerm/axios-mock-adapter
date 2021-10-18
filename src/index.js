@@ -1,5 +1,6 @@
 "use strict";
 
+var { match } = require("path-to-regexp");
 var handleRequest = require("./handle_request");
 var utils = require("./utils");
 
@@ -82,6 +83,12 @@ VERBS.concat("any").forEach(function (method) {
   MockAdapter.prototype[methodName] = function (matcher, body, requestHeaders) {
     var _this = this;
     var matcher = matcher === undefined ? /.*/ : matcher;
+
+    if (typeof matcher === 'string' && !utils.isUrl(matcher)) {
+      const matchingStr = matcher[0] === '/' ? matcher : '/' + matcher;
+      matcher = match(matchingStr);
+      matcher.matchingStr = matchingStr
+    }
 
     function reply(code, response, headers) {
       var handler = [matcher, body, requestHeaders, code, response, headers];
@@ -186,10 +193,16 @@ function findInHandlers(method, handlers, handler) {
   for (var i = 0; i < handlers[method].length; i += 1) {
     var item = handlers[method][i];
     var isReplyOnce = item.length === 7;
-    var comparePaths =
-      item[0] instanceof RegExp && handler[0] instanceof RegExp
-        ? String(item[0]) === String(handler[0])
-        : item[0] === handler[0];
+    var comparePaths;
+
+    if (item[0] instanceof RegExp && handler[0] instanceof RegExp) {
+      comparePaths = String(item[0]) === String(handler[0])
+    } else if (item[0].matchingStr && handler[0].matchingStr) {
+      comparePaths = item[0].matchingStr === handler[0].matchingStr;
+    } else {
+      comparePaths = item[0] === handler[0];
+    }
+
     var isSame =
       comparePaths &&
       utils.isEqual(item[1], handler[1]) &&
