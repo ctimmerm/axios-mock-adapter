@@ -77,8 +77,9 @@ function isUrlMatching(url, required) {
 function isBodyOrParametersMatching(method, body, parameters, required) {
   var allowedParamsMethods = ["delete", "get", "head", "options"];
   if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0) {
+    var data = required ? required.data : undefined;
     var params = required ? required.params : undefined;
-    return isObjectMatching(parameters, params);
+    return isObjectMatching(parameters, params) && isBodyMatching(body, data);
   } else {
     return isBodyMatching(body, required);
   }
@@ -206,6 +207,7 @@ module.exports = {
   isObjectOrArray: isObjectOrArray,
   isBuffer: isBuffer,
   isBlob: isBlob,
+  isBodyOrParametersMatching: isBodyOrParametersMatching,
   isEqual: isEqual,
   createAxiosError: createAxiosError,
   createCouldNotFindMockError: createCouldNotFindMockError,

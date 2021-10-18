@@ -157,6 +157,18 @@ describe("MockAdapter basics", function () {
       });
   });
 
+  it("can pass a body for delete to match to a handler", function () {
+    mock
+      .onDelete("/withParams",{ data: { bar: 2 }, params: { foo: 1 } })
+      .reply(200);
+
+    return instance
+      .delete("/withParams", { params: { foo: 1 }, data: { bar: 2 } } )
+      .then(function (response) {
+        expect(response.status).to.equal(200);
+      });
+  });
+
   it("can pass query params for head to match to a handler", function () {
     mock
       .onHead("/withParams", { params: { foo: "bar", bar: "foo" } })
