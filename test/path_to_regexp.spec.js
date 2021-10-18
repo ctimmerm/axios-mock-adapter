@@ -18,7 +18,6 @@ describe("MockAdapter pathToRegexp", function () {
     return instance
       .get("/foo/42")
       .then(function (response) {
-        console.log('response', response);
         expect(response.status).to.equal(200);
       });
   });
@@ -32,7 +31,6 @@ describe("MockAdapter pathToRegexp", function () {
     return instance
       .get("/foo/42")
       .then(function (response) {
-        console.log('response', response);
         expect(response.status).to.equal(200);
       });
   });
