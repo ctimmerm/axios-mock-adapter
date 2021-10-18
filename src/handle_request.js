@@ -43,7 +43,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     url = url.slice(config.baseURL.length);
   }
 
-  if (url[0] !== '/') {
+  if (url[0] !== "/") {
     url = "/" + url;
   }
 

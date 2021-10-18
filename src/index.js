@@ -1,6 +1,6 @@
 "use strict";
 
-var { match } = require("path-to-regexp");
+var match = require("path-to-regexp").match;
 var handleRequest = require("./handle_request");
 var utils = require("./utils");
 
@@ -35,6 +35,18 @@ function getVerbObject() {
     accumulator[verb] = [];
     return accumulator;
   }, {});
+}
+
+function getMatcher(val) {
+  var matcher = val === undefined ? /.*/ : val;
+
+  if (typeof matcher === "string" && !utils.isUrl(matcher)) {
+    var matchingStr = matcher[0] === "/" ? matcher : "/" + matcher;
+    matcher = match(matchingStr);
+    matcher.matchingStr = matchingStr;
+  }
+
+  return matcher;
 }
 
 function reset() {
@@ -82,13 +94,7 @@ VERBS.concat("any").forEach(function (method) {
   var methodName = "on" + method.charAt(0).toUpperCase() + method.slice(1);
   MockAdapter.prototype[methodName] = function (matcher, body, requestHeaders) {
     var _this = this;
-    var matcher = matcher === undefined ? /.*/ : matcher;
-
-    if (typeof matcher === 'string' && !utils.isUrl(matcher)) {
-      const matchingStr = matcher[0] === '/' ? matcher : '/' + matcher;
-      matcher = match(matchingStr);
-      matcher.matchingStr = matchingStr
-    }
+    var matcher = getMatcher(matcher);
 
     function reply(code, response, headers) {
       var handler = [matcher, body, requestHeaders, code, response, headers];
@@ -196,7 +202,7 @@ function findInHandlers(method, handlers, handler) {
     var comparePaths;
 
     if (item[0] instanceof RegExp && handler[0] instanceof RegExp) {
-      comparePaths = String(item[0]) === String(handler[0])
+      comparePaths = String(item[0]) === String(handler[0]);
     } else if (item[0].matchingStr && handler[0].matchingStr) {
       comparePaths = item[0].matchingStr === handler[0].matchingStr;
     } else {

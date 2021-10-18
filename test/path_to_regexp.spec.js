@@ -24,7 +24,7 @@ describe("MockAdapter pathToRegexp", function () {
 
   it("add urlParams to config", function () {
     mock.onGet("/foo/:id").reply(function (config) {
-      expect(config.urlParams.id).to.equal('42');
+      expect(config.urlParams.id).to.equal("42");
       return [200];
     });
 
