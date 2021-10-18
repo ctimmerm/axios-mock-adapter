@@ -63,7 +63,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
 
   if (result) {
     handler = result[0];
-    config.urlParams = result[1].params;
+    config.routeParams = result[1].params;
 
     if (handler.length === 7) {
       utils.purgeIfReplyOnce(mockAdapter, handler);

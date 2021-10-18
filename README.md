@@ -141,11 +141,11 @@ Using named params, parsed with [`path-to-regexp`](https://github.com/pillarjs/p
 
 ```js
 mock.onGet("/users/:id").reply(function (config) {
-  // the actual id can be grabbed from config.urlParams
+  // the actual id can be grabbed from config.routeParams
 
   return [
     200,
-    { id: config.urlParams.id }
+    { id: config.routeParams.id }
   ];
 });
 ```
