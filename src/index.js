@@ -41,9 +41,8 @@ function getMatcher(val) {
   var matcher = val === undefined ? /.*/ : val;
 
   if (typeof matcher === "string" && !utils.isUrl(matcher)) {
-    var matchingStr = matcher[0] === "/" ? matcher : "/" + matcher;
-    matcher = match(matchingStr);
-    matcher.matchingStr = matchingStr;
+    matcher = match(matcher);
+    matcher.matchingStr = val;
   }
 
   return matcher;
