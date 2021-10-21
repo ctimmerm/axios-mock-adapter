@@ -12,7 +12,7 @@ describe("utility functions", function () {
       var value = find(array, function (value) {
         return value === 2;
       });
-      expect(value).to.equal(2);
+      expect(value[0]).to.equal(2);
     });
 
     it("returns the first value for which the predicate holds true", function () {
@@ -23,7 +23,7 @@ describe("utility functions", function () {
       var value = find(array, function (value) {
         return value.key === 1;
       });
-      expect(value.value).to.equal("one");
+      expect(value[0].value).to.equal("one");
     });
 
     it("returns undefined if the value is not found", function () {

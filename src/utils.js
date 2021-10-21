@@ -13,7 +13,8 @@ function find(array, predicate) {
   var length = array.length;
   for (var i = 0; i < length; i++) {
     var value = array[i];
-    if (predicate(value)) return value;
+    var match = predicate(value);
+    if (match) return [value, match];
   }
 }
 
@@ -31,6 +32,18 @@ function isStream(val) {
 
 function isArrayBuffer(val) {
   return toString.call(val) === "[object ArrayBuffer]";
+}
+
+function isUrl(val) {
+  var url;
+
+  try {
+    url = new URL(val);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
 }
 
 function combineUrls(baseURL, url) {
@@ -51,7 +64,16 @@ function findHandler(
   baseURL
 ) {
   return find(handlers[method.toLowerCase()], function (handler) {
-    if (typeof handler[0] === "string") {
+    if (typeof handler[0] === "function") {
+      var match = handler[0](url) || handler[0](combineUrls(baseURL, url));
+      if (
+        match &&
+          isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
+          isObjectMatching(headers, handler[2])
+      ) {
+        return match;
+      }
+    } else if (typeof handler[0] === "string") {
       return (
         (isUrlMatching(url, handler[0]) ||
           isUrlMatching(combineUrls(baseURL, url), handler[0])) &&
@@ -203,6 +225,7 @@ module.exports = {
   settle: settle,
   isStream: isStream,
   isArrayBuffer: isArrayBuffer,
+  isUrl: isUrl,
   isFunction: isFunction,
   isObjectOrArray: isObjectOrArray,
   isBuffer: isBuffer,

@@ -56,12 +56,13 @@
   "dependencies": {
     "fast-deep-equal": "^3.1.3",
     "is-blob": "^2.1.0",
-    "is-buffer": "^2.0.5"
+    "is-buffer": "^2.0.5",
+    "path-to-regexp": "^6.2.0"
   },
   "bundlesize": [
     {
       "path": "./dist/axios-mock-adapter.min.js",
-      "maxSize": "3.0 kB"
+      "maxSize": "5.0 kB"
     }
   ]
 }

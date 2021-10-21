@@ -137,6 +137,19 @@ mock.onPost("/foo").reply(function (config) {
 });
 ```
 
+Using named params, parsed with [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp)
+
+```js
+mock.onGet("/users/:id").reply(function (config) {
+  // the actual id can be grabbed from config.routeParams
+
+  return [
+    200,
+    { id: config.routeParams.id }
+  ];
+});
+```
+
 Using a regex
 
 ```js
