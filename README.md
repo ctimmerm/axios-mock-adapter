@@ -253,9 +253,9 @@ mock
 // Mock POST requests to /api with HTTP 201, but forward
 // GET requests to server
 mock
-  .onPost(/\/^api/)
+  .onPost(/^\/api/)
   .reply(201)
-  .onGet(/\/^api/)
+  .onGet(/^\/api/)
   .passThrough();
 ```
 
