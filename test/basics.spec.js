@@ -585,6 +585,37 @@ describe("MockAdapter basics", function () {
       })
     ]);
   });
+  
+  it("overrides global delay if request per delay is provided and respects global delay if otherwise", function () {
+    const start = new Date().getTime();
+    const requestDelay = 100;
+    const globalDelay = 500;
+    const success = 200;
+    mock = new MockAdapter(instance, { delayResponse: globalDelay });
+    
+    const fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(requestDelay);
+    fooOnDelayResponds(success);
+    mock.onGet("/bar").reply(success);
+
+    return Promise.all([
+      instance.get("/foo").then(function (response) {
+        const end = new Date().getTime();
+        const totalTime = end - start;
+        
+        expect(response.status).to.equal(success);
+        expect(totalTime).greaterThanOrEqual(requestDelay);
+        //Ensure global delay is not applied
+        expect(totalTime).lessThan(globalDelay);
+      }),
+      instance.get("/bar").then(function (response) {
+        const end = new Date().getTime();
+        const totalTime = end - start;
+
+        expect(response.status).to.equal(success);
+        expect(totalTime).greaterThanOrEqual(globalDelay);
+      })
+    ]);
+  });
 
   it("maps empty GET path to any path", function () {
     mock.onGet("/foo").reply(200, "foo").onGet().reply(200, "bar");
