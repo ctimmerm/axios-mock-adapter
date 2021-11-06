@@ -555,61 +555,61 @@ describe("MockAdapter basics", function () {
       expect(message).to.equal("error");
     });
   });
-  
+
   it("allows delay in millsecond per request", function () {
     mock = new MockAdapter(instance);
-    const start = new Date().getTime();
-    const firstDelay = 100;
-    const secondDelay = 500;
-    const success = 200;
+    var start = new Date().getTime();
+    var firstDelay = 100;
+    var secondDelay = 500;
+    var success = 200;
 
-    const fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(firstDelay);
+    var fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(firstDelay);
     fooOnDelayResponds(success);
-    const barOnDelayResponds = mock.onGet("/bar").withDelayInMs(secondDelay);
+    var barOnDelayResponds = mock.onGet("/bar").withDelayInMs(secondDelay);
     barOnDelayResponds(success);
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        const end = new Date().getTime();
-        const totalTime = end - start;
-        
+        var end = new Date().getTime();
+        var totalTime = end - start;
+
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(firstDelay);
       }),
       instance.get("/bar").then(function (response) {
-        const end = new Date().getTime();
-        const totalTime = end - start;
+        var end = new Date().getTime();
+        var totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(secondDelay);
       })
     ]);
   });
-  
+
   it("overrides global delay if request per delay is provided and respects global delay if otherwise", function () {
-    const start = new Date().getTime();
-    const requestDelay = 100;
-    const globalDelay = 500;
-    const success = 200;
+    var start = new Date().getTime();
+    var requestDelay = 100;
+    var globalDelay = 500;
+    var success = 200;
     mock = new MockAdapter(instance, { delayResponse: globalDelay });
-    
-    const fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(requestDelay);
+
+    var fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(requestDelay);
     fooOnDelayResponds(success);
     mock.onGet("/bar").reply(success);
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        const end = new Date().getTime();
-        const totalTime = end - start;
-        
+        var end = new Date().getTime();
+        var totalTime = end - start;
+
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(requestDelay);
         //Ensure global delay is not applied
         expect(totalTime).lessThan(globalDelay);
       }),
       instance.get("/bar").then(function (response) {
-        const end = new Date().getTime();
-        const totalTime = end - start;
+        var end = new Date().getTime();
+        var totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(globalDelay);

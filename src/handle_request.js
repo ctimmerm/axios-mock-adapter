@@ -162,9 +162,9 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   }
 }
 
-function getEffectiveDelay(adapter, handler){
+function getEffectiveDelay(adapter, handler) {
   var delayPerRequest;
-  if(handler.length === 8){
+  if (handler.length === 8) {
     delayPerRequest = handler[7];
   }
   return delayPerRequest ? delayPerRequest : adapter.delayResponse;

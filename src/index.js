@@ -97,8 +97,10 @@ VERBS.concat("any").forEach(function (method) {
       return _this;
     }
 
-    function withDelayInMs(delay){
-      return (code, response, headers) => replyWithDelay(delay, code, response, headers);
+    function withDelayInMs(delay) {
+      return function (code, response, headers) {
+        replyWithDelay(delay, code, response, headers);
+      };
     }
 
     function replyOnce(code, response, headers) {
@@ -119,7 +121,7 @@ VERBS.concat("any").forEach(function (method) {
       reply: reply,
 
       replyOnce: replyOnce,
-      
+
       withDelayInMs: withDelayInMs,
 
       passThrough: function passThrough() {
