@@ -77,8 +77,9 @@ function isUrlMatching(url, required) {
 function isBodyOrParametersMatching(method, body, parameters, required) {
   var allowedParamsMethods = ["delete", "get", "head", "options"];
   if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0) {
+    var data = required ? required.data : undefined;
     var params = required ? required.params : undefined;
-    return isObjectMatching(parameters, params);
+    return isObjectMatching(parameters, params) && isBodyMatching(body, data);
   } else {
     return isBodyMatching(body, required);
   }
@@ -115,37 +116,44 @@ function purgeIfReplyOnce(mock, handler) {
 
 function settle(resolve, reject, response, delay) {
   if (delay > 0) {
-    setTimeout(function () {
-      settle(resolve, reject, response);
-    }, delay);
+    setTimeout(settle, delay, resolve, reject, response);
     return;
   }
 
-  if (response.config && response.config.validateStatus) {
+  // Support for axios < 0.13
+  if (
+    !rejectWithError &&
+    (!response.config || !response.config.validateStatus)
+  ) {
+    if (response.status >= 200 && response.status < 300) {
+      resolve(response);
+    } else {
+      reject(response);
+    }
+    return;
+  }
+
+  if (
+    !response.config.validateStatus ||
     response.config.validateStatus(response.status)
-      ? resolve(response)
-      : reject(
-          createAxiosError(
-            "Request failed with status code " + response.status,
-            response.config,
-            response
-          )
-        );
-    return;
-  }
-
-  // Support for axios < 0.11
-  if (response.status >= 200 && response.status < 300) {
+  ) {
     resolve(response);
   } else {
-    reject(response);
+    if (!rejectWithError) {
+      return reject(response);
+    }
+
+    reject(
+      createAxiosError(
+        "Request failed with status code " + response.status,
+        response.config,
+        response
+      )
+    );
   }
 }
 
 function createAxiosError(message, config, response, code) {
-  // Support for axios < 0.13.0
-  if (!rejectWithError) return response;
-
   var error = new Error(message);
   error.isAxiosError = true;
   error.config = config;
@@ -199,6 +207,7 @@ module.exports = {
   isObjectOrArray: isObjectOrArray,
   isBuffer: isBuffer,
   isBlob: isBlob,
+  isBodyOrParametersMatching: isBodyOrParametersMatching,
   isEqual: isEqual,
   createAxiosError: createAxiosError,
   createCouldNotFindMockError: createCouldNotFindMockError,

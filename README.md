@@ -1,8 +1,6 @@
 # axios-mock-adapter
 
-[![Build Status](https://travis-ci.org/ctimmerm/axios-mock-adapter.svg?branch=master)](https://travis-ci.org/ctimmerm/axios-mock-adapter)
-[![dependencies Status](https://david-dm.org/ctimmerm/axios-mock-adapter/status.svg)](https://david-dm.org/ctimmerm/axios-mock-adapter)
-[![devDependency Status](https://david-dm.org/ctimmerm/axios-mock-adapter/dev-status.svg)](https://david-dm.org/ctimmerm/axios-mock-adapter#info=devDependencies)
+[![Build Status](https://app.travis-ci.com/ctimmerm/axios-mock-adapter.svg?branch=master)](https://app.travis-ci.com/ctimmerm/axios-mock-adapter)
 
 Axios adapter that allows to easily mock requests
 
@@ -255,9 +253,9 @@ mock
 // Mock POST requests to /api with HTTP 201, but forward
 // GET requests to server
 mock
-  .onPost(/\/^api/)
+  .onPost(/^\/api/)
   .reply(201)
-  .onGet(/\/^api/)
+  .onGet(/^\/api/)
   .passThrough();
 ```
 
