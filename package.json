@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/ctimmerm/axios-mock-adapter#readme",
   "peerDependencies": {
-    "axios": ">= 0.9.0"
+    "axios": ">= 0.17.0"
   },
   "devDependencies": {
     "axios": "^0.27.2",

@@ -6,9 +6,6 @@ var isBuffer = require("is-buffer");
 var isBlob = require("is-blob");
 var toString = Object.prototype.toString;
 
-// < 0.13.0 will not have default headers set on a custom instance
-var rejectWithError = !!axios.create().defaults.headers;
-
 function find(array, predicate) {
   var length = array.length;
   for (var i = 0; i < length; i++) {
@@ -120,29 +117,12 @@ function settle(resolve, reject, response, delay) {
     return;
   }
 
-  // Support for axios < 0.13
-  if (
-    !rejectWithError &&
-    (!response.config || !response.config.validateStatus)
-  ) {
-    if (response.status >= 200 && response.status < 300) {
-      resolve(response);
-    } else {
-      reject(response);
-    }
-    return;
-  }
-
   if (
     !response.config.validateStatus ||
     response.config.validateStatus(response.status)
   ) {
     resolve(response);
   } else {
-    if (!rejectWithError) {
-      return reject(response);
-    }
-
     reject(
       createAxiosError(
         "Request failed with status code " + response.status,

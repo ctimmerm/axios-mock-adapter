@@ -17,15 +17,9 @@ var VERBS = [
 function adapter() {
   return function (config) {
     var mockAdapter = this;
-    // axios >= 0.13.0 only passes the config and expects a promise to be
-    // returned. axios < 0.13.0 passes (config, resolve, reject).
-    if (arguments.length === 3) {
-      handleRequest(mockAdapter, arguments[0], arguments[1], arguments[2]);
-    } else {
-      return new Promise(function (resolve, reject) {
-        handleRequest(mockAdapter, resolve, reject, config);
-      });
-    }
+    return new Promise(function (resolve, reject) {
+      handleRequest(mockAdapter, resolve, reject, config);
+    });
   }.bind(this);
 }
 

@@ -13,7 +13,7 @@ It's also available as a UMD build:
 - https://unpkg.com/axios-mock-adapter/dist/axios-mock-adapter.js
 - https://unpkg.com/axios-mock-adapter/dist/axios-mock-adapter.min.js
 
-axios-mock-adapter works on Node as well as in a browser, it works with axios v0.9.0 and above.
+axios-mock-adapter works on Node as well as in a browser, it works with axios v0.17.0 and above.
 
 ## Example
 
