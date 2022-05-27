@@ -1,6 +1,5 @@
 "use strict";
 
-var axios = require("axios");
 var isEqual = require("fast-deep-equal");
 var isBuffer = require("is-buffer");
 var isBlob = require("is-blob");
