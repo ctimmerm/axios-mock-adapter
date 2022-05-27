@@ -1,7 +1,5 @@
 # axios-mock-adapter
 
-[![Build Status](https://app.travis-ci.com/ctimmerm/axios-mock-adapter.svg?branch=master)](https://app.travis-ci.com/ctimmerm/axios-mock-adapter)
-
 Axios adapter that allows to easily mock requests
 
 ## Installation
