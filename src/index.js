@@ -12,6 +12,8 @@ var VERBS = [
   "put",
   "options",
   "list",
+  "link",
+  "unlink",
 ];
 
 function adapter() {

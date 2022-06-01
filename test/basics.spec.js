@@ -55,6 +55,8 @@ describe("MockAdapter basics", function () {
     expect(mock.onPatch).to.be.a("function");
     expect(mock.onOptions).to.be.a("function");
     expect(mock.onList).to.be.a("function");
+    expect(mock.onLink).to.be.a("function");
+    expect(mock.onUnlink).to.be.a("function");
   });
 
   it("mocks requests", function () {
