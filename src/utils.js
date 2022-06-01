@@ -2,7 +2,7 @@
 
 var isEqual = require("fast-deep-equal");
 var isBuffer = require("is-buffer");
-var isBlob = require("is-blob");
+var isBlob = require("./is_blob");
 var toString = Object.prototype.toString;
 
 function find(array, predicate) {
