@@ -1,5 +1,6 @@
 "use strict";
 
+var axios = require("axios");
 var isEqual = require("fast-deep-equal");
 var isBuffer = require("is-buffer");
 var isBlob = require("./is_blob");
@@ -133,6 +134,12 @@ function settle(resolve, reject, response, delay) {
 }
 
 function createAxiosError(message, config, response, code) {
+  // axios v0.27.0+ defines AxiosError as constructor
+  if (typeof axios.AxiosError === "function") {
+    return axios.AxiosError.from(new Error(message), code, config, null, response);
+  }
+
+  // handling for axios v0.26.1 and below
   var error = new Error(message);
   error.isAxiosError = true;
   error.config = config;
