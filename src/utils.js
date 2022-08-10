@@ -135,8 +135,8 @@ function settle(resolve, reject, response, delay) {
 
 function createAxiosError(message, config, response, code) {
   // axios v0.27.0+ defines AxiosError as constructor
-  if (typeof axios.AxiosError === 'function') {
-    return new axios.AxiosError(message, code, config, null, response);
+  if (typeof axios.AxiosError === "function") {
+    return axios.AxiosError.from(new Error(message), code, config, null, response);
   }
 
   // handling for axios v0.26.1 and below
