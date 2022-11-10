@@ -161,7 +161,9 @@ VERBS.concat("any").forEach(function (method) {
               "timeout of " + config.timeout + "ms exceeded",
             config,
             undefined,
-            "ECONNABORTED"
+            config.transitional?.clarifyTimeoutError
+              ? "ETIMEDOUT"
+              : "ECONNABORTED"
           );
           return Promise.reject(error);
         });
@@ -174,7 +176,9 @@ VERBS.concat("any").forEach(function (method) {
               "timeout of " + config.timeout + "ms exceeded",
             config,
             undefined,
-            "ECONNABORTED"
+            config.transitional?.clarifyTimeoutError
+              ? "ETIMEDOUT"
+              : "ECONNABORTED"
           );
           return Promise.reject(error);
         });
