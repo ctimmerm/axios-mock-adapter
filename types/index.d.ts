@@ -1,4 +1,4 @@
-import { AxiosAdapter, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { AxiosAdapter, AxiosStatic, AxiosRequestConfig } from 'axios';
 
 type CallbackResponseSpecFunc = (
   config: AxiosRequestConfig
@@ -55,7 +55,7 @@ type RequestMatcherFunc = (
 ) => AxiosAdapter.RequestHandler;
 
 declare class MockAdapter {
-  constructor(axiosInstance: AxiosInstance, options?: MockAdapterOptions);
+  constructor(axiosInstance: AxiosStatic, options?: MockAdapterOptions);
 
   adapter(): AxiosAdapter;
   reset(): void;
