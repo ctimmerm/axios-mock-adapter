@@ -63,7 +63,15 @@ function handleRequest(mockAdapter, resolve, reject, config) {
 
     if (handler.length === 2) {
       // passThrough handler
-      mockAdapter.originalAdapter(config).then(resolve, reject);
+      mockAdapter.axiosInstance({
+        ...config,
+        //  Use the original adapter, not the mock adapter
+        adapter: mockAdapter.originalAdapter,
+        // The request and url transformation runs on the original axios handler already
+        baseURL: null,
+        transformRequest: [],
+        transformResponse: []
+      }).then(resolve, reject);
     } else if (typeof handler[3] !== "function") {
       utils.settle(
         resolve,
@@ -119,7 +127,15 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     // handler not found
     switch (mockAdapter.onNoMatch) {
       case "passthrough":
-        mockAdapter.originalAdapter(config).then(resolve, reject);
+        mockAdapter.axiosInstance({
+          ...config,
+          //  Use the original adapter, not the mock adapter
+          adapter: mockAdapter.originalAdapter,
+          // The request and url transformation runs on the original axios handler already
+          baseURL: null,
+          transformRequest: [],
+          transformResponse: []
+        }).then(resolve, reject);
         break;
       case "throwException":
         throw utils.createCouldNotFindMockError(config);
