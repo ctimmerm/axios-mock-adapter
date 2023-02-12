@@ -1,4 +1,5 @@
 var axios = require("axios");
+var isLegacyAxios = require("axios/package.json").version[0] === "0";
 var expect = require("chai").expect;
 var createServer = require("http").createServer;
 
@@ -122,7 +123,11 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
 
     return instance.get("/foo").then(function (response) {
       expect(response.status).to.equal(200);
-      expect(response.data).to.equal("http://null/test/foo");
+      if (isLegacyAxios) {
+        expect(response.data).to.equal("http://null/test/foo");
+      } else {
+        expect(response.data).to.equal("http://localhost/test/foo");
+      }
     });
   });
 

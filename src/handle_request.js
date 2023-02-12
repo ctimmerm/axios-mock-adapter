@@ -33,6 +33,24 @@ function makeResponse(result, config) {
   };
 }
 
+function passThroughRequest (mockAdapter, resolve, reject, config) {
+  // Axios v0.17 mutates the url to include the baseURL for non hostnames
+  // but does not remove the baseURL from the config
+  var baseURL = config.baseURL;
+  if (config.baseURL && !/^https?:/.test(config.baseURL)) {
+    baseURL = undefined;
+  }
+
+  mockAdapter.axiosInstance(Object.assign({}, config, {
+    baseURL: baseURL,
+    //  Use the original adapter, not the mock adapter
+    adapter: mockAdapter.originalAdapter,
+    // The request transformation runs on the original axios handler already
+    transformRequest: [],
+    transformResponse: []
+  })).then(resolve, reject);
+}
+
 function handleRequest(mockAdapter, resolve, reject, config) {
   var url = config.url || "";
   // TODO we're not hitting this `if` in any of the tests, investigate
@@ -63,15 +81,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
 
     if (handler.length === 2) {
       // passThrough handler
-      mockAdapter.axiosInstance({
-        ...config,
-        //  Use the original adapter, not the mock adapter
-        adapter: mockAdapter.originalAdapter,
-        // The request and url transformation runs on the original axios handler already
-        baseURL: null,
-        transformRequest: [],
-        transformResponse: []
-      }).then(resolve, reject);
+      passThroughRequest(mockAdapter, resolve, reject, config);
     } else if (typeof handler[3] !== "function") {
       utils.settle(
         resolve,
@@ -127,15 +137,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     // handler not found
     switch (mockAdapter.onNoMatch) {
       case "passthrough":
-        mockAdapter.axiosInstance({
-          ...config,
-          //  Use the original adapter, not the mock adapter
-          adapter: mockAdapter.originalAdapter,
-          // The request and url transformation runs on the original axios handler already
-          baseURL: null,
-          transformRequest: [],
-          transformResponse: []
-        }).then(resolve, reject);
+        passThroughRequest(mockAdapter, resolve, reject, config);
         break;
       case "throwException":
         throw utils.createCouldNotFindMockError(config);
