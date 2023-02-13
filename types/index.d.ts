@@ -10,16 +10,18 @@ type ResponseSpecFunc = <T = any>(
   headers?: any
 ) => MockAdapter;
 
-export interface RequestHandler {
-  reply: ResponseSpecFunc;
-  replyOnce: ResponseSpecFunc;
-  passThrough(): MockAdapter;
-  abortRequest(): MockAdapter;
-  abortRequestOnce(): MockAdapter;
-  networkError(): MockAdapter;
-  networkErrorOnce(): MockAdapter;
-  timeout(): MockAdapter;
-  timeoutOnce(): MockAdapter;
+declare namespace MockAdapter {
+  export interface RequestHandler {
+    reply: ResponseSpecFunc;
+    replyOnce: ResponseSpecFunc;
+    passThrough(): MockAdapter;
+    abortRequest(): MockAdapter;
+    abortRequestOnce(): MockAdapter;
+    networkError(): MockAdapter;
+    networkErrorOnce(): MockAdapter;
+    timeout(): MockAdapter;
+    timeoutOnce(): MockAdapter;
+  }
 }
 
 interface MockAdapterOptions {
@@ -50,7 +52,7 @@ type RequestMatcherFunc = (
   matcher?: string | RegExp,
   body?: string | AsymmetricRequestDataMatcher,
   headers?: AsymmetricHeadersMatcher
-) => RequestHandler;
+) => AxiosAdapter.RequestHandler;
 
 declare class MockAdapter {
   constructor(axiosInstance: AxiosInstance, options?: MockAdapterOptions);
@@ -76,4 +78,4 @@ declare class MockAdapter {
   onUnlink: RequestMatcherFunc;
 }
 
-export default MockAdapter;
+export = MockAdapter;

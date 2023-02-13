@@ -1,5 +1,5 @@
 import axios from 'axios';
-import MockAdapter, { RequestHandler } from 'axios-mock-adapter';
+import MockAdapter = require('axios-mock-adapter');
 
 const instance = axios.create();
 const mock = new MockAdapter(instance);
@@ -149,6 +149,6 @@ namespace SupportsChaining {
 }
 
 namespace ExportsRequestHandlerInterface {
-  const handler: RequestHandler = mock.onAny();
+  const handler: MockAdapter.RequestHandler = mock.onAny();
   handler.reply(200);
 }
