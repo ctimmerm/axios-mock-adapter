@@ -50,6 +50,12 @@ function MockAdapter(axiosInstance, options) {
 
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
+    // Clone the axios instance to remove interceptors
+    // this is used for the passThrough mode with axios > 1.2
+    this.axiosInstanceWithoutInterceptors = axiosInstance.create
+      ? axiosInstance.create()
+      : undefined;
+
     this.originalAdapter = axiosInstance.defaults.adapter;
     this.delayResponse =
       options && options.delayResponse > 0 ? options.delayResponse : null;

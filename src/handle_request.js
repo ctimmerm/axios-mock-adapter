@@ -41,7 +41,12 @@ function passThroughRequest (mockAdapter, resolve, reject, config) {
     baseURL = undefined;
   }
 
-  mockAdapter.axiosInstance(Object.assign({}, config, {
+  // Axios pre 1.2
+  if (typeof mockAdapter.originalAdapter === 'function') {
+    return mockAdapter.originalAdapter(config).then(resolve, reject);
+  }
+
+  mockAdapter.axiosInstanceWithoutInterceptors(Object.assign({}, config, {
     baseURL: baseURL,
     //  Use the original adapter, not the mock adapter
     adapter: mockAdapter.originalAdapter,

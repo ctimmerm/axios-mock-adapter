@@ -167,4 +167,25 @@ describe("passThrough tests (requires Node)", function () {
         expect(response.data).to.equal("/foofoo");
       });
   });
+
+  it("applies interceptors only once", function () {
+    mock.onGet("/foo").passThrough();
+    var requestCount = 0;
+    var responseCount = 0;
+    instance.interceptors.request.use(function (config) {
+      requestCount++;
+      return config;
+    });
+
+    instance.interceptors.response.use(function (config) {
+      responseCount++;
+      return config;
+    });
+
+    return instance.get("/foo")
+      .then(function () {
+        expect(requestCount).to.equal(1);
+        expect(responseCount).to.equal(1);
+      });
+  });
 });
