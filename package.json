@@ -1,6 +1,6 @@
 {
   "name": "axios-mock-adapter",
-  "version": "1.21.2",
+  "version": "1.21.3",
   "description": "Axios adapter that allows to easily mock requests",
   "main": "src/index.js",
   "scripts": {
