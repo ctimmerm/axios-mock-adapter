@@ -52,7 +52,7 @@ type RequestMatcherFunc = (
   matcher?: string | RegExp,
   body?: string | AsymmetricRequestDataMatcher,
   headers?: AsymmetricHeadersMatcher
-) => AxiosAdapter.RequestHandler;
+) => MockAdapter.RequestHandler;
 
 declare class MockAdapter {
   constructor(axiosInstance: AxiosInstance, options?: MockAdapterOptions);
