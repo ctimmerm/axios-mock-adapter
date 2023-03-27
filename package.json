@@ -5,9 +5,10 @@
   "main": "src/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "test": "mocha && npm run test:bundlesize",
+    "test": "mocha && npm run test:bundlesize && npm run test:types",
     "test:bundlesize": "npm run clean && npm run build:umd:min && bundlesize",
     "test:coverage": "nyc --reporter=html --reporter=text-summary mocha",
+    "test:types": "tsc --project types",
     "lint": "eslint src test",
     "build:umd": "webpack --mode development ./src/index.js --output-path ./dist",
     "build:umd:min": "webpack --mode production ./src/index.js --output-path ./dist",
@@ -48,6 +49,7 @@
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",
     "rimraf": "^3.0.2",
+    "typescript": "^5.0.2",
     "webpack": "^5.72.1",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2"
