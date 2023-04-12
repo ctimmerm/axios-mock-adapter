@@ -161,7 +161,7 @@ VERBS.concat("any").forEach(function (method) {
               "timeout of " + config.timeout + "ms exceeded",
             config,
             undefined,
-            config.transitional?.clarifyTimeoutError
+            config.transitional && config.transitional.clarifyTimeoutError
               ? "ETIMEDOUT"
               : "ECONNABORTED"
           );
@@ -176,7 +176,7 @@ VERBS.concat("any").forEach(function (method) {
               "timeout of " + config.timeout + "ms exceeded",
             config,
             undefined,
-            config.transitional?.clarifyTimeoutError
+            config.transitional && config.transitional.clarifyTimeoutError
               ? "ETIMEDOUT"
               : "ECONNABORTED"
           );
