@@ -55,6 +55,8 @@ type RequestMatcherFunc = (
 ) => MockAdapter.RequestHandler;
 
 declare class MockAdapter {
+  static default: typeof MockAdapter;
+
   constructor(axiosInstance: AxiosInstance, options?: MockAdapterOptions);
 
   adapter(): AxiosAdapter;

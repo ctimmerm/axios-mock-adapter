@@ -2,7 +2,8 @@ import axios from 'axios';
 import MockAdapter = require('axios-mock-adapter');
 
 const instance = axios.create();
-const mock = new MockAdapter(instance);
+let mock = new MockAdapter(instance);
+mock = new MockAdapter.default(instance)
 
 namespace AllowsConstructing {
   new MockAdapter(instance);
