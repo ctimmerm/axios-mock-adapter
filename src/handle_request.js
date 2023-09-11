@@ -66,6 +66,10 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     url = url.slice(config.baseURL.length);
   }
 
+  if (url.indexOf("?") !== -1) {
+    url = url.substring(0, url.indexOf("?"))
+  }
+
   delete config.adapter;
   mockAdapter.history[config.method].push(config);
 
