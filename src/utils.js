@@ -102,6 +102,11 @@ function isBodyMatching(body, requiredBody) {
   return isObjectMatching(parsedBody ? parsedBody : body, requiredBody);
 }
 
+function getURLParams(matcher, url, baseURL) {
+  var matchResult = baseURL ? combineUrls(baseURL, url).match(matcher) : url.match(matcher);
+  return matchResult.groups || {};
+}
+
 function purgeIfReplyOnce(mock, handler) {
   Object.keys(mock.handlers).forEach(function (key) {
     var index = mock.handlers[key].indexOf(handler);
@@ -185,6 +190,7 @@ function createCouldNotFindMockError(config) {
 module.exports = {
   find: find,
   findHandler: findHandler,
+  getURLParams: getURLParams,
   purgeIfReplyOnce: purgeIfReplyOnce,
   settle: settle,
   isStream: isStream,
