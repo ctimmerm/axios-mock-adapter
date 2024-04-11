@@ -122,6 +122,8 @@ VERBS.concat("any").forEach(function (method) {
 
       replyOnce: replyOnce,
 
+      replyWithDelay: replyWithDelay,
+
       withDelayInMs: withDelayInMs,
 
       passThrough: function passThrough() {

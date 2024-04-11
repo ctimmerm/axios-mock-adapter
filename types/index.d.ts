@@ -10,10 +10,21 @@ type ResponseSpecFunc = <T = any>(
   headers?: any
 ) => MockAdapter;
 
+type ResponseSpecFuncWithDelay = <T = any>(
+  /**
+   * Delay in milliseconds
+   */
+  delay: number,
+  statusOrCallback: number | CallbackResponseSpecFunc,
+  data?: T,
+  headers?: any
+) => MockAdapter;
+
 declare namespace MockAdapter {
   export interface RequestHandler {
     reply: ResponseSpecFunc;
     replyOnce: ResponseSpecFunc;
+    replyWithDelay: ResponseSpecFuncWithDelay;
     passThrough(): MockAdapter;
     abortRequest(): MockAdapter;
     abortRequestOnce(): MockAdapter;
