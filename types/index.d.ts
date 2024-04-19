@@ -10,7 +10,7 @@ type ResponseSpecFunc = <T = any>(
   headers?: any
 ) => MockAdapter;
 
-type NetErr = 'ENOTFOUND' | 'ECONNREFUSED' | 'ECONNRESET' | 'ECONNABORTED' | 'ETIMEDOUT'
+type NetErr = 'ENOTFOUND' | 'ECONNREFUSED' | 'ECONNRESET' | 'ECONNABORTED' | 'ETIMEDOUT' | (string & Record<never, never>)
 
 declare namespace MockAdapter {
   export interface RequestHandler {
