@@ -21,10 +21,10 @@ Mocking a `GET` request
 
 ```js
 var axios = require("axios");
-var MockAdapter = require("axios-mock-adapter");
+var AxiosMockAdapter = require("axios-mock-adapter");
 
 // This sets the mock adapter on the default instance
-var mock = new MockAdapter(axios);
+var mock = new AxiosMockAdapter(axios);
 
 // Mock any GET request to /users
 // arguments for reply are (status, data, headers)
@@ -41,10 +41,10 @@ Mocking a `GET` request with specific parameters
 
 ```js
 var axios = require("axios");
-var MockAdapter = require("axios-mock-adapter");
+var AxiosMockAdapter = require("axios-mock-adapter");
 
 // This sets the mock adapter on the default instance
-var mock = new MockAdapter(axios);
+var mock = new AxiosMockAdapter(axios);
 
 // Mock GET request to /users when param `searchText` is 'John'
 // arguments for reply are (status, data, headers)
@@ -65,7 +65,7 @@ To add a delay to responses, specify a delay amount (in milliseconds) when insta
 
 ```js
 // All requests using this instance will have a 2 seconds delay:
-var mock = new MockAdapter(axiosInstance, { delayResponse: 2000 });
+var mock = new AxiosMockAdapter(axiosInstance, { delayResponse: 2000 });
 ```
 
 You can restore the original adapter (which will remove the mocking behavior)
@@ -277,7 +277,7 @@ If you set `onNoMatch` option to `passthrough` all requests would be forwarded o
 ```js
 // Mock all requests to /foo with HTTP 200, but forward
 // any others requests to server
-var mock = new MockAdapter(axiosInstance, { onNoMatch: "passthrough" });
+var mock = new AxiosMockAdapter(axiosInstance, { onNoMatch: "passthrough" });
 
 mock.onAny("/foo").reply(200);
 ```
@@ -285,7 +285,7 @@ mock.onAny("/foo").reply(200);
 Using `onNoMatch` option with `throwException` to throw an exception when a request is made without match any handler. It's helpful to debug your test mocks.
 
 ```js
-var mock = new MockAdapter(axiosInstance, { onNoMatch: "throwException" });
+var mock = new AxiosMockAdapter(axiosInstance, { onNoMatch: "throwException" });
 
 mock.onAny("/foo").reply(200);
 
@@ -323,7 +323,7 @@ Composing from multiple sources with Promises:
 ```js
 var normalAxios = axios.create();
 var mockAxios = axios.create();
-var mock = new MockAdapter(mockAxios);
+var mock = new AxiosMockAdapter(mockAxios);
 
 mock
   .onGet("/orders")
