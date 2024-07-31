@@ -82,7 +82,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   );
 
   if (handler) {
-    if (handler.length === 7) {
+    if (handler[6] === true) {
       utils.purgeIfReplyOnce(mockAdapter, handler);
     }
 
