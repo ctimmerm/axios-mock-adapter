@@ -556,7 +556,7 @@ describe("MockAdapter basics", function () {
     });
   });
 
-  it("allows delay in millsecond per request", function () {
+  it("allows delay in millsecond per request (legacy non-chaining)", function () {
     mock = new MockAdapter(instance);
     var start = new Date().getTime();
     var firstDelay = 100;
@@ -567,6 +567,39 @@ describe("MockAdapter basics", function () {
     fooOnDelayResponds(success);
     var barOnDelayResponds = mock.onGet("/bar").withDelayInMs(secondDelay);
     barOnDelayResponds(success);
+
+    return Promise.all([
+      instance.get("/foo").then(function (response) {
+        var end = new Date().getTime();
+        var totalTime = end - start;
+
+        expect(response.status).to.equal(success);
+        expect(totalTime).greaterThanOrEqual(firstDelay);
+      }),
+      instance.get("/bar").then(function (response) {
+        var end = new Date().getTime();
+        var totalTime = end - start;
+
+        expect(response.status).to.equal(success);
+        expect(totalTime).greaterThanOrEqual(secondDelay);
+      })
+    ]);
+  });
+
+  it("allows delay in millsecond per request", function () {
+    mock = new MockAdapter(instance);
+    var start = new Date().getTime();
+    var firstDelay = 100;
+    var secondDelay = 500;
+    var success = 200;
+
+    mock.onGet("/foo")
+      .withDelayInMs(firstDelay)
+      .reply(success);
+
+    mock.onGet("/bar")
+      .withDelayInMs(secondDelay)
+      .reply(success);
 
     return Promise.all([
       instance.get("/foo").then(function (response) {

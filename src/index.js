@@ -84,40 +84,28 @@ VERBS.concat("any").forEach(function (method) {
   MockAdapter.prototype[methodName] = function (matcher, body, requestHeaders) {
     var _this = this;
     var matcher = matcher === undefined ? /.*/ : matcher;
+    var delay;
 
     function reply(code, response, headers) {
-      var handler = [matcher, body, requestHeaders, code, response, headers];
-      addHandler(method, _this.handlers, handler);
-      return _this;
-    }
-
-    function replyWithDelay(delay, code, response, headers) {
       var handler = [matcher, body, requestHeaders, code, response, headers, false, delay];
       addHandler(method, _this.handlers, handler);
       return _this;
     }
 
-    function withDelayInMs(delay) {
-      return function (code, response, headers) {
-        replyWithDelay(delay, code, response, headers);
-      };
+    function withDelayInMs(_delay) {
+      delay = _delay;
+      var respond = requestApi.reply.bind(requestApi);
+      Object.assign(respond, requestApi);
+      return respond;
     }
 
     function replyOnce(code, response, headers) {
-      var handler = [
-        matcher,
-        body,
-        requestHeaders,
-        code,
-        response,
-        headers,
-        true,
-      ];
+      var handler = [matcher, body, requestHeaders, code, response, headers, true, delay];
       addHandler(method, _this.handlers, handler);
       return _this;
     }
 
-    return {
+    var requestApi = {
       reply: reply,
 
       replyOnce: replyOnce,
@@ -198,6 +186,8 @@ VERBS.concat("any").forEach(function (method) {
         });
       },
     };
+
+    return requestApi;
   };
 });
 
