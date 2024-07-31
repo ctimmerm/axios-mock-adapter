@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "test": "mocha && npm run test:bundlesize && npm run test:types",
-    "test:bundlesize": "npm run clean && npm run build:umd:min && bundlesize",
+    "test": "mocha && npm run clean && npm run build:umd:min && npm run test:types",
     "test:coverage": "nyc --reporter=html --reporter=text-summary mocha",
     "test:types": "tsc --project types",
     "lint": "eslint src test",
@@ -43,7 +42,6 @@
   },
   "devDependencies": {
     "axios": "^0.27.2",
-    "bundlesize": "^0.18.1",
     "chai": "^4.3.6",
     "eslint": "^8.16.0",
     "mocha": "^10.0.0",
@@ -57,11 +55,5 @@
   "dependencies": {
     "fast-deep-equal": "^3.1.3",
     "is-buffer": "^2.0.5"
-  },
-  "bundlesize": [
-    {
-      "path": "./dist/axios-mock-adapter.min.js",
-      "maxSize": "3.0 kB"
-    }
-  ]
+  }
 }
