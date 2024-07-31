@@ -141,7 +141,7 @@ describe("MockAdapter basics", function () {
       .reply(200);
 
     return instance
-      .get("/withParams", { params: { bar: "foo", foo: "bar" }, in: true })
+      .get("/withParams", { params: { bar: "foo", foo: "bar" } })
       .then(function (response) {
         expect(response.status).to.equal(200);
       });
@@ -153,7 +153,7 @@ describe("MockAdapter basics", function () {
       .reply(200);
 
     return instance
-      .delete("/withParams", { params: { bar: "foo", foo: "bar" }, in: true })
+      .delete("/withParams", { params: { bar: "foo", foo: "bar" } })
       .then(function (response) {
         expect(response.status).to.equal(200);
       });
@@ -177,33 +177,33 @@ describe("MockAdapter basics", function () {
       .reply(200);
 
     return instance
-      .head("/withParams", { params: { bar: "foo", foo: "bar" }, in: true })
+      .head("/withParams", { params: { bar: "foo", foo: "bar" } })
       .then(function (response) {
         expect(response.status).to.equal(200);
       });
   });
 
-  it("can't pass query params for post to match to a handler", function () {
+  it("can pass query params for post to match to a handler", function () {
     mock
       .onPost("/withParams", { params: { foo: "bar", bar: "foo" } })
       .reply(200);
 
     return instance
-      .post("/withParams", { params: { foo: "bar", bar: "foo" }, in: true })
-      .catch(function (error) {
-        expect(error.response.status).to.equal(404);
+      .post("/withParams", { some: 'body' }, { params: { foo: "bar", bar: "foo" } })
+      .then(function (response) {
+        expect(response.status).to.equal(200);
       });
   });
 
-  it("can't pass query params for put to match to a handler", function () {
+  it("can pass query params for put to match to a handler", function () {
     mock
       .onPut("/withParams", { params: { foo: "bar", bar: "foo" } })
       .reply(200);
 
     return instance
-      .put("/withParams", { params: { bar: "foo", foo: "bar" }, in: true })
-      .catch(function (error) {
-        expect(error.response.status).to.equal(404);
+      .put("/withParams", { some: 'body' }, { params: { bar: "foo", foo: "bar" } })
+      .then(function (response) {
+        expect(response.status).to.equal(200);
       });
   });
 
@@ -221,7 +221,7 @@ describe("MockAdapter basics", function () {
     });
   });
 
-  it("does not match when parameters are wrong", function () {
+  it("does not match when params are wrong", function () {
     mock
       .onGet("/withParams", { params: { foo: "bar", bar: "foo" } })
       .reply(200);
@@ -232,7 +232,7 @@ describe("MockAdapter basics", function () {
       });
   });
 
-  it("does not match when parameters are missing", function () {
+  it("does not match when params are missing", function () {
     mock
       .onGet("/withParams", { params: { foo: "bar", bar: "foo" } })
       .reply(200);
@@ -241,7 +241,7 @@ describe("MockAdapter basics", function () {
     });
   });
 
-  it("matches when parameters were not expected", function () {
+  it("matches when params were not expected", function () {
     mock.onGet("/withParams").reply(200);
     return instance
       .get("/withParams", { params: { foo: "bar", bar: "foo" } })
@@ -251,18 +251,18 @@ describe("MockAdapter basics", function () {
   });
 
   it("can pass a body to match to a handler", function () {
-    mock.onPost("/withBody", { body: { is: "passed" }, in: true }).reply(200);
+    mock.onPost("/withBody", { body: { is: "passed" } }).reply(200);
 
     return instance
-      .post("/withBody", { body: { is: "passed" }, in: true })
+      .post("/withBody", { body: { is: "passed" } })
       .then(function (response) {
         expect(response.status).to.equal(200);
       });
   });
 
   it("does not match when body is wrong", function () {
-    var body = { body: { is: "passed" }, in: true };
-    mock.onPatch("/wrongObjBody", body).reply(200);
+    var matcher = { body: { is: "passed" } };
+    mock.onPatch("/wrongObjBody", matcher).reply(200);
 
     return instance
       .patch("/wrongObjBody", { wrong: "body" })
@@ -850,7 +850,7 @@ describe("MockAdapter basics", function () {
       });
   });
 
-  it("allows overwriting mocks with parameters", function () {
+  it("allows overwriting mocks with params", function () {
     mock
       .onGet("/users", { params: { searchText: "John" } })
       .reply(500)

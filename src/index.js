@@ -81,13 +81,13 @@ MockAdapter.prototype.resetHistory = resetHistory;
 
 VERBS.concat("any").forEach(function (method) {
   var methodName = "on" + method.charAt(0).toUpperCase() + method.slice(1);
-  MockAdapter.prototype[methodName] = function (matcher, body, requestHeaders) {
+  MockAdapter.prototype[methodName] = function (matcher, paramsAndBody, requestHeaders) {
     var _this = this;
     var matcher = matcher === undefined ? /.*/ : matcher;
     var delay;
 
     function reply(code, response, headers) {
-      var handler = [matcher, body, requestHeaders, code, response, headers, false, delay];
+      var handler = [matcher, paramsAndBody, requestHeaders, code, response, headers, false, delay];
       addHandler(method, _this.handlers, handler);
       return _this;
     }
@@ -100,7 +100,7 @@ VERBS.concat("any").forEach(function (method) {
     }
 
     function replyOnce(code, response, headers) {
-      var handler = [matcher, body, requestHeaders, code, response, headers, true, delay];
+      var handler = [matcher, paramsAndBody, requestHeaders, code, response, headers, true, delay];
       addHandler(method, _this.handlers, handler);
       return _this;
     }
@@ -113,7 +113,7 @@ VERBS.concat("any").forEach(function (method) {
       withDelayInMs: withDelayInMs,
 
       passThrough: function passThrough() {
-        var handler = [matcher, body];
+        var handler = [matcher, paramsAndBody];
         addHandler(method, _this.handlers, handler);
         return _this;
       },
