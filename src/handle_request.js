@@ -163,11 +163,8 @@ function handleRequest(mockAdapter, resolve, reject, config) {
 }
 
 function getEffectiveDelay(adapter, handler) {
-  var delayPerRequest;
-  if (handler.length === 8) {
-    delayPerRequest = handler[7];
-  }
-  return delayPerRequest ? delayPerRequest : adapter.delayResponse;
+  var delayPerRequest = handler[7];
+  return typeof delayPerRequest === 'number' ? delayPerRequest : adapter.delayResponse;
 }
 
 module.exports = handleRequest;
