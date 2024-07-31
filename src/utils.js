@@ -48,20 +48,18 @@ function findHandler(
   baseURL
 ) {
   return find(handlers[method.toLowerCase()], function (handler) {
+    var matchesUrl = false;
     if (typeof handler[0] === "string") {
-      return (
-        (isUrlMatching(url, handler[0]) ||
-          isUrlMatching(combineUrls(baseURL, url), handler[0])) &&
-        isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
-        isObjectMatching(headers, handler[2])
-      );
+      matchesUrl  = isUrlMatching(url, handler[0]) ||
+        isUrlMatching(combineUrls(baseURL, url), handler[0]);
     } else if (handler[0] instanceof RegExp) {
-      return (
-        (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) &&
-        isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
-        isObjectMatching(headers, handler[2])
-      );
+      matchesUrl = handler[0].test(url) ||
+        handler[0].test(combineUrls(baseURL, url));
     }
+
+    return matchesUrl &&
+      isBodyOrParametersMatching(body, parameters, handler[1]) &&
+      isObjectMatching(headers, handler[2]);
   });
 }
 
@@ -71,15 +69,9 @@ function isUrlMatching(url, required) {
   return noSlashUrl === noSlashRequired;
 }
 
-function isBodyOrParametersMatching(method, body, parameters, required) {
-  var allowedParamsMethods = ["delete", "get", "head", "options"];
-  if (allowedParamsMethods.indexOf(method.toLowerCase()) >= 0) {
-    var data = required ? required.data : undefined;
-    var params = required ? required.params : undefined;
-    return isObjectMatching(parameters, params) && isBodyMatching(body, data);
-  } else {
-    return isBodyMatching(body, required);
-  }
+function isBodyOrParametersMatching(body, parameters, required) {
+  return isObjectMatching(parameters, required && required.params) &&
+    isBodyMatching(body, required && required.data);
 }
 
 function isObjectMatching(actual, expected) {
