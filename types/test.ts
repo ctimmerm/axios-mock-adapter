@@ -75,18 +75,14 @@ namespace AllowsStringBodyMatcher {
 }
 
 namespace AllowsBodyMatcher {
-  mock.onGet('/foo', {
-    id: 4,
-    name: 'foo'
-  });
+  mock.onPost('/foo', {id: 4, name: 'foo'});
+  mock.onPut('/foo', {id: 4, name: 'foo'});
+  mock.onAny('/foo', {data: {id: 4, name: 'foo'}});
 }
 
-namespace AllowsParameterMatcher {
-  mock.onGet('/foo', {
-    params: {
-      searchText: 'John'
-    }
-  });
+namespace AllowsParamsMatcher {
+  mock.onGet('/foo', {params: {searchText: 'John'}});
+  mock.onDelete('/foo', {params: {searchText: 'John'}});
 }
 
 namespace AllowsReplyWithStatus {

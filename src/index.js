@@ -79,15 +79,25 @@ MockAdapter.prototype.reset = reset;
 MockAdapter.prototype.resetHandlers = resetHandlers;
 MockAdapter.prototype.resetHistory = resetHistory;
 
+var methodsWithConfigsAsSecondArg = ["any", "get", "delete", "head", "options"];
+function convertDataAndConfigToConfig (method, data, config) {
+  if (methodsWithConfigsAsSecondArg.includes(method)) {
+    return data || {};
+  } else {
+    return Object.assign({}, config || {}, { data: data });
+  }
+}
+
 VERBS.concat("any").forEach(function (method) {
   var methodName = "on" + method.charAt(0).toUpperCase() + method.slice(1);
-  MockAdapter.prototype[methodName] = function (matcher, paramsAndBody, requestHeaders) {
+  MockAdapter.prototype[methodName] = function (matcher, data, config) {
     var _this = this;
     var matcher = matcher === undefined ? /.*/ : matcher;
     var delay;
+    var paramsAndBody = convertDataAndConfigToConfig(method, data, config);
 
     function reply(code, response, headers) {
-      var handler = [matcher, paramsAndBody, requestHeaders, code, response, headers, false, delay];
+      var handler = [matcher, paramsAndBody, paramsAndBody.headers, code, response, headers, false, delay];
       addHandler(method, _this.handlers, handler);
       return _this;
     }
@@ -100,7 +110,7 @@ VERBS.concat("any").forEach(function (method) {
     }
 
     function replyOnce(code, response, headers) {
-      var handler = [matcher, paramsAndBody, requestHeaders, code, response, headers, true, delay];
+      var handler = [matcher, paramsAndBody, paramsAndBody.headers, code, response, headers, true, delay];
       addHandler(method, _this.handlers, handler);
       return _this;
     }

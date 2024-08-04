@@ -226,9 +226,11 @@ mock
   .onPost(
     "/product",
     { id: 1 },
-    expect.objectContaining({
-      Authorization: expect.stringMatching(/^Basic /),
-    })
+    {
+      headers: expect.objectContaining({
+        Authorization: expect.stringMatching(/^Basic /),
+      })
+    }
   )
   .reply(204);
 ```

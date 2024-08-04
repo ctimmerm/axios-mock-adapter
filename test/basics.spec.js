@@ -185,7 +185,7 @@ describe("MockAdapter basics", function () {
 
   it("can pass query params for post to match to a handler", function () {
     mock
-      .onPost("/withParams", { params: { foo: "bar", bar: "foo" } })
+      .onPost("/withParams", undefined, { params: { foo: "bar", bar: "foo" } })
       .reply(200);
 
     return instance
@@ -197,7 +197,7 @@ describe("MockAdapter basics", function () {
 
   it("can pass query params for put to match to a handler", function () {
     mock
-      .onPut("/withParams", { params: { foo: "bar", bar: "foo" } })
+      .onPut("/withParams", undefined, { params: { foo: "bar", bar: "foo" } })
       .reply(200);
 
     return instance
@@ -251,17 +251,17 @@ describe("MockAdapter basics", function () {
   });
 
   it("can pass a body to match to a handler", function () {
-    mock.onPost("/withBody", { body: { is: "passed" } }).reply(200);
+    mock.onPost("/withBody", { somecontent: { is: "passed" } }).reply(200);
 
     return instance
-      .post("/withBody", { body: { is: "passed" } })
+      .post("/withBody", { somecontent: { is: "passed" } })
       .then(function (response) {
         expect(response.status).to.equal(200);
       });
   });
 
   it("does not match when body is wrong", function () {
-    var matcher = { body: { is: "passed" } };
+    var matcher = { somecontent: { is: "passed" } };
     mock.onPatch("/wrongObjBody", matcher).reply(200);
 
     return instance
@@ -294,12 +294,18 @@ describe("MockAdapter basics", function () {
       "Header-test": "test-header",
     };
 
-    mock.onPost("/withHeaders", undefined, headers).reply(200);
+    mock.onPost("/withHeaders", undefined, { headers: headers }).reply(200);
 
     return instance
       .post("/withHeaders", undefined, { headers: headers })
       .then(function (response) {
         expect(response.status).to.equal(200);
+
+        return instance
+          .post("/withHeaders", undefined, { headers: { Accept: 'no-match' } })
+          .catch(function (err) {
+            expect(err.response.status).to.equal(404);
+          });
       });
   });
 
