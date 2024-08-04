@@ -33,25 +33,34 @@ interface AsymmetricMatcher {
   asymmetricMatch: Function;
 }
 
-interface RequestDataMatcher {
-  [index: string]: any;
-  params?: {
-    [index: string]: any;
-  };
+interface ParamsMatcher {
+  [param: string]: any;
 }
 
 interface HeadersMatcher {
   [header: string]: string;
 }
 
+type UrlMatcher = string | RegExp;
+type AsymmetricParamsMatcher = AsymmetricMatcher | ParamsMatcher;
 type AsymmetricHeadersMatcher = AsymmetricMatcher | HeadersMatcher;
+type AsymmetricRequestDataMatcher = AsymmetricMatcher | any;
 
-type AsymmetricRequestDataMatcher = AsymmetricMatcher | RequestDataMatcher;
+interface ConfigMatcher {
+  params?: AsymmetricParamsMatcher;
+  headers?: AsymmetricHeadersMatcher;
+  data?: AsymmetricRequestDataMatcher;
+}
 
 type RequestMatcherFunc = (
-  matcher?: string | RegExp,
-  body?: string | AsymmetricRequestDataMatcher,
-  headers?: AsymmetricHeadersMatcher
+  matcher?: UrlMatcher,
+  body?: AsymmetricRequestDataMatcher,
+  config?: ConfigMatcher
+) => MockAdapter.RequestHandler;
+
+type NoBodyRequestMatcherFunc = (
+  matcher?: UrlMatcher,
+  config?: ConfigMatcher
 ) => MockAdapter.RequestHandler;
 
 declare class MockAdapter {
@@ -67,17 +76,17 @@ declare class MockAdapter {
 
   history: { [method: string]: AxiosRequestConfig[] };
 
-  onGet: RequestMatcherFunc;
+  onList: NoBodyRequestMatcherFunc;
+  onOptions: NoBodyRequestMatcherFunc;
+  onAny: NoBodyRequestMatcherFunc;
+  onLink: NoBodyRequestMatcherFunc;
+  onUnlink: NoBodyRequestMatcherFunc;
+  onGet: NoBodyRequestMatcherFunc;
+  onHead: NoBodyRequestMatcherFunc;
+  onDelete: NoBodyRequestMatcherFunc;
   onPost: RequestMatcherFunc;
   onPut: RequestMatcherFunc;
-  onHead: RequestMatcherFunc;
-  onDelete: RequestMatcherFunc;
   onPatch: RequestMatcherFunc;
-  onList: RequestMatcherFunc;
-  onOptions: RequestMatcherFunc;
-  onAny: RequestMatcherFunc;
-  onLink: RequestMatcherFunc;
-  onUnlink: RequestMatcherFunc;
 }
 
 export = MockAdapter;

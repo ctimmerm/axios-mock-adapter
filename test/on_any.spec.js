@@ -45,7 +45,7 @@ describe("MockAdapter onAny", function () {
       { object: { with: { deep: "property" } }, array: ["1", "abc"] },
       "a",
     ];
-    mock.onAny("/anyWithBody", body).reply(200);
+    mock.onAny("/anyWithBody", { data: body }).reply(200);
 
     return instance
       .put("/anyWithBody", body)
@@ -54,6 +54,14 @@ describe("MockAdapter onAny", function () {
       })
       .then(function (response) {
         expect(response.status).to.equal(200);
+
+        return instance.post("/anyWithBody")
+          .then(function () {
+            throw new Error("should not get here");
+          })
+          .catch(function (err) {
+            expect(err.response.status).to.equal(404);
+          });
       });
   });
 
