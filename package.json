@@ -43,12 +43,11 @@
   "devDependencies": {
     "axios": "^1.7.3",
     "chai": "^4.3.6",
-    "eslint": "^8.16.0",
+    "eslint": "^8.57.0",
     "mocha": "^10.7.0",
     "nyc": "^17.0.0",
     "typescript": "^5.5.4",
     "webpack": "^5.93.0",
-    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
