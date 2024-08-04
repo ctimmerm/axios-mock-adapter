@@ -55,7 +55,7 @@ function findHandler(
         isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
         isObjectMatching(headers, handler[2])
       );
-    } else if (handler[0] instanceof RegExp) {
+    } else if (typeof handler[0] === 'object' && handler[0].constructor.name === "RegExp") {
       return (
         (handler[0].test(url) || handler[0].test(combineUrls(baseURL, url))) &&
         isBodyOrParametersMatching(method, body, parameters, handler[1]) &&
