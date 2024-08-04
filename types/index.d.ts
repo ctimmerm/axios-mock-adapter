@@ -12,6 +12,7 @@ type ResponseSpecFunc = <T = any>(
 
 declare namespace MockAdapter {
   export interface RequestHandler {
+    withDelayInMs(delay: number): RequestHandler;
     reply: ResponseSpecFunc;
     replyOnce: ResponseSpecFunc;
     passThrough(): MockAdapter;
