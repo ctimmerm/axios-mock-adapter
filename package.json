@@ -4,7 +4,7 @@
   "description": "Axios adapter that allows to easily mock requests",
   "main": "src/index.js",
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "node -e 'require(`fs`).rmSync(`./dist`, {recursive: true, force: true})'",
     "test": "mocha && npm run clean && npm run build:umd:min && npm run test:types",
     "test:coverage": "nyc --reporter=html --reporter=text-summary mocha",
     "test:types": "tsc --project types",
@@ -41,16 +41,15 @@
     "axios": ">= 0.17.0"
   },
   "devDependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.7.3",
     "chai": "^4.3.6",
     "eslint": "^8.16.0",
-    "mocha": "^10.0.0",
-    "nyc": "^15.1.0",
-    "rimraf": "^3.0.2",
-    "typescript": "^5.0.2",
-    "webpack": "^5.72.1",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "^4.9.2"
+    "mocha": "^10.7.0",
+    "nyc": "^17.0.0",
+    "typescript": "^5.5.4",
+    "webpack": "^5.93.0",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "fast-deep-equal": "^3.1.3",
