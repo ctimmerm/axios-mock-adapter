@@ -311,7 +311,7 @@ describe("MockAdapter basics", function () {
 
   it("does not match when request header is wrong", function () {
     var headers = { "Header-test": "test-header" };
-    mock.onPatch("/wrongObjHeader", undefined, headers).reply(200);
+    mock.onPatch("/wrongObjHeader", undefined, { headers: headers }).reply(200);
 
     return instance
       .patch("/wrongObjHeader", undefined, {

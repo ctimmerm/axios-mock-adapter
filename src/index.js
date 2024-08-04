@@ -82,15 +82,36 @@ MockAdapter.prototype.resetHistory = resetHistory;
 var methodsWithConfigsAsSecondArg = ["any", "get", "delete", "head", "options"];
 function convertDataAndConfigToConfig (method, data, config) {
   if (methodsWithConfigsAsSecondArg.includes(method)) {
-    return data || {};
+    return validateconfig(method, data || {});
   } else {
-    return Object.assign({}, config || {}, { data: data });
+    return validateconfig(method, Object.assign({}, config || {}, { data: data }));
   }
 }
 
+var allowedConfigs = ['headers', 'params', 'data'];
+function validateconfig (method, config) {
+  for (var key in config) {
+    if (!allowedConfigs.includes(key)) {
+      throw new Error(
+        'Invalid config attribute ' +
+        key +
+        ' provided to ' +
+        toMethodName(method) +
+        '. Config: ' +
+        JSON.stringify(config)
+      );
+    }
+  }
+
+  return config;
+}
+
+function toMethodName (method) {
+  return "on" + method.charAt(0).toUpperCase() + method.slice(1);
+}
+
 VERBS.concat("any").forEach(function (method) {
-  var methodName = "on" + method.charAt(0).toUpperCase() + method.slice(1);
-  MockAdapter.prototype[methodName] = function (matcher, data, config) {
+  MockAdapter.prototype[toMethodName(method)] = function (matcher, data, config) {
     var _this = this;
     var matcher = matcher === undefined ? /.*/ : matcher;
     var delay;
