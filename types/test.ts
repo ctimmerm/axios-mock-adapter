@@ -125,6 +125,10 @@ namespace SupportsNetworkErrorOnce {
   mock.onGet().networkErrorOnce();
 }
 
+namespace withDelayInMs {
+  mock.onGet().withDelayInMs(2000).reply(200, { data: 'foo' });
+}
+
 namespace AllowsFunctionReply {
   mock.onGet().reply(config => {
     return [200, { data: 'foo' }, { RequestedURL: config.url }];
