@@ -76,7 +76,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
     config.data,
     config.params,
     (config.headers && config.headers.constructor.name === 'AxiosHeaders')
-      ? Object.assign({}, config.headers)
+      ? Object.assign({}, config.headers.toJSON())
       : config.headers,
     config.baseURL
   );
