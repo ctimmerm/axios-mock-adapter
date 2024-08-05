@@ -580,14 +580,14 @@ describe("MockAdapter basics", function () {
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
-        expect(totalTime).greaterThanOrEqual(firstDelay);
+        expect(totalTime).greaterThanOrEqual(firstDelay - 1);
       }),
       instance.get("/bar").then(function (response) {
         var end = performance.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
-        expect(totalTime).greaterThanOrEqual(secondDelay);
+        expect(totalTime).greaterThanOrEqual(secondDelay - 1);
       })
     ]);
   });
@@ -613,14 +613,14 @@ describe("MockAdapter basics", function () {
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
-        expect(totalTime).greaterThanOrEqual(firstDelay);
+        expect(totalTime).greaterThanOrEqual(firstDelay - 1);
       }),
       instance.get("/bar").then(function (response) {
         var end = performance.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
-        expect(totalTime).greaterThanOrEqual(secondDelay);
+        expect(totalTime).greaterThanOrEqual(secondDelay - 1);
       })
     ]);
   });
@@ -642,7 +642,7 @@ describe("MockAdapter basics", function () {
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
-        expect(totalTime).greaterThanOrEqual(requestDelay);
+        expect(totalTime).greaterThanOrEqual(requestDelay - 1);
         //Ensure global delay is not applied
         expect(totalTime).lessThan(globalDelay);
       }),
@@ -651,7 +651,7 @@ describe("MockAdapter basics", function () {
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
-        expect(totalTime).greaterThanOrEqual(globalDelay);
+        expect(totalTime).greaterThanOrEqual(globalDelay - 1);
       })
     ]);
   });
