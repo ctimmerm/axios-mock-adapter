@@ -84,17 +84,17 @@ function convertDataAndConfigToConfig (method, data, config) {
   if (methodsWithConfigsAsSecondArg.includes(method)) {
     return validateconfig(method, data || {});
   } else {
-    return validateconfig(method, Object.assign({}, config || {}, { data: data }));
+    return validateconfig(method, Object.assign({}, config, { data: data }));
   }
 }
 
-var allowedConfigs = ['headers', 'params', 'data'];
+var allowedConfigProperties = ['headers', 'params', 'data'];
 function validateconfig (method, config) {
   for (var key in config) {
-    if (!allowedConfigs.includes(key)) {
+    if (!allowedConfigProperties.includes(key)) {
       throw new Error(
-        'Invalid config attribute ' +
-        key +
+        'Invalid config property ' +
+        JSON.stringify(key) +
         ' provided to ' +
         toMethodName(method) +
         '. Config: ' +

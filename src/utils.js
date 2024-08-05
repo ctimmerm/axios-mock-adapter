@@ -166,7 +166,12 @@ function createAxiosError(message, config, response, code) {
 function createCouldNotFindMockError(config) {
   var message =
     "Could not find mock for: \n" +
-    JSON.stringify(config, ["method", "url"], 2);
+    JSON.stringify({
+      method: config.method,
+      url: config.url,
+      params: config.params,
+      headers: config.headers
+    }, null, 2);
   var error = new Error(message);
   error.isCouldNotFindMockError = true;
   error.url = config.url;
