@@ -77,17 +77,17 @@ declare class MockAdapter {
 
   history: { [method: string]: AxiosRequestConfig[] };
 
-  onList: NoBodyRequestMatcherFunc;
-  onOptions: NoBodyRequestMatcherFunc;
   onAny: NoBodyRequestMatcherFunc;
-  onLink: NoBodyRequestMatcherFunc;
-  onUnlink: NoBodyRequestMatcherFunc;
   onGet: NoBodyRequestMatcherFunc;
-  onHead: NoBodyRequestMatcherFunc;
   onDelete: NoBodyRequestMatcherFunc;
+  onHead: NoBodyRequestMatcherFunc;
+  onOptions: NoBodyRequestMatcherFunc;
   onPost: RequestMatcherFunc;
   onPut: RequestMatcherFunc;
   onPatch: RequestMatcherFunc;
+  onList: RequestMatcherFunc;
+  onLink: RequestMatcherFunc;
+  onUnlink: RequestMatcherFunc;
 }
 
 export = MockAdapter;
