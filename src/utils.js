@@ -95,12 +95,10 @@ function isBodyMatching(body, requiredBody) {
 }
 
 function purgeIfReplyOnce(mock, handler) {
-  Object.keys(mock.handlers).forEach(function (key) {
-    var index = mock.handlers[key].indexOf(handler);
-    if (index > -1) {
-      mock.handlers[key].splice(index, 1);
-    }
-  });
+  var index = mock.handlers.indexOf(handler);
+  if (index > -1) {
+    mock.handlers.splice(index, 1);
+  }
 }
 
 function settle(resolve, reject, response, delay) {

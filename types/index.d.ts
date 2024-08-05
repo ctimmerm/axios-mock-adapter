@@ -64,6 +64,20 @@ type NoBodyRequestMatcherFunc = (
   config?: ConfigMatcher
 ) => MockAdapter.RequestHandler;
 
+type verb =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head'
+  | 'list'
+  | 'link'
+  | 'unlink';
+
+type HistoryArray = AxiosRequestConfig[] & Record<verb, AxiosRequestConfig[]>
+
 declare class MockAdapter {
   static default: typeof MockAdapter;
 
@@ -75,7 +89,7 @@ declare class MockAdapter {
   resetHistory(): void;
   restore(): void;
 
-  history: { [method: string]: AxiosRequestConfig[] };
+  history: HistoryArray;
 
   onAny: NoBodyRequestMatcherFunc;
   onGet: NoBodyRequestMatcherFunc;

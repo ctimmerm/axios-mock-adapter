@@ -38,6 +38,21 @@ namespace SupportsResetHistory {
   mock.resetHistory();
 }
 
+namespace SupportsHistoryArray {
+  mock.history.length;
+  mock.history[0].method;
+  mock.history[0].url;
+  mock.history[0].params;
+  mock.history[0].data;
+  mock.history[0].headers;
+
+  mock.history.get[0].method;
+  mock.history.get[0].url;
+  mock.history.get[0].params;
+  mock.history.get[0].data;
+  mock.history.get[0].headers;
+}
+
 namespace SupportsRestore {
   mock.restore();
 }
