@@ -564,7 +564,7 @@ describe("MockAdapter basics", function () {
 
   it("allows delay in millsecond per request (legacy non-chaining)", function () {
     mock = new MockAdapter(instance);
-    var start = new Date().getTime();
+    var start = Date.now();
     var firstDelay = 100;
     var secondDelay = 500;
     var success = 200;
@@ -576,14 +576,14 @@ describe("MockAdapter basics", function () {
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        var end = new Date().getTime();
+        var end = Date.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(firstDelay);
       }),
       instance.get("/bar").then(function (response) {
-        var end = new Date().getTime();
+        var end = Date.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
@@ -594,7 +594,7 @@ describe("MockAdapter basics", function () {
 
   it("allows delay in millsecond per request", function () {
     mock = new MockAdapter(instance);
-    var start = new Date().getTime();
+    var start = Date.now();
     var firstDelay = 100;
     var secondDelay = 500;
     var success = 200;
@@ -609,14 +609,14 @@ describe("MockAdapter basics", function () {
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        var end = new Date().getTime();
+        var end = Date.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(firstDelay);
       }),
       instance.get("/bar").then(function (response) {
-        var end = new Date().getTime();
+        var end = Date.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
@@ -626,7 +626,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("overrides global delay if request per delay is provided and respects global delay if otherwise", function () {
-    var start = new Date().getTime();
+    var start = Date.now();
     var requestDelay = 100;
     var globalDelay = 500;
     var success = 200;
@@ -638,7 +638,7 @@ describe("MockAdapter basics", function () {
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        var end = new Date().getTime();
+        var end = Date.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
@@ -647,7 +647,7 @@ describe("MockAdapter basics", function () {
         expect(totalTime).lessThan(globalDelay);
       }),
       instance.get("/bar").then(function (response) {
-        var end = new Date().getTime();
+        var end = Date.now();
         var totalTime = end - start;
 
         expect(response.status).to.equal(success);
