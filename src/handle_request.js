@@ -67,7 +67,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   }
 
   delete config.adapter;
-  mockAdapter.history[config.method].push(config);
+  mockAdapter.history.push(config);
 
   var handler = utils.findHandler(
     mockAdapter.handlers,

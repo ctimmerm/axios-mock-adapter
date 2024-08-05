@@ -1,5 +1,4 @@
 "use strict";
-
 var handleRequest = require("./handle_request");
 var utils = require("./utils");
 
@@ -25,28 +24,22 @@ function adapter() {
   }.bind(this);
 }
 
-function getVerbObject() {
-  return VERBS.reduce(function (accumulator, verb) {
-    accumulator[verb] = [];
-    return accumulator;
-  }, {});
-}
-
-function reset() {
-  resetHandlers.call(this);
-  resetHistory.call(this);
-}
-
-function resetHandlers() {
-  this.handlers = getVerbObject();
-}
-
-function resetHistory() {
-  this.history = getVerbObject();
+function getVerbArray() {
+  var arr = [];
+  VERBS.forEach(function (verb) {
+    Object.defineProperty(arr, verb, {
+      get: function () {
+        return arr.filter(function (h) {
+          return !h.method || h.method === verb;
+        });
+      },
+    });
+  });
+  return arr;
 }
 
 function MockAdapter(axiosInstance, options) {
-  reset.call(this);
+  this.reset();
 
   if (axiosInstance) {
     this.axiosInstance = axiosInstance;
@@ -75,9 +68,20 @@ MockAdapter.prototype.restore = function restore() {
   }
 };
 
-MockAdapter.prototype.reset = reset;
-MockAdapter.prototype.resetHandlers = resetHandlers;
-MockAdapter.prototype.resetHistory = resetHistory;
+MockAdapter.prototype.reset = function reset() {
+  this.resetHandlers();
+  this.resetHistory();
+};
+
+MockAdapter.prototype.resetHandlers = function resetHandlers() {
+  if (this.handlers) this.handlers.length = 0;
+  else this.handlers = getVerbArray();
+};
+
+MockAdapter.prototype.resetHistory = function resetHistory() {
+  if (this.history) this.history.length = 0;
+  else this.history = getVerbArray();
+};
 
 var methodsWithConfigsAsSecondArg = ["any", "get", "delete", "head", "options"];
 function convertDataAndConfigToConfig (method, data, config) {
@@ -120,7 +124,7 @@ VERBS.concat("any").forEach(function (method) {
     function reply(code, response, headers) {
       var handler = {
         url: matcher,
-        method: method,
+        method: method === 'any' ? undefined : method,
         params: paramsAndBody.params,
         data: paramsAndBody.data,
         headers: paramsAndBody.headers,
@@ -146,7 +150,7 @@ VERBS.concat("any").forEach(function (method) {
     function replyOnce(code, response, headers) {
       var handler = {
         url: matcher,
-        method: method,
+        method: method === 'any' ? undefined : method,
         params: paramsAndBody.params,
         data: paramsAndBody.data,
         headers: paramsAndBody.headers,
@@ -172,7 +176,7 @@ VERBS.concat("any").forEach(function (method) {
       passThrough: function passThrough() {
         var handler = {
           passThrough: true,
-          method: method,
+          method: method === 'any' ? undefined : method,
           url: matcher,
           params: paramsAndBody.params,
           data: paramsAndBody.data,
@@ -257,13 +261,15 @@ VERBS.concat("any").forEach(function (method) {
 
 function findInHandlers(method, handlers, handler) {
   var index = -1;
-  for (var i = 0; i < handlers[method].length; i += 1) {
-    var item = handlers[method][i];
+  for (var i = 0; i < handlers.length; i += 1) {
+    var item = handlers[i];
     var comparePaths =
       item.url instanceof RegExp && handler.url instanceof RegExp
         ? String(item.url) === String(handler.url)
         : item.url === handler.url;
+
     var isSame =
+      (!item.method || item.method === handler.method) &&
       comparePaths &&
       utils.isEqual(item.params, handler.params) &&
       utils.isEqual(item.data, handler.data) &&
@@ -277,18 +283,16 @@ function findInHandlers(method, handlers, handler) {
 
 function addHandler(method, handlers, handler) {
   if (method === "any") {
-    VERBS.forEach(function (verb) {
-      handlers[verb].push(handler);
-    });
+    handlers.push(handler);
   } else {
     var indexOfExistingHandler = findInHandlers(method, handlers, handler);
     // handler.replyOnce indicates that a handler only runs once.
     // It's supported to register muliple ones like that without
     // overwriting the previous one.
     if (indexOfExistingHandler > -1 && !handler.replyOnce) {
-      handlers[method].splice(indexOfExistingHandler, 1, handler);
+      handlers.splice(indexOfExistingHandler, 1, handler);
     } else {
-      handlers[method].push(handler);
+      handlers.push(handler);
     }
   }
 }
