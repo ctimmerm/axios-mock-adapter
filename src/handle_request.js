@@ -82,22 +82,22 @@ function handleRequest(mockAdapter, resolve, reject, config) {
   );
 
   if (handler) {
-    if (handler[6] === true) {
+    if (handler.replyOnce) {
       utils.purgeIfReplyOnce(mockAdapter, handler);
     }
 
-    if (handler.length === 2) {
+    if (handler.passThrough) {
       // passThrough handler
       passThroughRequest(mockAdapter, resolve, reject, config);
-    } else if (typeof handler[3] !== "function") {
+    } else if (typeof handler.response !== "function") {
       utils.settle(
         resolve,
         reject,
-        makeResponse(handler.slice(3), config),
+        makeResponse(handler.response, config),
         getEffectiveDelay(mockAdapter, handler)
       );
     } else {
-      var result = handler[3](config);
+      var result = handler.response(config);
       // TODO throw a sane exception when return value is incorrect
       if (typeof result.then !== "function") {
         utils.settle(
@@ -163,8 +163,7 @@ function handleRequest(mockAdapter, resolve, reject, config) {
 }
 
 function getEffectiveDelay(adapter, handler) {
-  var delayPerRequest = handler[7];
-  return typeof delayPerRequest === 'number' ? delayPerRequest : adapter.delayResponse;
+  return typeof handler.delay === 'number' ? handler.delay : adapter.delayResponse;
 }
 
 module.exports = handleRequest;

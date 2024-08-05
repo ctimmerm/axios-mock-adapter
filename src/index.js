@@ -118,7 +118,20 @@ VERBS.concat("any").forEach(function (method) {
     var paramsAndBody = convertDataAndConfigToConfig(method, data, config);
 
     function reply(code, response, headers) {
-      var handler = [matcher, paramsAndBody, paramsAndBody.headers, code, response, headers, false, delay];
+      var handler = {
+        url: matcher,
+        method: method,
+        params: paramsAndBody.params,
+        data: paramsAndBody.data,
+        headers: paramsAndBody.headers,
+        replyOnce: false,
+        delay: delay,
+        response: typeof code === 'function' ? code : [
+          code,
+          response,
+          headers
+        ]
+      };
       addHandler(method, _this.handlers, handler);
       return _this;
     }
@@ -131,7 +144,20 @@ VERBS.concat("any").forEach(function (method) {
     }
 
     function replyOnce(code, response, headers) {
-      var handler = [matcher, paramsAndBody, paramsAndBody.headers, code, response, headers, true, delay];
+      var handler = {
+        url: matcher,
+        method: method,
+        params: paramsAndBody.params,
+        data: paramsAndBody.data,
+        headers: paramsAndBody.headers,
+        replyOnce: true,
+        delay: delay,
+        response: typeof code === 'function' ? code : [
+          code,
+          response,
+          headers
+        ]
+      };
       addHandler(method, _this.handlers, handler);
       return _this;
     }
@@ -144,7 +170,14 @@ VERBS.concat("any").forEach(function (method) {
       withDelayInMs: withDelayInMs,
 
       passThrough: function passThrough() {
-        var handler = [matcher, paramsAndBody];
+        var handler = {
+          passThrough: true,
+          method: method,
+          url: matcher,
+          params: paramsAndBody.params,
+          data: paramsAndBody.data,
+          headers: paramsAndBody.headers
+        };
         addHandler(method, _this.handlers, handler);
         return _this;
       },
@@ -226,16 +259,16 @@ function findInHandlers(method, handlers, handler) {
   var index = -1;
   for (var i = 0; i < handlers[method].length; i += 1) {
     var item = handlers[method][i];
-    var isReplyOnce = item[6] === true;
     var comparePaths =
-      item[0] instanceof RegExp && handler[0] instanceof RegExp
-        ? String(item[0]) === String(handler[0])
-        : item[0] === handler[0];
+      item.url instanceof RegExp && handler.url instanceof RegExp
+        ? String(item.url) === String(handler.url)
+        : item.url === handler.url;
     var isSame =
       comparePaths &&
-      utils.isEqual(item[1], handler[1]) &&
-      utils.isEqual(item[2], handler[2]);
-    if (isSame && !isReplyOnce) {
+      utils.isEqual(item.params, handler.params) &&
+      utils.isEqual(item.data, handler.data) &&
+      utils.isEqual(item.headers, handler.headers);
+    if (isSame && !item.replyOnce) {
       index = i;
     }
   }
@@ -249,10 +282,10 @@ function addHandler(method, handlers, handler) {
     });
   } else {
     var indexOfExistingHandler = findInHandlers(method, handlers, handler);
-    // handler[6] !== true indicates that a handler only runs once.
+    // handler.replyOnce indicates that a handler only runs once.
     // It's supported to register muliple ones like that without
     // overwriting the previous one.
-    if (indexOfExistingHandler > -1 && handler[6] !== true) {
+    if (indexOfExistingHandler > -1 && !handler.replyOnce) {
       handlers[method].splice(indexOfExistingHandler, 1, handler);
     } else {
       handlers[method].push(handler);
