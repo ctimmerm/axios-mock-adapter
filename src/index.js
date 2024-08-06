@@ -17,9 +17,7 @@ const VERBS = [
 
 function adapter() {
   return (config) => {
-    return new Promise((resolve, reject) => {
-      handleRequest(this, resolve, reject, config);
-    });
+    return handleRequest(this, config);
   };
 }
 

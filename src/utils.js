@@ -100,24 +100,57 @@ function purgeIfReplyOnce(mock, handler) {
   }
 }
 
-function settle(resolve, reject, response, delay) {
-  if (delay > 0) {
-    setTimeout(settle, delay, resolve, reject, response);
-    return;
+function transformRequest(data) {
+  if (
+    isArrayBuffer(data) ||
+    isBuffer(data) ||
+    isStream(data) ||
+    isBlob(data)
+  ) {
+    return data;
   }
 
+  // Object and Array: returns a deep copy
+  if (isObjectOrArray(data)) {
+    return JSON.parse(JSON.stringify(data));
+  }
+
+  // for primitives like string, undefined, null, number
+  return data;
+}
+
+async function makeResponse(result, config) {
+  if (typeof result === "function") result = await result(config);
+
+  const status = result.status || result[0];
+  const data = transformRequest(result.data || result[1]);
+  const headers = result.headers || result[2];
+  if (result.config) config = result.config;
+
+  return {
+    status,
+    data,
+    headers,
+    config,
+    request: { responseURL: config.url }
+  };
+}
+
+async function settle(config, response, delay) {
+  if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+
+  const result = await makeResponse(response, config);
+
   if (
-    !response.config.validateStatus ||
-    response.config.validateStatus(response.status)
+    !result.config.validateStatus ||
+    result.config.validateStatus(result.status)
   ) {
-    resolve(response);
+    return result;
   } else {
-    reject(
-      createAxiosError(
-        `Request failed with status code ${response.status}`,
-        response.config,
-        response
-      )
+    throw createAxiosError(
+      `Request failed with status code ${result.status}`,
+      result.config,
+      result
     );
   }
 }
@@ -177,18 +210,15 @@ function createCouldNotFindMockError(config) {
 }
 
 module.exports = {
-  find: find,
-  findHandler: findHandler,
-  purgeIfReplyOnce: purgeIfReplyOnce,
-  settle: settle,
-  isStream: isStream,
-  isArrayBuffer: isArrayBuffer,
-  isFunction: isFunction,
-  isObjectOrArray: isObjectOrArray,
-  isBuffer: isBuffer,
-  isBlob: isBlob,
-  isBodyOrParametersMatching: isBodyOrParametersMatching,
-  isEqual: isEqual,
-  createAxiosError: createAxiosError,
-  createCouldNotFindMockError: createCouldNotFindMockError,
+  find,
+  findHandler,
+  purgeIfReplyOnce,
+  settle,
+  isObjectOrArray,
+  isBuffer,
+  isBlob,
+  isBodyOrParametersMatching,
+  isEqual,
+  createAxiosError,
+  createCouldNotFindMockError,
 };
