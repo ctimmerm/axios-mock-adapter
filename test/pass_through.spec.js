@@ -1,15 +1,15 @@
-var axios = require("axios");
-var isLegacyAxios = require("axios/package.json").version[0] === "0";
-var expect = require("chai").expect;
-var createServer = require("http").createServer;
+const axios = require("axios");
+const isLegacyAxios = require("axios/package.json").version[0] === "0";
+const expect = require("chai").expect;
+const createServer = require("http").createServer;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("passThrough tests (requires Node)", function () {
-  var instance;
-  var mock;
-  var httpServer;
-  var serverUrl;
+  let instance;
+  let mock;
+  let httpServer;
+  let serverUrl;
 
   before("set up Node server", function () {
     return new Promise(function (resolve, reject) {
@@ -24,7 +24,7 @@ describe("passThrough tests (requires Node)", function () {
         }
       })
         .listen(0, "127.0.0.1", function () {
-          serverUrl = "http://127.0.0.1:" + httpServer.address().port;
+          serverUrl = `http://127.0.0.1:${httpServer.address().port}`;
           resolve();
         })
         .on("error", reject);
@@ -87,16 +87,16 @@ describe("passThrough tests (requires Node)", function () {
   it("allows setting default passThrough handler", function () {
     mock.onGet("/foo").reply(200, "bar").onAny().passThrough();
 
-    var randomPath = "xyz" + Math.round(10000 * Math.random());
+    const randomPath = `xyz${Math.round(10000 * Math.random())}`;
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal("bar");
       }),
-      instance.get("/" + randomPath).then(function (response) {
+      instance.get(`/${randomPath}`).then(function (response) {
         expect(response.status).to.equal(200);
-        expect(response.data).to.equal("/" + randomPath);
+        expect(response.data).to.equal(`/${randomPath}`);
       }),
       instance.post("/post").then(function (response) {
         expect(response.status).to.equal(200);
@@ -143,7 +143,7 @@ describe("passThrough tests (requires Node)", function () {
         data: "foo",
         transformRequest: [
           function (data) {
-            return data + "foo";
+            return `${data}foo`;
           },
         ],
       })
@@ -159,7 +159,7 @@ describe("passThrough tests (requires Node)", function () {
       .get("/foo", {
         transformResponse: [
           function (data) {
-            return data + "foo";
+            return `${data}foo`;
           },
         ],
       })
@@ -170,8 +170,8 @@ describe("passThrough tests (requires Node)", function () {
 
   it("applies interceptors only once", function () {
     mock.onGet("/foo").passThrough();
-    var requestCount = 0;
-    var responseCount = 0;
+    let requestCount = 0;
+    let responseCount = 0;
     instance.interceptors.request.use(function (config) {
       requestCount++;
       return config;

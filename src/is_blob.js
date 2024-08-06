@@ -18,11 +18,11 @@
  */
 
 function isBlob(value) {
-  if (typeof Blob === 'undefined') {
+  if (typeof Blob === "undefined") {
     return false;
   }
 
-  return value instanceof Blob || Object.prototype.toString.call(value) === '[object Blob]';
+  return value instanceof Blob || Object.prototype.toString.call(value) === "[object Blob]";
 }
 
 module.exports = isBlob;
