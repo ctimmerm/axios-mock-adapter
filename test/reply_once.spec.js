@@ -1,11 +1,11 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("MockAdapter replyOnce", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();
@@ -37,7 +37,7 @@ describe("MockAdapter replyOnce", function () {
   });
 
   it("replies only once", function () {
-    var called = false;
+    let called = false;
     mock.onGet("/foo").replyOnce(200);
 
     return instance
@@ -53,7 +53,7 @@ describe("MockAdapter replyOnce", function () {
   });
 
   it("replies only once when used with onAny", function () {
-    var called = false;
+    let called = false;
     mock.onAny("/foo").replyOnce(200);
 
     return instance
@@ -69,8 +69,8 @@ describe("MockAdapter replyOnce", function () {
   });
 
   it("replies only once when using request body matching", function () {
-    var called = false;
-    var body = "abc";
+    let called = false;
+    const body = "abc";
     mock.onPost("/onceWithBody", body).replyOnce(200);
 
     return instance

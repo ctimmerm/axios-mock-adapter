@@ -1,8 +1,8 @@
 "use strict";
-var handleRequest = require("./handle_request");
-var utils = require("./utils");
+const handleRequest = require("./handle_request");
+const utils = require("./utils");
 
-var VERBS = [
+const VERBS = [
   "get",
   "post",
   "head",
@@ -16,16 +16,15 @@ var VERBS = [
 ];
 
 function adapter() {
-  return function (config) {
-    var mockAdapter = this;
-    return new Promise(function (resolve, reject) {
-      handleRequest(mockAdapter, resolve, reject, config);
+  return (config) => {
+    return new Promise((resolve, reject) => {
+      handleRequest(this, resolve, reject, config);
     });
-  }.bind(this);
+  };
 }
 
 function getVerbArray() {
-  var arr = [];
+  const arr = [];
   VERBS.forEach(function (verb) {
     Object.defineProperty(arr, verb, {
       get: function () {
@@ -38,7 +37,7 @@ function getVerbArray() {
   return arr;
 }
 
-function MockAdapter(axiosInstance, options) {
+function MockAdapter(axiosInstance, options = {}) {
   this.reset();
 
   if (axiosInstance) {
@@ -50,9 +49,8 @@ function MockAdapter(axiosInstance, options) {
       : undefined;
 
     this.originalAdapter = axiosInstance.defaults.adapter;
-    this.delayResponse =
-      options && options.delayResponse > 0 ? options.delayResponse : null;
-    this.onNoMatch = (options && options.onNoMatch) || null;
+    this.delayResponse = options.delayResponse > 0 ? options.delayResponse : null;
+    this.onNoMatch = options.onNoMatch || null;
     axiosInstance.defaults.adapter = this.adapter.call(this);
   } else {
     throw new Error("Please provide an instance of axios to mock");
@@ -83,7 +81,7 @@ MockAdapter.prototype.resetHistory = function resetHistory() {
   else this.history = getVerbArray();
 };
 
-var methodsWithConfigsAsSecondArg = ["any", "get", "delete", "head", "options"];
+const methodsWithConfigsAsSecondArg = ["any", "get", "delete", "head", "options"];
 function convertDataAndConfigToConfig (method, data, config) {
   if (methodsWithConfigsAsSecondArg.includes(method)) {
     return validateconfig(method, data || {});
@@ -92,17 +90,17 @@ function convertDataAndConfigToConfig (method, data, config) {
   }
 }
 
-var allowedConfigProperties = ['headers', 'params', 'data'];
+const allowedConfigProperties = ["headers", "params", "data"];
 function validateconfig (method, config) {
-  for (var key in config) {
+  for (const key in config) {
     if (!allowedConfigProperties.includes(key)) {
       throw new Error(
-        'Invalid config property ' +
-        JSON.stringify(key) +
-        ' provided to ' +
-        toMethodName(method) +
-        '. Config: ' +
-        JSON.stringify(config)
+        `Invalid config property ${
+        JSON.stringify(key)
+        } provided to ${
+        toMethodName(method)
+        }. Config: ${
+        JSON.stringify(config)}`
       );
     }
   }
@@ -111,62 +109,63 @@ function validateconfig (method, config) {
 }
 
 function toMethodName (method) {
-  return "on" + method.charAt(0).toUpperCase() + method.slice(1);
+  return `on${method.charAt(0).toUpperCase()}${method.slice(1)}`;
 }
 
 VERBS.concat("any").forEach(function (method) {
   MockAdapter.prototype[toMethodName(method)] = function (matcher, data, config) {
-    var _this = this;
-    var matcher = matcher === undefined ? /.*/ : matcher;
-    var delay;
-    var paramsAndBody = convertDataAndConfigToConfig(method, data, config);
+    const self = this;
+    let delay;
+    matcher = matcher === undefined ? /.*/ : matcher;
+
+    const paramsAndBody = convertDataAndConfigToConfig(method, data, config);
 
     function reply(code, response, headers) {
-      var handler = {
+      const handler = {
         url: matcher,
-        method: method === 'any' ? undefined : method,
+        method: method === "any" ? undefined : method,
         params: paramsAndBody.params,
         data: paramsAndBody.data,
         headers: paramsAndBody.headers,
         replyOnce: false,
-        delay: delay,
-        response: typeof code === 'function' ? code : [
+        delay,
+        response: typeof code === "function" ? code : [
           code,
           response,
           headers
         ]
       };
-      addHandler(method, _this.handlers, handler);
-      return _this;
+      addHandler(method, self.handlers, handler);
+      return self;
     }
 
     function withDelayInMs(_delay) {
       delay = _delay;
-      var respond = requestApi.reply.bind(requestApi);
+      const respond = requestApi.reply.bind(requestApi);
       Object.assign(respond, requestApi);
       return respond;
     }
 
     function replyOnce(code, response, headers) {
-      var handler = {
+      const handler = {
         url: matcher,
-        method: method === 'any' ? undefined : method,
+        method: method === "any" ? undefined : method,
         params: paramsAndBody.params,
         data: paramsAndBody.data,
         headers: paramsAndBody.headers,
         replyOnce: true,
         delay: delay,
-        response: typeof code === 'function' ? code : [
+        response: typeof code === "function" ? code : [
           code,
           response,
           headers
         ]
       };
-      addHandler(method, _this.handlers, handler);
-      return _this;
+      addHandler(method, self.handlers, handler);
+      return self;
     }
 
-    var requestApi = {
+    const requestApi = {
       reply: reply,
 
       replyOnce: replyOnce,
@@ -174,83 +173,77 @@ VERBS.concat("any").forEach(function (method) {
       withDelayInMs: withDelayInMs,
 
       passThrough: function passThrough() {
-        var handler = {
+        const handler = {
           passThrough: true,
-          method: method === 'any' ? undefined : method,
+          method: method === "any" ? undefined : method,
           url: matcher,
           params: paramsAndBody.params,
           data: paramsAndBody.data,
           headers: paramsAndBody.headers
         };
-        addHandler(method, _this.handlers, handler);
-        return _this;
+        addHandler(method, self.handlers, handler);
+        return self;
       },
 
       abortRequest: function () {
-        return reply(function (config) {
-          var error = utils.createAxiosError(
+        return reply(async function (config) {
+          throw utils.createAxiosError(
             "Request aborted",
             config,
             undefined,
             "ECONNABORTED"
           );
-          return Promise.reject(error);
         });
       },
 
       abortRequestOnce: function () {
-        return replyOnce(function (config) {
-          var error = utils.createAxiosError(
+        return replyOnce(async function (config) {
+          throw utils.createAxiosError(
             "Request aborted",
             config,
             undefined,
             "ECONNABORTED"
           );
-          return Promise.reject(error);
         });
       },
 
       networkError: function () {
-        return reply(function (config) {
-          var error = utils.createAxiosError("Network Error", config);
-          return Promise.reject(error);
+        return reply(async function (config) {
+          throw utils.createAxiosError("Network Error", config);
         });
       },
 
       networkErrorOnce: function () {
-        return replyOnce(function (config) {
-          var error = utils.createAxiosError("Network Error", config);
-          return Promise.reject(error);
+        return replyOnce(async function (config) {
+          throw utils.createAxiosError("Network Error", config);
         });
       },
 
       timeout: function () {
-        return reply(function (config) {
-          var error = utils.createAxiosError(
+        return reply(async function (config) {
+          throw utils.createAxiosError(
             config.timeoutErrorMessage ||
-              "timeout of " + config.timeout + "ms exceeded",
+              `timeout of ${config.timeout  }ms exceeded`,
             config,
             undefined,
             config.transitional && config.transitional.clarifyTimeoutError
               ? "ETIMEDOUT"
               : "ECONNABORTED"
           );
-          return Promise.reject(error);
         });
       },
 
       timeoutOnce: function () {
-        return replyOnce(function (config) {
-          var error = utils.createAxiosError(
+        return replyOnce(async function (config) {
+          throw utils.createAxiosError(
             config.timeoutErrorMessage ||
-              "timeout of " + config.timeout + "ms exceeded",
+              `timeout of ${config.timeout  }ms exceeded`,
             config,
             undefined,
             config.transitional && config.transitional.clarifyTimeoutError
               ? "ETIMEDOUT"
               : "ECONNABORTED"
           );
-          return Promise.reject(error);
         });
       },
     };
@@ -260,20 +253,21 @@ VERBS.concat("any").forEach(function (method) {
 });
 
 function findInHandlers(method, handlers, handler) {
-  var index = -1;
-  for (var i = 0; i < handlers.length; i += 1) {
-    var item = handlers[i];
-    var comparePaths =
+  let index = -1;
+  for (let i = 0; i < handlers.length; i += 1) {
+    const item = handlers[i];
+    const comparePaths =
       item.url instanceof RegExp && handler.url instanceof RegExp
         ? String(item.url) === String(handler.url)
         : item.url === handler.url;
 
-    var isSame =
+    const isSame =
       (!item.method || item.method === handler.method) &&
       comparePaths &&
       utils.isEqual(item.params, handler.params) &&
       utils.isEqual(item.data, handler.data) &&
       utils.isEqual(item.headers, handler.headers);
+
     if (isSame && !item.replyOnce) {
       index = i;
     }
@@ -285,7 +279,7 @@ function addHandler(method, handlers, handler) {
   if (method === "any") {
     handlers.push(handler);
   } else {
-    var indexOfExistingHandler = findInHandlers(method, handlers, handler);
+    const indexOfExistingHandler = findInHandlers(method, handlers, handler);
     // handler.replyOnce indicates that a handler only runs once.
     // It's supported to register muliple ones like that without
     // overwriting the previous one.

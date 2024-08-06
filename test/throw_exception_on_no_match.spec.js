@@ -1,11 +1,11 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("onNoMatch=throwException option tests (requires Node)", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();
@@ -29,8 +29,8 @@ describe("onNoMatch=throwException option tests (requires Node)", function () {
   });
 
   it("handles errors correctly when could not find mock for requested url", function () {
-    var expectedUrl = "http://127.0.0.1/unexistent_path";
-    var expectedMethod = "get";
+    const expectedUrl = "http://127.0.0.1/unexistent_path";
+    const expectedMethod = "get";
 
     return instance
       .get(expectedUrl)

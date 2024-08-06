@@ -1,14 +1,14 @@
-var axios = require("axios");
-var expect = require("chai").expect;
-var createServer = require("http").createServer;
+const axios = require("axios");
+const expect = require("chai").expect;
+const createServer = require("http").createServer;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("trailing slash in axios baseUrl issue (requires Node)", function () {
-  var instance;
-  var mock;
-  var httpServer;
-  var serverUrl;
+  let instance;
+  let mock;
+  let httpServer;
+  let serverUrl;
 
   before("set up Node server", function () {
     return new Promise(function (resolve, reject) {
@@ -23,7 +23,7 @@ describe("trailing slash in axios baseUrl issue (requires Node)", function () {
         }
       })
         .listen(0, "127.0.0.1", function () {
-          serverUrl = "http://127.0.0.1:" + httpServer.address().port;
+          serverUrl = `http://127.0.0.1:${httpServer.address().port}`;
           resolve();
         })
         .on("error", reject);
@@ -35,7 +35,7 @@ describe("trailing slash in axios baseUrl issue (requires Node)", function () {
   });
 
   beforeEach(function () {
-    instance = axios.create({ baseURL: serverUrl + "/" }); // baseUrl has a trailing slash
+    instance = axios.create({ baseURL: `${serverUrl}/` }); // baseUrl has a trailing slash
     mock = new MockAdapter(instance);
   });
 

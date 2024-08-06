@@ -1,10 +1,10 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("MockAdapter on default axios instance", function () {
-  var mock;
+  let mock;
 
   beforeEach(function () {
     mock = new MockAdapter(axios);

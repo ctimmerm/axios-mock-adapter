@@ -1,12 +1,12 @@
-var axios = require("axios");
-var fs = require("fs");
-var expect = require("chai").expect;
+const axios = require("axios");
+const fs = require("fs");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("MockAdapter basics", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();
@@ -18,8 +18,8 @@ describe("MockAdapter basics", function () {
   });
 
   it("correctly throws an error when attempting to instantiate an undefined axios instance", function () {
-    var emptyInstance = undefined;
-    var constructorFunc = function () {
+    const emptyInstance = undefined;
+    const constructorFunc = function () {
       new MockAdapter(emptyInstance);
     };
     expect(constructorFunc).to.throw(
@@ -189,7 +189,7 @@ describe("MockAdapter basics", function () {
       .reply(200);
 
     return instance
-      .post("/withParams", { some: 'body' }, { params: { foo: "bar", bar: "foo" } })
+      .post("/withParams", { some: "body" }, { params: { foo: "bar", bar: "foo" } })
       .then(function (response) {
         expect(response.status).to.equal(200);
       });
@@ -201,7 +201,7 @@ describe("MockAdapter basics", function () {
       .reply(200);
 
     return instance
-      .put("/withParams", { some: 'body' }, { params: { bar: "foo", foo: "bar" } })
+      .put("/withParams", { some: "body" }, { params: { bar: "foo", foo: "bar" } })
       .then(function (response) {
         expect(response.status).to.equal(200);
       });
@@ -261,7 +261,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("does not match when body is wrong", function () {
-    var matcher = { somecontent: { is: "passed" } };
+    const matcher = { somecontent: { is: "passed" } };
     mock.onPatch("/wrongObjBody", matcher).reply(200);
 
     return instance
@@ -288,7 +288,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("can pass headers to match to a handler", function () {
-    var headers = {
+    const headers = {
       Accept: "application/json, text/plain, */*",
       "Content-Type": "application/x-www-form-urlencoded",
       "Header-test": "test-header",
@@ -302,7 +302,7 @@ describe("MockAdapter basics", function () {
         expect(response.status).to.equal(200);
 
         return instance
-          .post("/withHeaders", undefined, { headers: { Accept: 'no-match' } })
+          .post("/withHeaders", undefined, { headers: { Accept: "no-match" } })
           .catch(function (err) {
             expect(err.response.status).to.equal(404);
           });
@@ -310,7 +310,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("does not match when request header is wrong", function () {
-    var headers = { "Header-test": "test-header" };
+    const headers = { "Header-test": "test-header" };
     mock.onPatch("/wrongObjHeader", undefined, { headers: headers }).reply(200);
 
     return instance
@@ -465,10 +465,10 @@ describe("MockAdapter basics", function () {
   });
 
   it("restores the previous adapter (if any)", function () {
-    var adapter = function () {};
-    var newInstance = axios.create();
+    const adapter = function () {};
+    const newInstance = axios.create();
     newInstance.defaults.adapter = adapter;
-    var newMock = new MockAdapter(newInstance);
+    const newMock = new MockAdapter(newInstance);
     newMock.restore();
 
     expect(newInstance.defaults.adapter).to.equal(adapter);
@@ -476,7 +476,7 @@ describe("MockAdapter basics", function () {
 
   it("performs a noop when restore is called more than once", function () {
     mock.restore();
-    var newAdapter = function () {};
+    const newAdapter = function () {};
     instance.defaults.adapter = newAdapter;
     mock.restore();
     expect(instance.defaults.adapter).to.equal(newAdapter);
@@ -554,37 +554,37 @@ describe("MockAdapter basics", function () {
     mock = new MockAdapter(instance, { delayResponse: 1 });
 
     mock.onGet("/foo").reply(function (config) {
-      return Promise.reject("error");
+      return Promise.reject(new Error("error"));
     });
 
-    return instance.get("/foo").catch(function (message) {
-      expect(message).to.equal("error");
+    return instance.get("/foo").catch(function (err) {
+      expect(err.message).to.equal("error");
     });
   });
 
   it("allows delay in millsecond per request (legacy non-chaining)", function () {
     mock = new MockAdapter(instance);
-    var start = performance.now();
-    var firstDelay = 100;
-    var secondDelay = 500;
-    var success = 200;
+    const start = performance.now();
+    const firstDelay = 100;
+    const secondDelay = 500;
+    const success = 200;
 
-    var fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(firstDelay);
+    const fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(firstDelay);
     fooOnDelayResponds(success);
-    var barOnDelayResponds = mock.onGet("/bar").withDelayInMs(secondDelay);
+    const barOnDelayResponds = mock.onGet("/bar").withDelayInMs(secondDelay);
     barOnDelayResponds(success);
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        var end = performance.now();
-        var totalTime = end - start;
+        const end = performance.now();
+        const totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(firstDelay - 1);
       }),
       instance.get("/bar").then(function (response) {
-        var end = performance.now();
-        var totalTime = end - start;
+        const end = performance.now();
+        const totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(secondDelay - 1);
@@ -594,10 +594,10 @@ describe("MockAdapter basics", function () {
 
   it("allows delay in millsecond per request", function () {
     mock = new MockAdapter(instance);
-    var start = performance.now();
-    var firstDelay = 100;
-    var secondDelay = 500;
-    var success = 200;
+    const start = performance.now();
+    const firstDelay = 100;
+    const secondDelay = 500;
+    const success = 200;
 
     mock.onGet("/foo")
       .withDelayInMs(firstDelay)
@@ -609,15 +609,15 @@ describe("MockAdapter basics", function () {
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        var end = performance.now();
-        var totalTime = end - start;
+        const end = performance.now();
+        const totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(firstDelay - 1);
       }),
       instance.get("/bar").then(function (response) {
-        var end = performance.now();
-        var totalTime = end - start;
+        const end = performance.now();
+        const totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(secondDelay - 1);
@@ -626,20 +626,20 @@ describe("MockAdapter basics", function () {
   });
 
   it("overrides global delay if request per delay is provided and respects global delay if otherwise", function () {
-    var start = performance.now();
-    var requestDelay = 100;
-    var globalDelay = 500;
-    var success = 200;
+    const start = performance.now();
+    const requestDelay = 100;
+    const globalDelay = 500;
+    const success = 200;
     mock = new MockAdapter(instance, { delayResponse: globalDelay });
 
-    var fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(requestDelay);
+    const fooOnDelayResponds = mock.onGet("/foo").withDelayInMs(requestDelay);
     fooOnDelayResponds(success);
     mock.onGet("/bar").reply(success);
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
-        var end = performance.now();
-        var totalTime = end - start;
+        const end = performance.now();
+        const totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(requestDelay - 1);
@@ -647,8 +647,8 @@ describe("MockAdapter basics", function () {
         expect(totalTime).lessThan(globalDelay);
       }),
       instance.get("/bar").then(function (response) {
-        var end = performance.now();
-        var totalTime = end - start;
+        const end = performance.now();
+        const totalTime = end - start;
 
         expect(response.status).to.equal(success);
         expect(totalTime).greaterThanOrEqual(globalDelay - 1);
@@ -669,7 +669,7 @@ describe("MockAdapter basics", function () {
         expect(response.data).to.equal("bar");
       }),
       instance
-        .get("/xyz" + Math.round(100000 * Math.random()))
+        .get(`/xyz${Math.round(100000 * Math.random())}`)
         .then(function (response) {
           expect(response.status).to.equal(200);
           expect(response.data).to.equal("bar");
@@ -695,7 +695,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("returns a deep copy of the mock data in the response when the data is an object", function () {
-    var data = {
+    const data = {
       foo: {
         bar: 123,
       },
@@ -714,7 +714,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("returns a deep copy of the mock data in the response when the data is an array", function () {
-    var data = [
+    const data = [
       {
         bar: 123,
       },
@@ -812,7 +812,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("allows overwriting only on reply if replyOnce was used first", function () {
-    var counter = 0;
+    let counter = 0;
     mock.onGet("/").replyOnce(500);
     mock.onGet("/").reply(200);
     mock.onGet("/").reply(401);
@@ -834,7 +834,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("should not allow overwriting only on reply if replyOnce wasn't used first", function () {
-    var counter = 0;
+    let counter = 0;
     mock.onGet("/").reply(200);
     mock.onGet("/").reply(401);
     mock.onGet("/").replyOnce(500);
@@ -903,8 +903,8 @@ describe("MockAdapter basics", function () {
       .get("http://www.foo.com/bar", { responseType: "stream" })
       .then(function (response) {
         expect(response.status).to.equal(200);
-        var stream = response.data;
-        var string = "";
+        const stream = response.data;
+        let string = "";
         stream.on("data", function (chunk) {
           string += chunk.toString("utf8");
         });
@@ -926,7 +926,7 @@ describe("MockAdapter basics", function () {
       .get("http://www.foo.com/bar", { responseType: "stream" })
       .then(function (response) {
         expect(response.status).to.equal(200);
-        var string = response.data.toString("utf8");
+        const string = response.data.toString("utf8");
         expect(string).to.equal("fooBar");
       });
   });
@@ -940,8 +940,8 @@ describe("MockAdapter basics", function () {
   });
 
   it("allows sending an Uint8Array as response", function () {
-    var buffer = new ArrayBuffer(1);
-    var view = new Uint8Array(buffer);
+    const buffer = new ArrayBuffer(1);
+    const view = new Uint8Array(buffer);
     view[0] = 0xff;
 
     mock.onGet("/").reply(200, buffer);
@@ -951,7 +951,7 @@ describe("MockAdapter basics", function () {
       method: "GET",
       responseType: "arraybuffer",
     }).then(function (response) {
-      var view = new Uint8Array(response.data);
+      const view = new Uint8Array(response.data);
       expect(view[0]).to.equal(0xff);
     });
   });
@@ -990,7 +990,7 @@ describe("MockAdapter basics", function () {
         expect(true).to.be.false;
       })
       .catch(function (error) {
-        var serializableError = error.toJSON();
+        const serializableError = error.toJSON();
         expect(serializableError.message).to.equal(
           "Request failed with status code 404"
         );
