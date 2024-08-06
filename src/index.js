@@ -25,7 +25,7 @@ function getVerbArray() {
   const arr = [];
   VERBS.forEach(function (verb) {
     Object.defineProperty(arr, verb, {
-      get: function () {
+      get () {
         return arr.filter(function (h) {
           return !h.method || h.method === verb;
         });
@@ -250,7 +250,7 @@ VERBS.concat("any").forEach(function (method) {
   };
 });
 
-function findInHandlers(method, handlers, handler) {
+function findInHandlers(handlers, handler) {
   let index = -1;
   for (let i = 0; i < handlers.length; i += 1) {
     const item = handlers[i];
@@ -277,7 +277,7 @@ function addHandler(method, handlers, handler) {
   if (method === "any") {
     handlers.push(handler);
   } else {
-    const indexOfExistingHandler = findInHandlers(method, handlers, handler);
+    const indexOfExistingHandler = findInHandlers(handlers, handler);
     // handler.replyOnce indicates that a handler only runs once.
     // It's supported to register muliple ones like that without
     // overwriting the previous one.

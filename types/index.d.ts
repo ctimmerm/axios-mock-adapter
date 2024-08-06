@@ -1,13 +1,32 @@
 import { AxiosAdapter, AxiosInstance, AxiosRequestConfig } from 'axios';
 
+interface AxiosHeaders {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+type MockArrayResponse = [
+  status: number,
+  data?: any,
+  headers?: AxiosHeaders
+];
+
+type MockObjectResponse = {
+  status: number;
+  data: any;
+  headers?: AxiosHeaders,
+  config?: AxiosRequestConfig
+};
+
+type MockResponse = MockArrayResponse | MockObjectResponse;
+
 type CallbackResponseSpecFunc = (
   config: AxiosRequestConfig
-) => any[] | Promise<any[]>;
+) => MockResponse | Promise<MockResponse>;
 
 type ResponseSpecFunc = <T = any>(
   statusOrCallback: number | CallbackResponseSpecFunc,
   data?: T,
-  headers?: any
+  headers?: AxiosHeaders
 ) => MockAdapter;
 
 declare namespace MockAdapter {
