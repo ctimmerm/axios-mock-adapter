@@ -1,11 +1,11 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("requestAborted spec", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();

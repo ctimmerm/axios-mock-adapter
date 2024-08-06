@@ -1,11 +1,11 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("timeout spec", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();
@@ -46,7 +46,7 @@ describe("timeout spec", function () {
 
   it("responds with timeoutErrorMessage", function () {
     mock.onGet("/foo").timeout();
-    var timeoutErrorMessage = "That request sure did time out";
+    const timeoutErrorMessage = "That request sure did time out";
 
     return instance
       .get("/foo", {

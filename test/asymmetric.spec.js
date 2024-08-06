@@ -1,11 +1,10 @@
-var axios = require("axios");
-var expect = require("chai").expect;
-
-var MockAdapter = require("../src");
+const axios = require("axios");
+const expect = require("chai").expect;
+const MockAdapter = require("../src");
 
 describe("MockAdapter asymmetric matchers", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();

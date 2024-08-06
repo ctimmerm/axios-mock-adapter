@@ -1,13 +1,32 @@
 import { AxiosAdapter, AxiosInstance, AxiosRequestConfig } from 'axios';
 
+interface AxiosHeaders {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+type MockArrayResponse = [
+  status: number,
+  data?: any,
+  headers?: AxiosHeaders
+];
+
+type MockObjectResponse = {
+  status: number;
+  data: any;
+  headers?: AxiosHeaders,
+  config?: AxiosRequestConfig
+};
+
+type MockResponse = MockArrayResponse | MockObjectResponse;
+
 type CallbackResponseSpecFunc = (
   config: AxiosRequestConfig
-) => any[] | Promise<any[]>;
+) => MockResponse | Promise<MockResponse>;
 
 type ResponseSpecFunc = <T = any>(
   statusOrCallback: number | CallbackResponseSpecFunc,
   data?: T,
-  headers?: any
+  headers?: AxiosHeaders
 ) => MockAdapter;
 
 declare namespace MockAdapter {
@@ -64,6 +83,20 @@ type NoBodyRequestMatcherFunc = (
   config?: ConfigMatcher
 ) => MockAdapter.RequestHandler;
 
+type verb =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head'
+  | 'list'
+  | 'link'
+  | 'unlink';
+
+type HistoryArray = AxiosRequestConfig[] & Record<verb, AxiosRequestConfig[]>
+
 declare class MockAdapter {
   static default: typeof MockAdapter;
 
@@ -75,7 +108,7 @@ declare class MockAdapter {
   resetHistory(): void;
   restore(): void;
 
-  history: { [method: string]: AxiosRequestConfig[] };
+  history: HistoryArray;
 
   onAny: NoBodyRequestMatcherFunc;
   onGet: NoBodyRequestMatcherFunc;

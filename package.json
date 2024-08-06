@@ -43,7 +43,7 @@
   "devDependencies": {
     "axios": "^1.7.3",
     "chai": "^4.3.6",
-    "eslint": "^8.57.0",
+    "eslint": "^9.8.0",
     "mocha": "^10.7.0",
     "nyc": "^17.0.0",
     "typescript": "^5.5.4",

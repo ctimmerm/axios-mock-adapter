@@ -1,12 +1,12 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
-var CancelToken = axios.CancelToken;
+const MockAdapter = require("../src");
+const CancelToken = axios.CancelToken;
 
 describe("MockAdapter basics", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();
@@ -14,7 +14,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("handles canceled requests", function () {
-    var source = CancelToken.source();
+    const source = CancelToken.source();
 
     mock.onGet("/foo").reply(200);
 
@@ -34,7 +34,7 @@ describe("MockAdapter basics", function () {
   });
 
   it("works as normal is request is not canceled", function () {
-    var source = CancelToken.source();
+    const source = CancelToken.source();
 
     mock.onGet("/foo").reply(200);
 

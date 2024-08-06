@@ -1,34 +1,34 @@
-var expect = require("chai").expect;
-var find = require("../src/utils").find;
-var isEqual = require("../src/utils").isEqual;
-var isObjectOrArray = require("../src/utils").isObjectOrArray;
-var isBlob = require("../src/utils").isBlob;
-var isBodyOrParametersMatching = require("../src/utils").isBodyOrParametersMatching;
+const expect = require("chai").expect;
+const find = require("../src/utils").find;
+const isEqual = require("../src/utils").isEqual;
+const isObjectOrArray = require("../src/utils").isObjectOrArray;
+const isBlob = require("../src/utils").isBlob;
+const isBodyOrParametersMatching = require("../src/utils").isBodyOrParametersMatching;
 
 describe("utility functions", function () {
   context("find", function () {
     it("returns the value for which the predicate holds true", function () {
-      var array = [1, 2, 3];
-      var value = find(array, function (value) {
+      const array = [1, 2, 3];
+      const value = find(array, function (value) {
         return value === 2;
       });
       expect(value).to.equal(2);
     });
 
     it("returns the first value for which the predicate holds true", function () {
-      var array = [
+      const array = [
         { key: 1, value: "one" },
         { key: 1, value: "two" },
       ];
-      var value = find(array, function (value) {
+      const value = find(array, function (value) {
         return value.key === 1;
       });
       expect(value.value).to.equal("one");
     });
 
     it("returns undefined if the value is not found", function () {
-      var array = [1, 2, 3];
-      var value = find(array, function (value) {
+      const array = [1, 2, 3];
+      const value = find(array, function (value) {
         return value === 4;
       });
       expect(value).to.be.undefined;
@@ -37,8 +37,8 @@ describe("utility functions", function () {
 
   context("isEqual", function () {
     it("checks with strict equality", function () {
-      var a = { foo: "5" };
-      var b = { foo: 5 };
+      const a = { foo: "5" };
+      const b = { foo: 5 };
       expect(isEqual(a, b)).to.be.false;
     });
   });
@@ -84,18 +84,18 @@ describe("utility functions", function () {
   });
 
   context("isBodyOrParametersMatching", function() {
-    it('delete has params only', function () {
-      expect(isBodyOrParametersMatching(null, { 'a': 2 }, { 'params': { 'a': 2 } } )).to.be.true;
-      expect(isBodyOrParametersMatching(null, { 'a': 2 }, { 'params': { 'b': 2 } } )).to.be.false;
+    it("delete has params only", function () {
+      expect(isBodyOrParametersMatching(null, { "a": 2 }, { "params": { "a": 2 } } )).to.be.true;
+      expect(isBodyOrParametersMatching(null, { "a": 2 }, { "params": { "b": 2 } } )).to.be.false;
     });
-    it('delete has data only', function () {
-      expect(isBodyOrParametersMatching({ 'x': 1 }, null, { 'data': { 'x': 1 } })).to.be.true;
-      expect(isBodyOrParametersMatching({ 'x': 1 }, null, { 'data': { 'y': 1 } })).to.be.false;
+    it("delete has data only", function () {
+      expect(isBodyOrParametersMatching({ "x": 1 }, null, { "data": { "x": 1 } })).to.be.true;
+      expect(isBodyOrParametersMatching({ "x": 1 }, null, { "data": { "y": 1 } })).to.be.false;
     });
-    it('delete has body and params', function () {
-      expect(isBodyOrParametersMatching({ 'x': 1 }, { 'a': 2 }, { 'data': { 'x': 1 }, 'params': { 'a': 2 } })).to.be.true;
-      expect(isBodyOrParametersMatching({ 'x': 1 }, { 'a': 2 }, { 'data': { 'x': 1 }, 'params': { 'b': 2 } })).to.be.false;
-      expect(isBodyOrParametersMatching({ 'x': 1 }, { 'a': 2 }, { 'data': { 'y': 1 }, 'params': { 'a': 2 } })).to.be.false;
+    it("delete has body and params", function () {
+      expect(isBodyOrParametersMatching({ "x": 1 }, { "a": 2 }, { "data": { "x": 1 }, "params": { "a": 2 } })).to.be.true;
+      expect(isBodyOrParametersMatching({ "x": 1 }, { "a": 2 }, { "data": { "x": 1 }, "params": { "b": 2 } })).to.be.false;
+      expect(isBodyOrParametersMatching({ "x": 1 }, { "a": 2 }, { "data": { "y": 1 }, "params": { "a": 2 } })).to.be.false;
     });
   });
 });

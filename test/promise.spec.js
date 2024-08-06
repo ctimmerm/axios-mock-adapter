@@ -1,11 +1,11 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("MockAdapter reply with Promise", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();
@@ -51,6 +51,7 @@ describe("MockAdapter reply with Promise", function () {
   it("passes rejecting Promise verbatim", function () {
     mock.onGet("/reject").reply(function () {
       return new Promise(function (resolve, reject) {
+        // eslint-disable-next-line prefer-promise-reject-errors
         reject({ custom: "error" });
       });
     });

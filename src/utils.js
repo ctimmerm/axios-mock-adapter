@@ -1,15 +1,14 @@
 "use strict";
-
-var axios = require("axios");
-var isEqual = require("fast-deep-equal");
-var isBuffer = require("is-buffer");
-var isBlob = require("./is_blob");
-var toString = Object.prototype.toString;
+const axios = require("axios");
+const isEqual = require("fast-deep-equal");
+const isBuffer = require("is-buffer");
+const isBlob = require("./is_blob");
+const toString = Object.prototype.toString;
 
 function find(array, predicate) {
-  var length = array.length;
-  for (var i = 0; i < length; i++) {
-    var value = array[i];
+  const length = array.length;
+  for (let i = 0; i < length; i++) {
+    const value = array[i];
     if (predicate(value)) return value;
   }
 }
@@ -32,7 +31,7 @@ function isArrayBuffer(val) {
 
 function combineUrls(baseURL, url) {
   if (baseURL) {
-    return baseURL.replace(/\/+$/, "") + "/" + url.replace(/^\/+/, "");
+    return `${baseURL.replace(/\/+$/, "")}/${url.replace(/^\/+/, "")}`;
   }
 
   return url;
@@ -48,30 +47,30 @@ function findHandler(
   baseURL
 ) {
   return find(handlers[method.toLowerCase()], function (handler) {
-    var matchesUrl = false;
-    if (typeof handler[0] === "string") {
-      matchesUrl  = isUrlMatching(url, handler[0]) ||
-        isUrlMatching(combineUrls(baseURL, url), handler[0]);
-    } else if (handler[0] instanceof RegExp) {
-      matchesUrl = handler[0].test(url) ||
-        handler[0].test(combineUrls(baseURL, url));
+    let matchesUrl = false;
+    if (typeof handler.url === "string") {
+      matchesUrl  = isUrlMatching(url, handler.url) ||
+        isUrlMatching(combineUrls(baseURL, url), handler.url);
+    } else if (handler.url instanceof RegExp) {
+      matchesUrl = handler.url.test(url) ||
+        handler.url.test(combineUrls(baseURL, url));
     }
 
     return matchesUrl &&
-      isBodyOrParametersMatching(body, parameters, handler[1]) &&
-      isObjectMatching(headers, handler[2]);
+      isBodyOrParametersMatching(body, parameters, handler) &&
+      isObjectMatching(headers, handler.headers);
   });
 }
 
 function isUrlMatching(url, required) {
-  var noSlashUrl = url[0] === "/" ? url.substr(1) : url;
-  var noSlashRequired = required[0] === "/" ? required.substr(1) : required;
+  const noSlashUrl = url[0] === "/" ? url.substr(1) : url;
+  const noSlashRequired = required[0] === "/" ? required.substr(1) : required;
   return noSlashUrl === noSlashRequired;
 }
 
 function isBodyOrParametersMatching(body, parameters, required) {
-  return isObjectMatching(parameters, required && required.params) &&
-    isBodyMatching(body, required && required.data);
+  return isObjectMatching(parameters, required.params) &&
+    isBodyMatching(body, required.data);
 }
 
 function isObjectMatching(actual, expected) {
@@ -86,41 +85,72 @@ function isBodyMatching(body, requiredBody) {
   if (requiredBody === undefined) {
     return true;
   }
-  var parsedBody;
+  let parsedBody;
   try {
     parsedBody = JSON.parse(body);
-  } catch (e) {}
+  } catch (_e) {}
 
   return isObjectMatching(parsedBody ? parsedBody : body, requiredBody);
 }
 
 function purgeIfReplyOnce(mock, handler) {
-  Object.keys(mock.handlers).forEach(function (key) {
-    var index = mock.handlers[key].indexOf(handler);
-    if (index > -1) {
-      mock.handlers[key].splice(index, 1);
-    }
-  });
+  const index = mock.handlers.indexOf(handler);
+  if (index > -1) {
+    mock.handlers.splice(index, 1);
+  }
 }
 
-function settle(resolve, reject, response, delay) {
-  if (delay > 0) {
-    setTimeout(settle, delay, resolve, reject, response);
-    return;
+function transformRequest(data) {
+  if (
+    isArrayBuffer(data) ||
+    isBuffer(data) ||
+    isStream(data) ||
+    isBlob(data)
+  ) {
+    return data;
   }
 
+  // Object and Array: returns a deep copy
+  if (isObjectOrArray(data)) {
+    return JSON.parse(JSON.stringify(data));
+  }
+
+  // for primitives like string, undefined, null, number
+  return data;
+}
+
+async function makeResponse(result, config) {
+  if (typeof result === "function") result = await result(config);
+
+  const status = result.status || result[0];
+  const data = transformRequest(result.data || result[1]);
+  const headers = result.headers || result[2];
+  if (result.config) config = result.config;
+
+  return {
+    status,
+    data,
+    headers,
+    config,
+    request: { responseURL: config.url }
+  };
+}
+
+async function settle(config, response, delay) {
+  if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+
+  const result = await makeResponse(response, config);
+
   if (
-    !response.config.validateStatus ||
-    response.config.validateStatus(response.status)
+    !result.config.validateStatus ||
+    result.config.validateStatus(result.status)
   ) {
-    resolve(response);
+    return result;
   } else {
-    reject(
-      createAxiosError(
-        "Request failed with status code " + response.status,
-        response.config,
-        response
-      )
+    throw createAxiosError(
+      `Request failed with status code ${result.status}`,
+      result.config,
+      result
     );
   }
 }
@@ -132,7 +162,7 @@ function createAxiosError(message, config, response, code) {
   }
 
   // handling for axios v0.26.1 and below
-  var error = new Error(message);
+  const error = new Error(message);
   error.isAxiosError = true;
   error.config = config;
   if (response !== undefined) {
@@ -164,15 +194,15 @@ function createAxiosError(message, config, response, code) {
 }
 
 function createCouldNotFindMockError(config) {
-  var message =
-    "Could not find mock for: \n" +
+  const message =
+    `Could not find mock for: \n${
     JSON.stringify({
       method: config.method,
       url: config.url,
       params: config.params,
       headers: config.headers
-    }, null, 2);
-  var error = new Error(message);
+    }, null, 2)}`;
+  const error = new Error(message);
   error.isCouldNotFindMockError = true;
   error.url = config.url;
   error.method = config.method;
@@ -180,18 +210,15 @@ function createCouldNotFindMockError(config) {
 }
 
 module.exports = {
-  find: find,
-  findHandler: findHandler,
-  purgeIfReplyOnce: purgeIfReplyOnce,
-  settle: settle,
-  isStream: isStream,
-  isArrayBuffer: isArrayBuffer,
-  isFunction: isFunction,
-  isObjectOrArray: isObjectOrArray,
-  isBuffer: isBuffer,
-  isBlob: isBlob,
-  isBodyOrParametersMatching: isBodyOrParametersMatching,
-  isEqual: isEqual,
-  createAxiosError: createAxiosError,
-  createCouldNotFindMockError: createCouldNotFindMockError,
+  find,
+  findHandler,
+  purgeIfReplyOnce,
+  settle,
+  isObjectOrArray,
+  isBuffer,
+  isBlob,
+  isBodyOrParametersMatching,
+  isEqual,
+  createAxiosError,
+  createCouldNotFindMockError,
 };
