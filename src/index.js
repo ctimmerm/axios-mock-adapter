@@ -175,14 +175,14 @@ VERBS.concat("any").forEach(function (method) {
 
       networkError: function () {
         return reply(function (config) {
-          var error = utils.createAxiosError("Network Error", config);
+          var error = utils.createAxiosError("Network Error", config, undefined, "ERR_NETWORK");
           return Promise.reject(error);
         });
       },
 
       networkErrorOnce: function () {
         return replyOnce(function (config) {
-          var error = utils.createAxiosError("Network Error", config);
+          var error = utils.createAxiosError("Network Error", config, undefined, "ERR_NETWORK");
           return Promise.reject(error);
         });
       },
