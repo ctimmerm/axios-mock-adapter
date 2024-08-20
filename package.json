@@ -41,7 +41,7 @@
     "axios": ">= 0.17.0"
   },
   "devDependencies": {
-    "axios": "^1.7.3",
+    "axios": "^1.7.4",
     "chai": "^4.3.6",
     "eslint": "^9.8.0",
     "mocha": "^10.7.0",

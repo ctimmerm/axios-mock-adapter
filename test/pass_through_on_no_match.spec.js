@@ -1,5 +1,4 @@
 const axios = require("axios");
-const isLegacyAxios = require("axios/package.json").version[0] === "0";
 const expect = require("chai").expect;
 const createServer = require("http").createServer;
 
@@ -113,7 +112,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
 
   it("handles baseURL correctly", function () {
     instance = axios.create({
-      baseURL: "/test",
+      baseURL: "http://localhost/test",
       proxy: {
         host: "127.0.0.1",
         port: httpServer.address().port,
@@ -123,11 +122,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
 
     return instance.get("/foo").then(function (response) {
       expect(response.status).to.equal(200);
-      if (isLegacyAxios) {
-        expect(response.data).to.equal("http://null/test/foo");
-      } else {
-        expect(response.data).to.equal("http://localhost/test/foo");
-      }
+      expect(response.data).to.equal("http://localhost/test/foo");
     });
   });
 
