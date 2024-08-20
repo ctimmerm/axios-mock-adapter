@@ -15,17 +15,11 @@ const VERBS = [
   "unlink",
 ];
 
-function adapter() {
-  return (config) => {
-    return handleRequest(this, config);
-  };
-}
-
 function getVerbArray() {
   const arr = [];
   VERBS.forEach(function (verb) {
     Object.defineProperty(arr, verb, {
-      get: function () {
+      get () {
         return arr.filter(function (h) {
           return !h.method || h.method === verb;
         });
@@ -35,49 +29,52 @@ function getVerbArray() {
   return arr;
 }
 
-function MockAdapter(axiosInstance, options = {}) {
-  this.reset();
+class AxiosMockAdapter {
+  constructor (axiosInstance, options = {}) {
+    this.reset();
 
-  if (axiosInstance) {
-    this.axiosInstance = axiosInstance;
-    // Clone the axios instance to remove interceptors
-    // this is used for the passThrough mode with axios > 1.2
-    this.axiosInstanceWithoutInterceptors = axiosInstance.create
-      ? axiosInstance.create()
-      : undefined;
+    if (axiosInstance) {
+      this.axiosInstance = axiosInstance;
+      // Clone the axios instance to remove interceptors
+      // this is used for the passThrough mode with axios > 1.2
+      this.axiosInstanceWithoutInterceptors = axiosInstance.create
+        ? axiosInstance.create()
+        : undefined;
 
-    this.originalAdapter = axiosInstance.defaults.adapter;
-    this.delayResponse = options.delayResponse > 0 ? options.delayResponse : null;
-    this.onNoMatch = options.onNoMatch || null;
-    axiosInstance.defaults.adapter = this.adapter.call(this);
-  } else {
-    throw new Error("Please provide an instance of axios to mock");
+      this.originalAdapter = axiosInstance.defaults.adapter;
+      this.delayResponse = options.delayResponse > 0 ? options.delayResponse : null;
+      this.onNoMatch = options.onNoMatch || null;
+      axiosInstance.defaults.adapter = this.adapter();
+    } else {
+      throw new Error("Please provide an instance of axios to mock");
+    }
   }
-}
 
-MockAdapter.prototype.adapter = adapter;
+  adapter () {
+    return (config) => handleRequest(this, config);
+  }
 
-MockAdapter.prototype.restore = function restore() {
-  if (this.axiosInstance) {
+  restore () {
+    if (!this.axiosInstance) return;
     this.axiosInstance.defaults.adapter = this.originalAdapter;
     this.axiosInstance = undefined;
   }
-};
 
-MockAdapter.prototype.reset = function reset() {
-  this.resetHandlers();
-  this.resetHistory();
-};
+  reset () {
+    this.resetHandlers();
+    this.resetHistory();
+  }
 
-MockAdapter.prototype.resetHandlers = function resetHandlers() {
-  if (this.handlers) this.handlers.length = 0;
-  else this.handlers = getVerbArray();
-};
+  resetHandlers () {
+    if (this.handlers) this.handlers.length = 0;
+    else this.handlers = getVerbArray();
+  }
 
-MockAdapter.prototype.resetHistory = function resetHistory() {
-  if (this.history) this.history.length = 0;
-  else this.history = getVerbArray();
-};
+  resetHistory () {
+    if (this.history) this.history.length = 0;
+    else this.history = getVerbArray();
+  }
+}
 
 const methodsWithConfigsAsSecondArg = ["any", "get", "delete", "head", "options"];
 function convertDataAndConfigToConfig (method, data, config) {
@@ -111,14 +108,14 @@ function toMethodName (method) {
 }
 
 VERBS.concat("any").forEach(function (method) {
-  MockAdapter.prototype[toMethodName(method)] = function (matcher, data, config) {
+  AxiosMockAdapter.prototype[toMethodName(method)] = function (matcher, data, config) {
     const self = this;
     let delay;
     matcher = matcher === undefined ? /.*/ : matcher;
 
     const paramsAndBody = convertDataAndConfigToConfig(method, data, config);
 
-    function reply(code, response, headers) {
+    function reply (code, response, headers) {
       const handler = {
         url: matcher,
         method: method === "any" ? undefined : method,
@@ -137,14 +134,14 @@ VERBS.concat("any").forEach(function (method) {
       return self;
     }
 
-    function withDelayInMs(_delay) {
+    function withDelayInMs (_delay) {
       delay = _delay;
       const respond = requestApi.reply.bind(requestApi);
       Object.assign(respond, requestApi);
       return respond;
     }
 
-    function replyOnce(code, response, headers) {
+    function replyOnce (code, response, headers) {
       const handler = {
         url: matcher,
         method: method === "any" ? undefined : method,
@@ -164,13 +161,10 @@ VERBS.concat("any").forEach(function (method) {
     }
 
     const requestApi = {
-      reply: reply,
-
-      replyOnce: replyOnce,
-
-      withDelayInMs: withDelayInMs,
-
-      passThrough: function passThrough() {
+      reply,
+      replyOnce,
+      withDelayInMs,
+      passThrough () {
         const handler = {
           passThrough: true,
           method: method === "any" ? undefined : method,
@@ -182,8 +176,7 @@ VERBS.concat("any").forEach(function (method) {
         addHandler(method, self.handlers, handler);
         return self;
       },
-
-      abortRequest: function () {
+      abortRequest () {
         return reply(async function (config) {
           throw utils.createAxiosError(
             "Request aborted",
@@ -193,8 +186,7 @@ VERBS.concat("any").forEach(function (method) {
           );
         });
       },
-
-      abortRequestOnce: function () {
+      abortRequestOnce () {
         return replyOnce(async function (config) {
           throw utils.createAxiosError(
             "Request aborted",
@@ -205,19 +197,19 @@ VERBS.concat("any").forEach(function (method) {
         });
       },
 
-      networkError: function () {
+      networkError () {
         return reply(async function (config) {
           throw utils.createAxiosError("Network Error", config);
         });
       },
 
-      networkErrorOnce: function () {
+      networkErrorOnce () {
         return replyOnce(async function (config) {
           throw utils.createAxiosError("Network Error", config);
         });
       },
 
-      timeout: function () {
+      timeout () {
         return reply(async function (config) {
           throw utils.createAxiosError(
             config.timeoutErrorMessage ||
@@ -231,7 +223,7 @@ VERBS.concat("any").forEach(function (method) {
         });
       },
 
-      timeoutOnce: function () {
+      timeoutOnce () {
         return replyOnce(async function (config) {
           throw utils.createAxiosError(
             config.timeoutErrorMessage ||
@@ -250,7 +242,7 @@ VERBS.concat("any").forEach(function (method) {
   };
 });
 
-function findInHandlers(method, handlers, handler) {
+function findInHandlers (handlers, handler) {
   let index = -1;
   for (let i = 0; i < handlers.length; i += 1) {
     const item = handlers[i];
@@ -273,11 +265,11 @@ function findInHandlers(method, handlers, handler) {
   return index;
 }
 
-function addHandler(method, handlers, handler) {
+function addHandler (method, handlers, handler) {
   if (method === "any") {
     handlers.push(handler);
   } else {
-    const indexOfExistingHandler = findInHandlers(method, handlers, handler);
+    const indexOfExistingHandler = findInHandlers(handlers, handler);
     // handler.replyOnce indicates that a handler only runs once.
     // It's supported to register muliple ones like that without
     // overwriting the previous one.
@@ -289,5 +281,5 @@ function addHandler(method, handlers, handler) {
   }
 }
 
-module.exports = MockAdapter;
-module.exports.default = MockAdapter;
+module.exports = AxiosMockAdapter;
+module.exports.default = AxiosMockAdapter;
