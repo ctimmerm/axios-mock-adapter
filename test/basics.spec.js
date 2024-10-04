@@ -135,6 +135,17 @@ describe("MockAdapter basics", function () {
     });
   });
 
+  it("supports capture groups in urls with a regex", function () {
+    mock.onGet(/\/api\/foo\/(?<fooId>[^/]+)\/bar\/(?<barId>[^?/]+)$/).reply(function (config) {
+      return [200, config.urlParams];
+    });
+
+    return instance.get("/api/foo/1/bar/2").then(function (response) {
+      expect(response.data.fooId).to.equal('1');
+      expect(response.data.barId).to.equal('2');
+    });
+  });
+
   it("can pass query params for get to match to a handler", function () {
     mock
       .onGet("/withParams", { params: { foo: "bar", bar: "foo" } })
