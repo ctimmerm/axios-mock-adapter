@@ -34,6 +34,10 @@ async function handleRequest(mockAdapter, config) {
     url = url.slice(config.baseURL.length);
   }
 
+  if (url.indexOf("?") !== -1) {
+    url = url.substring(0, url.indexOf("?"))
+  }
+
   delete config.adapter;
   mockAdapter.history.push(config);
 
