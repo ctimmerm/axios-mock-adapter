@@ -29,6 +29,8 @@ type ResponseSpecFunc = <T = any>(
   headers?: AxiosHeaders
 ) => MockAdapter;
 
+type NetErr = 'ENOTFOUND' | 'ECONNREFUSED' | 'ECONNRESET' | 'ECONNABORTED' | 'ETIMEDOUT' | (string & Record<never, never>)
+
 declare namespace MockAdapter {
   export interface RequestHandler {
     withDelayInMs(delay: number): RequestHandler;
@@ -37,8 +39,8 @@ declare namespace MockAdapter {
     passThrough(): MockAdapter;
     abortRequest(): MockAdapter;
     abortRequestOnce(): MockAdapter;
-    networkError(): MockAdapter;
-    networkErrorOnce(): MockAdapter;
+    networkError(code?: NetErr): MockAdapter;
+    networkErrorOnce(code?: NetErr): MockAdapter;
     timeout(): MockAdapter;
     timeoutOnce(): MockAdapter;
   }

@@ -155,14 +155,14 @@ async function settle(config, response, delay) {
   }
 }
 
-function createAxiosError(message, config, response, code) {
+function createAxiosError(message, config, response, code, cause) {
   // axios v0.27.0+ defines AxiosError as constructor
   if (typeof axios.AxiosError === "function") {
-    return axios.AxiosError.from(new Error(message), code, config, null, response);
+    return axios.AxiosError.from(Object.assign(new Error(message), cause), code, config, null, response);
   }
 
   // handling for axios v0.26.1 and below
-  const error = new Error(message);
+  const error = Object.assign(new Error(message), cause);
   error.isAxiosError = true;
   error.config = config;
   if (response !== undefined) {

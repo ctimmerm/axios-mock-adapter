@@ -15,6 +15,66 @@ const VERBS = [
   "unlink",
 ];
 
+function throwNetErrorFactory(code) {
+  if (typeof code === "string") {
+    return function (config) {
+      let url = { hostname: "UNKNOWN", host: "UNKNOWN" };
+      try {
+        url = new URL(config.url, config.baseURL);
+      } catch (_error) {}
+      let error = undefined;
+      switch (code) {
+        case "ENOTFOUND": {
+          error = utils.createAxiosError(`getaddrinfo ENOTFOUND ${url.hostname}`, config, undefined, "ENOTFOUND", {
+            errno: -3008,
+            code: "ENOTFOUND",
+              syscall: "getaddrinfo",
+              hostname: url.hostname,
+            }
+          );
+        } break;
+
+        case "ECONNREFUSED": {
+          error = utils.createAxiosError(`connect ECONNREFUSED ${url.host}`, config, undefined, "ECONNREFUSED", {
+              code: "ECONNREFUSED",
+              syscall: "connect",
+              port: url.port ? parseInt(url.port, 10) : undefined,
+              address: url.hostname,
+              errno: -111
+            }
+          );
+        } break;
+
+        case "ECONNRESET": {
+          error = utils.createAxiosError("socket hang up", config, undefined, "ECONNRESET", { code: "ECONNRESET" });
+        } break;
+
+        case "ECONNABORTED":
+        case "ETIMEDOUT": {
+          error = Object.assign(utils.createAxiosError(
+              config.timeoutErrorMessage ||
+                `timeout of ${config.timeout}ms exceeded`,
+              config,
+              undefined,
+              config.transitional && config.transitional.clarifyTimeoutError
+                ? "ETIMEDOUT"
+                : "ECONNABORTED"
+            ), { name: "AxiosError" });
+        } break;
+
+        default: {
+          error = utils.createAxiosError(`Error ${code}`, config, undefined, code);
+        } break;
+      }
+      return Promise.reject(error);
+    };
+  } else {
+    return function (config) {
+      return Promise.reject(utils.createAxiosError("Network Error", config));
+    };
+  }
+}
+
 function getVerbArray() {
   const arr = [];
   VERBS.forEach(function (verb) {
@@ -177,64 +237,37 @@ VERBS.concat("any").forEach(function (method) {
         return self;
       },
       abortRequest () {
+        const throwNetError = throwNetErrorFactory("ECONNABORTED");
         return reply(async function (config) {
-          throw utils.createAxiosError(
-            "Request aborted",
-            config,
-            undefined,
-            "ECONNABORTED"
-          );
+          return throwNetError(Object.assign({ timeoutErrorMessage: "Request aborted" }, config));
         });
       },
       abortRequestOnce () {
+        const throwNetError = throwNetErrorFactory("ECONNABORTED");
+
         return replyOnce(async function (config) {
-          throw utils.createAxiosError(
-            "Request aborted",
-            config,
-            undefined,
-            "ECONNABORTED"
-          );
+          return throwNetError(Object.assign({ timeoutErrorMessage: "Request aborted" }, config));
         });
       },
 
-      networkError () {
-        return reply(async function (config) {
-          throw utils.createAxiosError("Network Error", config);
-        });
+      networkError (code) {
+        const throwNetError = throwNetErrorFactory(code);
+        return reply(throwNetError);
       },
 
-      networkErrorOnce () {
-        return replyOnce(async function (config) {
-          throw utils.createAxiosError("Network Error", config);
-        });
+      networkErrorOnce (code) {
+        const throwNetError = throwNetErrorFactory(code);
+        return replyOnce(throwNetError);
       },
 
       timeout () {
-        return reply(async function (config) {
-          throw utils.createAxiosError(
-            config.timeoutErrorMessage ||
-              `timeout of ${config.timeout  }ms exceeded`,
-            config,
-            undefined,
-            config.transitional && config.transitional.clarifyTimeoutError
-              ? "ETIMEDOUT"
-              : "ECONNABORTED"
-          );
-        });
+        const throwNetError = throwNetErrorFactory("ETIMEDOUT");
+        return reply(throwNetError);
       },
 
       timeoutOnce () {
-        return replyOnce(async function (config) {
-          throw utils.createAxiosError(
-            config.timeoutErrorMessage ||
-              `timeout of ${config.timeout  }ms exceeded`,
-            config,
-            undefined,
-            config.transitional && config.transitional.clarifyTimeoutError
-              ? "ETIMEDOUT"
-              : "ECONNABORTED"
-          );
-        });
+        const throwNetError = throwNetErrorFactory("ETIMEDOUT");
+        return replyOnce(throwNetError);
       },
     };
 
