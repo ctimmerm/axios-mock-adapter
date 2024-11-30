@@ -132,7 +132,7 @@ async function makeResponse(result, config) {
     data,
     headers,
     config,
-    request: { responseURL: config.url }
+    request: { responseURL: result.request?.responseURL || config.url },
   };
 }
 
