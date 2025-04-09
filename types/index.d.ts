@@ -21,7 +21,7 @@ type MockResponse = MockArrayResponse | MockObjectResponse;
 
 type CallbackResponseSpecFunc = (
   config: AxiosRequestConfig
-) => MockResponse | Promise<MockResponse>;
+) => MockResponse | Promise<MockResponse> | any[] | Promise<any[]>;
 
 type ResponseSpecFunc = <T = any>(
   statusOrCallback: number | CallbackResponseSpecFunc,
