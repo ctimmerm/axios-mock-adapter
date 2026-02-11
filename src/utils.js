@@ -69,7 +69,9 @@ function isUrlMatching(url, required) {
 }
 
 function isBodyOrParametersMatching(body, parameters, required) {
-  return isObjectMatching(parameters, required.params) &&
+  const params = required ? required.params : undefined;
+  if (params && typeof required.paramsSerializer === "function") params = required.paramsSerializer(params);
+  return isObjectMatching(parameters, params) &&
     isBodyMatching(body, required.data);
 }
 

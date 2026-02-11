@@ -42,7 +42,7 @@ async function handleRequest(mockAdapter, config) {
     config.method,
     url,
     config.data,
-    config.params,
+    typeof config.paramsSerializer === "function" ? config.paramsSerializer(config.params) : config.params,
     (config.headers && config.headers.constructor.name === "AxiosHeaders")
       ? Object.assign({}, config.headers.toJSON())
       : config.headers,

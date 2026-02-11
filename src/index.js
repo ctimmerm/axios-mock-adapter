@@ -85,7 +85,7 @@ function convertDataAndConfigToConfig (method, data, config) {
   }
 }
 
-const allowedConfigProperties = ["headers", "params", "data"];
+const allowedConfigProperties = ["headers", "params", "data", "paramsSerializer"];
 function validateconfig (method, config) {
   for (const key in config) {
     if (!allowedConfigProperties.includes(key)) {
