@@ -43,7 +43,7 @@ async function handleRequest(mockAdapter, config) {
     url,
     config.data,
     config.params,
-    (config.headers && config.headers.constructor.name === "AxiosHeaders")
+    (config.headers && config.headers.constructor && config.headers.constructor.name === "AxiosHeaders")
       ? Object.assign({}, config.headers.toJSON())
       : config.headers,
     config.baseURL

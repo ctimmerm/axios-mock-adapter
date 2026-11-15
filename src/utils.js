@@ -1,9 +1,27 @@
 "use strict";
 const axios = require("axios");
-const isEqual = require("fast-deep-equal");
+const deepEqual = require("fast-deep-equal");
 const isBuffer = require("is-buffer");
 const isBlob = require("./is_blob");
 const toString = Object.prototype.toString;
+
+function normalizeObjects(value) {
+  if (Array.isArray(value)) return value.map(normalizeObjects);
+  if (value !== null && typeof value === "object") {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype === null || prototype === Object.prototype) {
+      return Object.fromEntries(Object.entries(value).map(function ([key, item]) {
+        return [key, normalizeObjects(item)];
+      }));
+    }
+  }
+  return value;
+}
+
+function isEqual(actual, expected) {
+  // Axios can provide records without Object.prototype, including nested params.
+  return actual === expected || deepEqual(normalizeObjects(actual), normalizeObjects(expected));
+}
 
 function find(array, predicate) {
   const length = array.length;
