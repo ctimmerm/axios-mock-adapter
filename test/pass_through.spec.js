@@ -13,7 +13,13 @@ describe("passThrough tests (requires Node)", function () {
   before("set up Node server", function () {
     return new Promise(function (resolve, reject) {
       httpServer = createServer(function (req, resp) {
-        if (req.url === "/error") {
+        if (req.url === "/disconnect") {
+          req.socket.destroy();
+        } else if (req.url.startsWith("/json")) {
+          resp.statusCode = req.url === "/json-error" ? 401 : 200;
+          resp.setHeader("Content-Type", "application/json");
+          resp.end(JSON.stringify({ path: req.url }));
+        } else if (req.url === "/error") {
           resp.statusCode = 500;
           resp.end();
         } else {
@@ -181,5 +187,71 @@ describe("passThrough tests (requires Node)", function () {
         expect(requestCount).to.equal(1);
         expect(responseCount).to.equal(1);
       });
+  });
+
+  ["handler", "onNoMatch"].forEach(function (mode) {
+    describe(`reusable passthrough config (${mode})`, function () {
+      beforeEach(function () {
+        if (mode === "handler") mock.onAny().passThrough();
+        else mock.onNoMatch = "passthrough";
+      });
+
+      it("preserves JSON parsing when retrying error.config with axios", async function () {
+        const error = await instance.get("/json-error").catch(error => error);
+        expect(error.response.status).to.equal(401);
+        expect(error.response.data).to.deep.equal({ path: "/json-error" });
+
+        const response = await axios(Object.assign({}, error.config, {
+          url: `${serverUrl}/json`,
+        }));
+        expect(response.data).to.deep.equal({ path: "/json" });
+        expect(error.config).to.equal(mock.history[0]);
+        expect(error.response.config).to.equal(error.config);
+      });
+
+      it("uses the instance adapter when retrying error.config", async function () {
+        const error = await instance.get("/json-error").catch(error => error);
+        expect(error.response.status).to.equal(401);
+        mock.resetHandlers();
+        mock.onGet("/retry").reply(200, { mocked: true });
+
+        const response = await instance(Object.assign({}, error.config, {
+          url: "/retry",
+        }));
+        expect(response.data).to.deep.equal({ mocked: true });
+      });
+
+      it("exposes the original transforms without running them twice", async function () {
+        let requestCount = 0;
+        let responseCount = 0;
+        const transformRequest = function (data) {
+          requestCount++;
+          return data;
+        };
+        const transformResponse = function (data) {
+          responseCount++;
+          return JSON.parse(data);
+        };
+
+        const response = await instance.get("/json", {
+          transformRequest: [transformRequest],
+          transformResponse: [transformResponse],
+        });
+        expect(response.data).to.deep.equal({ path: "/json" });
+        expect(requestCount).to.equal(1);
+        expect(responseCount).to.equal(1);
+        expect(response.config).to.equal(mock.history[0]);
+        expect(response.config.transformRequest[0]).to.equal(transformRequest);
+        expect(response.config.transformResponse[0]).to.equal(transformResponse);
+      });
+
+      it("restores config for network errors without a response", async function () {
+        const error = await instance.get("/disconnect").catch(error => error);
+        expect(error.code).to.equal("ECONNRESET");
+        expect(error.response).to.be.undefined;
+        expect(error.config).to.equal(mock.history[0]);
+        expect(error.config.transformResponse[0]).to.equal(instance.defaults.transformResponse[0]);
+      });
+    });
   });
 });

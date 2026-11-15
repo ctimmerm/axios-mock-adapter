@@ -21,7 +21,15 @@ function passThroughRequest (mockAdapter, config) {
     // The request transformation runs on the original axios handler already
     transformRequest: [],
     transformResponse: []
-  }));
+  })).then(function (response) {
+    // Keep the caller's transforms and adapter choice available for retries.
+    response.config = config;
+    return response;
+  }, function (error) {
+    if (error && error.config) error.config = config;
+    if (error && error.response) error.response.config = config;
+    throw error;
+  });
 }
 
 async function handleRequest(mockAdapter, config) {
