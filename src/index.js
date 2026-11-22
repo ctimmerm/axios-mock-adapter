@@ -142,6 +142,14 @@ VERBS.concat("any").forEach(function (method) {
     }
 
     function replyOnce (code, response, headers) {
+      return addOnceHandler(code, response, headers, false);
+    }
+
+    function replyOnceFirst (code, response, headers) {
+      return addOnceHandler(code, response, headers, true);
+    }
+
+    function addOnceHandler (code, response, headers, priority) {
       const handler = {
         url: matcher,
         method: method === "any" ? undefined : method,
@@ -149,6 +157,7 @@ VERBS.concat("any").forEach(function (method) {
         data: paramsAndBody.data,
         headers: paramsAndBody.headers,
         replyOnce: true,
+        replyOnceFirst: priority,
         delay: delay,
         response: typeof code === "function" ? code : [
           code,
@@ -163,6 +172,7 @@ VERBS.concat("any").forEach(function (method) {
     const requestApi = {
       reply,
       replyOnce,
+      replyOnceFirst,
       withDelayInMs,
       passThrough () {
         const handler = {
@@ -266,7 +276,10 @@ function findInHandlers (handlers, handler) {
 }
 
 function addHandler (method, handlers, handler) {
-  if (method === "any") {
+  if (handler.replyOnceFirst) {
+    const firstRegular = handlers.findIndex(item => !item.replyOnceFirst);
+    handlers.splice(firstRegular === -1 ? handlers.length : firstRegular, 0, handler);
+  } else if (method === "any") {
     handlers.push(handler);
   } else {
     const indexOfExistingHandler = findInHandlers(handlers, handler);
