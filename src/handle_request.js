@@ -35,7 +35,13 @@ async function handleRequest(mockAdapter, config) {
   }
 
   delete config.adapter;
-  mockAdapter.history.push(config);
+  const historyConfig = Object.assign({}, config);
+  if (config.headers) {
+    historyConfig.headers = config.headers.constructor.name === "AxiosHeaders"
+      ? new config.headers.constructor(config.headers)
+      : Object.assign({}, config.headers);
+  }
+  mockAdapter.history.push(historyConfig);
 
   const handler = utils.findHandler(
     mockAdapter.handlers,
