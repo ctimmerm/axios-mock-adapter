@@ -1,5 +1,26 @@
 import axios from 'axios';
 import MockAdapter = require('axios-mock-adapter');
+import type {
+  AxiosHeaders,
+  MockArrayResponse,
+  MockObjectResponse,
+  MockResponse,
+  CallbackResponseSpecFunc,
+  ResponseSpecFunc,
+  MockAdapterOptions,
+  AsymmetricMatcher,
+  ParamsMatcher,
+  HeadersMatcher,
+  UrlMatcher,
+  AsymmetricParamsMatcher,
+  AsymmetricHeadersMatcher,
+  AsymmetricRequestDataMatcher,
+  ConfigMatcher,
+  RequestMatcherFunc,
+  NoBodyRequestMatcherFunc,
+  HistoryArray,
+  verb
+} from 'axios-mock-adapter';
 
 const instance = axios.create();
 let mock = new MockAdapter(instance);
@@ -167,4 +188,42 @@ namespace SupportsChaining {
 namespace ExportsRequestHandlerInterface {
   const handler: MockAdapter.RequestHandler = mock.onAny();
   handler.reply(200);
+}
+
+namespace ExportsSupportingTypes {
+  const options: MockAdapterOptions = { delayResponse: 10 };
+  const adapter = new MockAdapter(instance, options);
+  const headers: AxiosHeaders = { 'Content-Type': 'application/json' };
+  const arrayResponse: MockArrayResponse = [200, {}, headers];
+  const objectResponse: MockObjectResponse = { status: 200, data: {}, headers };
+  const response: MockResponse = objectResponse;
+  const callback: CallbackResponseSpecFunc = () => Promise.resolve(response);
+  const reply: ResponseSpecFunc = adapter.onGet().reply;
+  reply(callback);
+  adapter.onGet('/array').reply(() => arrayResponse);
+
+  const url: UrlMatcher = /users/;
+  const asymmetric: AsymmetricMatcher = { asymmetricMatch: () => true };
+  const params: ParamsMatcher = { page: 1 };
+  const matchedParams: AsymmetricParamsMatcher = params;
+  const matchedHeaders: HeadersMatcher = { Accept: 'application/json' };
+  const requestHeaders: AsymmetricHeadersMatcher = matchedHeaders;
+  const data: AsymmetricRequestDataMatcher = asymmetric;
+  const config: ConfigMatcher = { params: matchedParams, headers: requestHeaders };
+  const withBody: RequestMatcherFunc = adapter.onPost;
+  const withoutBody: NoBodyRequestMatcherFunc = adapter.onGet;
+  withBody(url, data, config);
+  withoutBody(url, config);
+
+  const history: HistoryArray = adapter.history;
+  const method: verb = 'post';
+  history[method].length;
+  const namespacedOptions: MockAdapter.MockAdapterOptions = options;
+  const namespacedConfig: MockAdapter.ConfigMatcher = config;
+  new MockAdapter(instance, namespacedOptions).onGet(url, namespacedConfig);
+
+  // @ts-expect-error Only documented onNoMatch values are accepted.
+  const invalidOptions: MockAdapterOptions = { onNoMatch: 'ignore' };
+  // @ts-expect-error A URL matcher must be a string or RegExp.
+  const invalidUrl: UrlMatcher = 123;
 }
