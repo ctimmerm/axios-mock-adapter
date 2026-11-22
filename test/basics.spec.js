@@ -271,6 +271,28 @@ describe("MockAdapter basics", function () {
       });
   });
 
+  ['{"value":1}', "[1,2]", '"text"', "42", "true", "0", "false", "null"].forEach(function (body) {
+    it(`matches the exact JSON string body ${body}`, function () {
+      mock.onPost("/raw-json", body).reply(204);
+      return instance.post("/raw-json", body, {
+        transformRequest: [data => data],
+      }).then(function (response) {
+        expect(response.status).to.equal(204);
+      });
+    });
+  });
+
+  it("does not normalize JSON whitespace for a string body matcher", function () {
+    mock.onPost("/raw-json", '{"value":1}').reply(204);
+    return instance.post("/raw-json", '{ "value": 1 }', {
+      transformRequest: [data => data],
+    }).then(function () {
+      throw new Error("Unexpected match");
+    }, function (error) {
+      expect(error.response.status).to.equal(404);
+    });
+  });
+
   it("does not match when string body is wrong", function () {
     mock.onPatch("/wrongStrBody", "foo").reply(200);
 
