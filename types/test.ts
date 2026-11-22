@@ -5,6 +5,13 @@ const instance = axios.create();
 let mock = new MockAdapter(instance);
 mock = new MockAdapter.default(instance)
 
+namespace SupportsReplyOnceFirst {
+  mock.onGet('/priority').replyOnceFirst(200, { ok: true });
+  mock.onAny().replyOnceFirst(config => [200, config.url]);
+  mock.onPost('/priority').withDelayInMs(1)
+    .replyOnceFirst(async config => [201, config.data]);
+}
+
 namespace AllowsConstructing {
   new MockAdapter(instance);
 }

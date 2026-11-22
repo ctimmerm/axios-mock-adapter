@@ -177,6 +177,23 @@ mock
 // no matching handlers left
 ```
 
+Use `.replyOnceFirst()` to add a one-time response ahead of existing regular
+handlers, such as a default response installed in shared test setup:
+
+```js
+mock.onGet("/users").reply(200, users);
+mock.onGet("/users").replyOnceFirst(503);
+// The next matching GET /users fails with 503; later requests use the default.
+```
+
+Priority handlers run in their registration order, before `.reply()`,
+`.replyOnce()`, and `.passThrough()` handlers. They are removed only when a
+request matches, and support the same response callbacks, chaining, and
+`.withDelayInMs()` options as `.replyOnce()`. An `.onAny().replyOnceFirst(...)`
+handler can override the next request of any method. Regular `.replyOnce()`
+handlers keep their existing registration order, including when an earlier
+default handler matches first.
+
 Mocking any request to a given url
 
 ```js

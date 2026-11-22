@@ -34,6 +34,7 @@ declare namespace MockAdapter {
     withDelayInMs(delay: number): RequestHandler;
     reply: ResponseSpecFunc;
     replyOnce: ResponseSpecFunc;
+    replyOnceFirst: ResponseSpecFunc;
     passThrough(): MockAdapter;
     abortRequest(): MockAdapter;
     abortRequestOnce(): MockAdapter;
