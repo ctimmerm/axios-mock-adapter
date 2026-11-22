@@ -235,6 +235,10 @@ mock
   .reply(204);
 ```
 
+Asymmetric matchers are compared by object identity when registering handlers.
+Separate matcher objects can coexist for the same URL; reuse the same matcher
+object to replace its existing handler with another `.reply()`.
+
 Using a custom asymmetric matcher (any object that has a `asymmetricMatch` property)
 
 ```js

@@ -242,6 +242,16 @@ VERBS.concat("any").forEach(function (method) {
   };
 });
 
+function isSameMatcher (left, right) {
+  if (
+    (left && typeof left.asymmetricMatch === "function") ||
+    (right && typeof right.asymmetricMatch === "function")
+  ) {
+    return left === right;
+  }
+  return utils.isEqual(left, right);
+}
+
 function findInHandlers (handlers, handler) {
   let index = -1;
   for (let i = 0; i < handlers.length; i += 1) {
@@ -254,9 +264,9 @@ function findInHandlers (handlers, handler) {
     const isSame =
       (!item.method || item.method === handler.method) &&
       comparePaths &&
-      utils.isEqual(item.params, handler.params) &&
-      utils.isEqual(item.data, handler.data) &&
-      utils.isEqual(item.headers, handler.headers);
+      isSameMatcher(item.params, handler.params) &&
+      isSameMatcher(item.data, handler.data) &&
+      isSameMatcher(item.headers, handler.headers);
 
     if (isSame && !item.replyOnce) {
       index = i;
