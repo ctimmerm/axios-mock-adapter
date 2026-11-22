@@ -85,6 +85,9 @@ function isBodyMatching(body, requiredBody) {
   if (requiredBody === undefined) {
     return true;
   }
+  if (typeof requiredBody === "string") {
+    return body === requiredBody;
+  }
   let parsedBody;
   try {
     parsedBody = JSON.parse(body);
