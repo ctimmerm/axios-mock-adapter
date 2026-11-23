@@ -136,23 +136,57 @@ async function makeResponse(result, config) {
   };
 }
 
-async function settle(config, response, delay) {
-  if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+function settle(config, response, delay) {
+  return new Promise((resolve, reject) => {
+    const signal = config.signal;
+    let timer;
+    let finished = false;
 
-  const result = await makeResponse(response, config);
+    function finish(callback, value) {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      if (signal) signal.removeEventListener("abort", onAbort);
+      callback(value);
+    }
 
-  if (
-    !result.config.validateStatus ||
-    result.config.validateStatus(result.status)
-  ) {
-    return result;
-  } else {
-    throw createAxiosError(
-      `Request failed with status code ${result.status}`,
-      result.config,
-      result
-    );
-  }
+    function onAbort() {
+      const error = typeof axios.CanceledError === "function"
+        ? new axios.CanceledError(null, config)
+        : new axios.Cancel("canceled");
+      finish(reject, error);
+    }
+
+    if (signal) {
+      if (signal.aborted) {
+        onAbort();
+        return;
+      }
+      signal.addEventListener("abort", onAbort);
+    }
+
+    async function respond() {
+      if (finished) return;
+      try {
+        const result = await makeResponse(response, config);
+        if (finished) return;
+        if (!result.config.validateStatus || result.config.validateStatus(result.status)) {
+          finish(resolve, result);
+        } else {
+          finish(reject, createAxiosError(
+            `Request failed with status code ${result.status}`,
+            result.config,
+            result
+          ));
+        }
+      } catch (error) {
+        finish(reject, error);
+      }
+    }
+
+    if (delay > 0) timer = setTimeout(respond, delay);
+    else respond();
+  });
 }
 
 function createAxiosError(message, config, response, code) {
