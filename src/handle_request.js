@@ -26,10 +26,13 @@ function passThroughRequest (mockAdapter, config) {
 
 async function handleRequest(mockAdapter, config) {
   let url = config.url || "";
-  // TODO we're not hitting this `if` in any of the tests, investigate
+  // Older Axios versions may already include baseURL in the URL. Only strip
+  // complete prefixes, not similarly named paths or hosts (e.g. /app, /appliance).
   if (
     config.baseURL &&
-    url.substr(0, config.baseURL.length) === config.baseURL
+    url.substr(0, config.baseURL.length) === config.baseURL &&
+    (config.baseURL.endsWith("/") ||
+      /^(?:[/?#]|$)/.test(url.slice(config.baseURL.length)))
   ) {
     url = url.slice(config.baseURL.length);
   }
