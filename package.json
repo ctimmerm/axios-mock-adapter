@@ -3,15 +3,32 @@
   "version": "2.1.0",
   "description": "Axios adapter that allows to easily mock requests",
   "main": "src/index.js",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./types/index.d.mts",
+        "require": "./types/index.d.ts",
+        "default": "./types/index.d.ts"
+      },
+      "default": "./src/index.js"
+    },
+    "./src": "./src/index.js",
+    "./src/*.js": "./src/*.js",
+    "./src/*": "./src/*.js",
+    "./dist/axios-mock-adapter": "./dist/axios-mock-adapter.js",
+    "./dist/axios-mock-adapter.min": "./dist/axios-mock-adapter.min.js",
+    "./*": "./*"
+  },
   "scripts": {
     "clean": "node -e 'require(`fs`).rmSync(`./dist`, {recursive: true, force: true})'",
     "test": "mocha && npm run clean && npm run build:umd:min && npm run test:types",
     "test:coverage": "nyc --reporter=html --reporter=text-summary mocha",
-    "test:types": "tsc --project types",
-    "lint": "eslint src test",
+    "test:types": "node scripts/generate-types.js --check && tsc --project types && node scripts/test-module-types.js",
+    "lint": "eslint src test scripts",
+    "build:types": "node scripts/generate-types.js",
     "build:umd": "webpack --mode development ./src/index.js --output-path ./dist",
     "build:umd:min": "webpack --mode production ./src/index.js --output-path ./dist",
-    "prepublish": "npm run clean && npm run build:umd && npm run build:umd:min"
+    "prepublish": "npm run build:types && npm run clean && npm run build:umd && npm run build:umd:min"
   },
   "files": [
     "src",
